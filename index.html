@@ -1,0 +1,1023 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Yoga">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="theme-color" content="#5a4a9a">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" href="icon-192.png">
+<title>Yoga-Ablauf</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=DM+Mono:wght@400;500&family=Source+Sans+3:wght@400;600&display=swap">
+<style>
+/* Layout: the pictogram tile takes everything the screen can spare and is the only control (tap left = back, tap middle/right = next, double tap = start/pause). Below it one slim strip with name, next exercise and countdown. The sequence list is a drawer that is closed by default. */
+:root {
+  --bg: #eceef3;
+  --surface: #fbfbfd;
+  --surface2: #e2e5ee;
+  --fg: #1c2032;
+  --muted: #5d6480;
+  --line: #cfd3e0;
+  --accent: #5a4a9a;
+  --accent-fg: #ffffff;
+  --warn: #b4570c;
+  --ok: #2f7d5b;
+  --tile: #fafaf6;
+  --tile-ink: #6b6f80;
+  --scrim: rgba(18, 20, 32, 0.55);
+  --font-display: "Bricolage Grotesque", "Avenir Next", "Helvetica Neue", sans-serif;
+  --font-body: "Source Sans 3", "Helvetica Neue", Arial, sans-serif;
+  --font-mono: "DM Mono", ui-monospace, "SF Mono", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #121420; --surface: #1b1e2e; --surface2: #262a3e; --fg: #ecedf6; --muted: #9aa1bf;
+    --line: #2f3450; --accent: #b3a4ee; --accent-fg: #161230; --warn: #f0a35a; --ok: #6cc9a0;
+    --tile: #fafaf6; --tile-ink: #6b6f80; --scrim: rgba(0, 0, 0, 0.65);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #121420; --surface: #1b1e2e; --surface2: #262a3e; --fg: #ecedf6; --muted: #9aa1bf;
+  --line: #2f3450; --accent: #b3a4ee; --accent-fg: #161230; --warn: #f0a35a; --ok: #6cc9a0;
+  --tile: #fafaf6; --tile-ink: #6b6f80; --scrim: rgba(0, 0, 0, 0.65);
+  color-scheme: dark;
+}
+html, body { height: 100%; box-sizing: border-box; }
+body {
+  background: var(--bg); color: var(--fg);
+  font-family: var(--font-body); font-size: 17px; line-height: 1.35;
+  padding-inline: 12px; padding-block: 8px;
+  -webkit-text-size-adjust: 100%; -webkit-tap-highlight-color: transparent;
+}
+*, *::before, *::after { box-sizing: border-box; }
+button, input, textarea { font: inherit; color: inherit; }
+button:focus-visible, input:focus-visible, label:focus-within { outline: 3px solid var(--accent); outline-offset: 2px; }
+[hidden] { display: none !important; }
+
+.app { height: 100%; display: grid; grid-template-rows: auto minmax(0, 1fr); gap: 8px; max-width: 1600px; margin-inline: auto; }
+
+/* header */
+.top { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 16px; }
+.brand { font-family: var(--font-display); font-weight: 700; font-size: 1.1rem; letter-spacing: -0.01em; margin-right: auto; }
+.clock { display: flex; flex-wrap: wrap; gap: 2px 16px; font-variant-numeric: tabular-nums; color: var(--muted); font-size: 0.9rem; }
+.clock b { font-family: var(--font-mono); font-weight: 500; color: var(--fg); }
+.ghost { background: none; border: 1px solid var(--line); border-radius: 10px; padding: 6px 14px; min-height: 44px; cursor: pointer; }
+.total-bar { flex-basis: 100%; height: 5px; background: var(--surface2); border-radius: 3px; overflow: hidden; }
+.total-bar > i { display: block; height: 100%; width: 0; background: var(--accent); transition: width 0.3s linear; }
+.total-bar.over > i { background: var(--warn); }
+.example-tag { display: inline-block; font-family: var(--font-body); font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.1em; font-weight: 600; background: var(--surface2); color: var(--muted); border-radius: 6px; padding: 2px 8px; margin-left: 8px; vertical-align: middle; }
+
+/* play view */
+.play { display: grid; grid-template-rows: minmax(0, 1fr); min-height: 0; }
+.stagebox { position: relative; background: var(--tile); border-radius: 18px; overflow: hidden; min-height: 0; cursor: pointer; touch-action: manipulation; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; border: 1px solid var(--line); }
+.tilebody { position: absolute; inset: 0; display: grid; gap: 8px 18px; padding: 14px 14px 22px; text-align: left; color: #1c2032;
+  grid-template-columns: minmax(0, 1fr) clamp(230px, 31%, 420px); grid-template-rows: auto minmax(0, 1fr) auto;
+  grid-template-areas: "head side" "pic side" "pic timer"; }
+.tl-head { grid-area: head; min-width: 0; }
+.tl-head .eyebrow, .tl-side .eyebrow { color: var(--tile-ink); }
+.tl-head .name { color: #1c2032; font-size: clamp(2rem, 6.5vh, 3.6rem); line-height: 1.05; }
+.tl-head .note { color: var(--tile-ink); font-size: clamp(1.05rem, 2.6vh, 1.4rem); }
+.tl-pic { grid-area: pic; position: relative; min-height: 0; min-width: 0; display: flex; align-items: center; justify-content: center; text-align: center; }
+.tl-pic img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; object-position: center; display: block; pointer-events: none; }
+.tl-side { grid-area: side; min-width: 0; min-height: 0; overflow: hidden; display: flex; flex-direction: column; gap: 14px; align-items: stretch; }
+.nxb { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.tl-side .thumb { width: 100%; height: clamp(120px, 26vh, 300px); border: 1px solid #e6e6df; }
+.namerow { display: flex; align-items: baseline; gap: 14px; min-width: 0; }
+.namerow .name { min-width: 0; }
+.namerow .count { font-family: var(--font-mono); font-size: clamp(0.9rem, 2.2vh, 1.2rem); color: var(--tile-ink); white-space: nowrap; }
+.nmrow { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; min-width: 0; }
+.nmrow .nm { min-width: 0; }
+.nmrow .dur { white-space: nowrap; }
+.tl-side .nxb.small { width: 60%; align-self: flex-end; text-align: left; }
+.tl-side .nxb.small .thumb { height: clamp(70px, 14vh, 150px); }
+.tl-side .nxb.small .nm { font-size: clamp(1.15rem, 2.7vh, 1.6rem); }
+.tl-side .nxb.small .dur { font-size: 0.95rem; }
+.tl-side .nm { font-family: var(--font-display); font-weight: 700; font-size: clamp(1.5rem, 4vh, 2.3rem); line-height: 1.1; overflow-wrap: anywhere; color: #1c2032; }
+.tl-side .dur { font-family: var(--font-mono); font-size: 1.1rem; color: var(--tile-ink); }
+.tl-timer { grid-area: timer; text-align: right; align-self: end; min-width: 0; }
+.tl-timer .digits { font-size: clamp(2.6rem, 9vh, 5rem); color: #1c2032; }
+.tl-timer .digits.idle { color: var(--tile-ink); }
+.tl-timer .digits.over { color: #b4570c; }
+.tl-timer .sub { color: var(--tile-ink); }
+@media (max-width: 760px), (orientation: portrait) {
+  .tilebody { grid-template-columns: minmax(0, 1fr) auto; grid-template-rows: auto minmax(0, 1fr) auto; grid-template-areas: "head head" "pic pic" "side timer"; }
+  .tl-side { flex-direction: row; flex-wrap: wrap; align-items: flex-start; gap: 6px 20px; }
+  .nxb { flex-direction: row; flex-wrap: wrap; align-items: center; gap: 2px 10px; }
+  .nxb .eyebrow { flex-basis: 100%; }
+  .tl-side .thumb { width: 96px; height: 96px; }
+  .tl-side .nxb.small { width: auto; }
+  .tl-side .nxb.small .thumb { width: 64px; height: 64px; }
+}
+.tilebody .bigname { font-family: var(--font-display); font-weight: 700; font-size: clamp(2.6rem, 13vh, 8rem); line-height: 1.02; letter-spacing: -0.02em; color: #1c2032; text-wrap: balance; overflow-wrap: anywhere; }
+.tilebody .bignote { display: block; margin-top: 12px; font-family: var(--font-body); font-weight: 400; font-size: clamp(1.1rem, 3vh, 1.8rem); letter-spacing: 0; color: var(--tile-ink); }
+.chev { position: absolute; top: 50%; transform: translateY(-50%); font-size: 3rem; line-height: 1; color: var(--tile-ink); opacity: 0.28; pointer-events: none; font-family: var(--font-display); }
+.chev.l { left: 10px; } .chev.r { display: none; }
+.chip { position: absolute; bottom: 22px; left: 16px; background: var(--surface); color: var(--fg); border: 1px solid var(--line); border-radius: 999px; padding: 4px 14px; font-family: var(--font-mono); font-size: 0.9rem; pointer-events: none; }
+.chip.warn { color: var(--warn); }
+.flash { position: absolute; left: 50%; top: 50%; width: 120px; height: 120px; margin: -60px 0 0 -60px; border-radius: 50%; background: var(--scrim); color: #fff; font-size: 3.4rem; display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; font-family: var(--font-display); }
+.flash.on { animation: flash 0.65s ease-out forwards; }
+@keyframes flash { 0% { opacity: 0.95; transform: scale(0.85); } 100% { opacity: 0; transform: scale(1.15); } }
+
+.bar { position: absolute; left: 0; right: 0; bottom: 0; height: 8px; background: #e2e5ee; overflow: hidden; pointer-events: none; }
+.bar > i { display: block; height: 100%; width: 0; background: var(--accent); transition: width 0.25s linear; }
+.bar.over > i { background: var(--warn); }
+
+.strip { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 8px 14px; display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr) auto; align-items: center; gap: 6px 20px; }
+@media (max-width: 760px) { .strip { grid-template-columns: minmax(0, 1fr) auto; } .strip .nx { grid-column: 1 / -1; grid-row: 2; } }
+.eyebrow { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.12em; color: var(--muted); font-weight: 600; }
+.name { font-family: var(--font-display); font-weight: 700; font-size: clamp(1.3rem, 3.4vh, 2rem); line-height: 1.1; letter-spacing: -0.01em; margin: 0; overflow-wrap: anywhere; }
+.note { margin: 2px 0 0; color: var(--muted); font-size: 1rem; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.cur-info, .nx { min-width: 0; }
+.nx { display: flex; align-items: center; gap: 10px; }
+.nx .txt { min-width: 0; }
+.nx .nm { font-family: var(--font-display); font-weight: 700; font-size: 1.15rem; overflow-wrap: anywhere; }
+.nx .dur { font-family: var(--font-mono); color: var(--muted); font-size: 0.85rem; }
+.thumb { position: relative; background: var(--tile); border-radius: 8px; overflow: hidden; }
+.thumb img { position: absolute; inset: 3px; width: calc(100% - 6px); height: calc(100% - 6px); object-fit: contain; object-position: center; display: block; }
+.nx .thumb { width: 52px; height: 52px; flex: none; }
+.timer { text-align: right; }
+.digits { font-family: var(--font-mono); font-weight: 500; font-size: clamp(2.4rem, 8vh, 4.4rem); line-height: 1; letter-spacing: -0.03em; font-variant-numeric: tabular-nums; }
+.digits.over { color: var(--warn); }
+.digits.idle { color: var(--muted); }
+.sub { color: var(--muted); font-size: 0.85rem; font-variant-numeric: tabular-nums; }
+
+/* drawer with the sequence list */
+.drawer-wrap { position: fixed; inset: 0; z-index: 8; display: flex; justify-content: flex-end; background: var(--scrim); }
+.drawer { width: min(380px, 92vw); height: 100%; background: var(--surface); padding: 8px; padding-top: calc(8px + env(safe-area-inset-top, 0px)); padding-bottom: calc(8px + env(safe-area-inset-bottom, 0px)); display: flex; flex-direction: column; min-height: 0; }
+.list-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 4px 8px; }
+.mini { background: none; border: none; color: var(--accent); font-weight: 600; cursor: pointer; padding: 8px; min-height: 44px; }
+#list { overflow-y: auto; min-height: 0; }
+.grp { display: flex; justify-content: space-between; gap: 8px; padding: 12px 10px 2px; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.1em; font-weight: 600; color: var(--muted); }
+.item { display: flex; align-items: center; gap: 10px; width: 100%; text-align: left; background: none; border: none; border-radius: 10px; padding: 4px 10px; min-height: 48px; cursor: pointer; }
+.item .n { font-family: var(--font-mono); color: var(--muted); font-size: 0.85rem; width: 1.5rem; flex: none; }
+.item .thumb { width: 40px; height: 40px; flex: none; }
+.item .t { flex: 1; min-width: 0; overflow-wrap: anywhere; }
+.item .d { font-family: var(--font-mono); font-size: 0.85rem; color: var(--muted); font-variant-numeric: tabular-nums; flex: none; }
+.item.done .t { color: var(--muted); text-decoration: line-through; text-decoration-thickness: 1px; }
+.item.done .d { color: var(--ok); }
+.item.cur { background: var(--accent); color: var(--accent-fg); }
+.item.cur .n, .item.cur .d { color: var(--accent-fg); opacity: 0.85; }
+
+/* buttons (editor, dialogs) */
+.btn { min-height: 56px; border-radius: 14px; border: 1px solid var(--line); background: var(--surface); font-family: var(--font-body); font-weight: 600; font-size: 1.05rem; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 10px; padding-inline: 18px; touch-action: manipulation; }
+.btn.go { background: var(--accent); color: var(--accent-fg); border-color: var(--accent); }
+.btn.small { min-height: 48px; border-radius: 12px; font-size: 1rem; padding-inline: 16px; }
+
+/* editor */
+.editor { display: flex; flex-direction: column; gap: 10px; min-height: 0; }
+.ed-head { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 10px; }
+.ed-head h2 { font-family: var(--font-display); margin: 0 auto 0 0; font-size: 1.4rem; }
+.status { color: var(--muted); font-size: 0.95rem; }
+.ed-body { overflow-y: auto; min-height: 0; display: flex; flex-direction: column; gap: 12px; padding-bottom: 12px; }
+.blk { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 10px; display: flex; flex-direction: column; gap: 8px; }
+.blk-head { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.blk-head .title { flex: 1 1 220px; min-width: 0; font-family: var(--font-display); font-weight: 700; font-size: 1.15rem; }
+.field { background: var(--bg); border: 1px solid var(--line); border-radius: 10px; padding: 8px 12px; min-height: 48px; min-width: 0; width: 100%; }
+.sum { font-family: var(--font-mono); color: var(--muted); font-size: 0.9rem; }
+.srow { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.srow .pic { width: 64px; height: 64px; flex: none; border: 1px dashed var(--line); background: var(--tile); border-radius: 10px; cursor: pointer; padding: 3px; display: flex; align-items: center; justify-content: center; color: var(--tile-ink); font-size: 0.8rem; position: relative; overflow: hidden; }
+.srow .pic img { position: absolute; inset: 3px; width: calc(100% - 6px); height: calc(100% - 6px); object-fit: contain; }
+.srow .nm { flex: 2 1 200px; }
+.srow .mn { flex: 0 0 84px; width: 84px; text-align: center; font-family: var(--font-mono); }
+.srow .nt { flex: 3 1 240px; }
+.sq { width: 44px; height: 44px; flex: none; border-radius: 10px; border: 1px solid var(--line); background: var(--surface); cursor: pointer; font-size: 1.05rem; line-height: 1; }
+.sq[disabled] { opacity: 0.35; cursor: default; }
+.sq.del { color: var(--warn); }
+.addrow { display: flex; flex-wrap: wrap; gap: 8px; }
+
+/* image chooser */
+.overlay { position: fixed; inset: 0; background: var(--scrim); z-index: 10; display: flex; align-items: center; justify-content: center; padding: 16px; }
+.panel { background: var(--surface); border-radius: 18px; padding: 16px; width: min(960px, 100%); max-height: 100%; display: flex; flex-direction: column; gap: 12px; }
+.panel h3 { font-family: var(--font-display); margin: 0 auto 0 0; font-size: 1.3rem; }
+.panel .bar-row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 10px; }
+.grid { overflow-y: auto; display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 10px; min-height: 0; }
+.cell { position: relative; background: var(--surface2); border-radius: 12px; border: 2px solid transparent; padding: 6px; display: flex; flex-direction: column; gap: 4px; align-items: stretch; cursor: pointer; text-align: center; }
+.cell.sel { border-color: var(--accent); }
+.cell .thumb { height: 96px; }
+.cell span { font-size: 0.85rem; overflow-wrap: anywhere; }
+.cell .x { position: absolute; top: 4px; right: 4px; min-width: 40px; min-height: 40px; border-radius: 10px; border: 1px solid var(--line); background: var(--surface); color: var(--warn); font-weight: 600; cursor: pointer; padding: 0 8px; }
+.filebtn { position: relative; overflow: hidden; }
+.filebtn input { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; font-size: 0; }
+.hint { color: var(--muted); margin: 0; }
+
+.lrow { display: flex; gap: 8px; align-items: center; }
+.lrow .item { flex: 1; min-width: 0; }
+.lmin { font-family: var(--font-mono); font-size: 0.85rem; opacity: 0.7; margin-left: auto; white-space: nowrap; }
+.ed-head .field.lname { flex: 1 1 160px; min-width: 120px; max-width: 360px; }
+@media (prefers-reduced-motion: reduce) { .bar > i, .total-bar > i { transition: none; } .flash.on { animation-duration: 0.01s; } }
+</style>
+</head>
+<body>
+
+<div class="app" id="app">
+  <header class="top">
+    <div class="brand">Yoga-Ablauf <span class="example-tag" id="example-tag" hidden>Beispiel</span></div>
+    <div class="clock" id="clock"></div>
+    <button class="ghost" id="lesson-btn" type="button">Stunden</button>
+    <button class="ghost" id="list-btn" type="button">Ablauf</button>
+    <button class="ghost" id="edit-btn" type="button">Bearbeiten</button>
+    <button class="ghost" id="fs-btn" type="button" hidden>Vollbild</button>
+    <div class="total-bar" id="total-bar"><i></i></div>
+  </header>
+
+  <section class="play" id="play">
+    <div class="stagebox" id="stagebox" role="button" tabindex="0" aria-label="Übung. Doppelt tippen: Start oder Pause. Links tippen: zurück. Sonst tippen: nächste Übung.">
+      <div class="tilebody" id="tilebody"></div>
+      <span class="chev l" aria-hidden="true">‹</span><span class="chev r" aria-hidden="true">›</span>
+      <span class="chip" id="chip"></span>
+      <div class="flash" id="flash" aria-hidden="true"></div>
+      <div class="bar" id="bar"><i></i></div>
+    </div>
+  </section>
+
+  <section class="editor" id="editor" hidden>
+    <div class="ed-head">
+      <h2>Stunde</h2>
+      <input class="field lname" id="lesson-name" type="text" placeholder="Name der Stunde" autocomplete="off" spellcheck="false">
+      <span class="status" id="ed-status"></span>
+      <button class="btn small" id="images-btn" type="button">Bilder verwalten</button>
+      <button class="btn small" id="cancel-plan" type="button">Abbrechen</button>
+      <button class="btn small go" id="save-plan" type="button">Speichern</button>
+    </div>
+    <div class="ed-body" id="ed-body"></div>
+  </section>
+</div>
+
+<div class="drawer-wrap" id="drawer" hidden>
+  <aside class="drawer" role="dialog" aria-label="Ablauf">
+    <div class="list-head">
+      <span class="eyebrow">Ablauf</span>
+      <span>
+        <button class="mini" id="reset-btn" type="button">Zurücksetzen</button>
+        <button class="mini" id="drawer-close" type="button">Schließen</button>
+      </span>
+    </div>
+    <div id="list"></div>
+  </aside>
+</div>
+
+<div class="drawer-wrap" id="lessons-wrap" hidden>
+  <aside class="drawer" role="dialog" aria-label="Stunden">
+    <div class="list-head">
+      <span class="eyebrow">Stunden</span>
+      <span>
+        <button class="mini" id="lesson-new" type="button">Neue Stunde</button>
+        <button class="mini" id="lesson-dup" type="button">Duplizieren</button>
+        <button class="mini" id="lessons-close" type="button">Schließen</button>
+      </span>
+    </div>
+    <p class="hint" id="lesson-status"></p>
+    <div id="lesson-list"></div>
+  </aside>
+</div>
+
+<div class="overlay" id="overlay" hidden>
+  <div class="panel" role="dialog" aria-modal="true" aria-labelledby="ov-title">
+    <div class="bar-row">
+      <h3 id="ov-title">Bild wählen</h3>
+      <label class="btn small filebtn" id="upload-label">Bild hinzufügen<input id="file-input" type="file" accept="image/*" multiple></label>
+      <button class="btn small" id="no-image" type="button">Kein Bild</button>
+      <button class="btn small go" id="ov-close" type="button">Schließen</button>
+    </div>
+    <p class="hint" id="ov-status"></p>
+    <div class="grid" id="ov-grid"></div>
+  </div>
+</div>
+
+<script>
+/* Offline build: replaces the claude.ai storage with this device's own storage (localStorage for plan and image list, IndexedDB for uploaded images). */
+(function () {
+  var SEED = {"lessons": [{"blocks": [{"id": "b1", "steps": [{"id": "s1", "img": "66e71a7a301389817a719a7a1b69b581", "min": 4, "name": "Drehsitz", "note": "Knie heranziehen, Aufrecht"}, {"id": "oyqj9w8py1", "img": "33050b0659056343c1df75e96db790b1", "min": 3, "name": "Brett", "note": "Becken nicht durchhängen"}, {"id": "dddnfwuq91", "img": "d23724797774057159cfdd8313440c07", "min": 3, "name": "Baum", "note": ""}, {"id": "wj6qt5plv1", "img": "35f2c99b619f6f3d99c475ccdbd2c7f2", "min": 4, "name": "Krieger II", "note": ""}, {"id": "b23b0evcx2", "img": "d8ddd404d4492eb958d355fcd10fd444", "min": 3, "name": "Gestreckter Seitlicher Winkel", "note": ""}], "title": "Beginn"}, {"id": "b2", "steps": [{"id": "s2", "img": "2e635244bbe989b1a4cdeddf660b7e5d", "min": 4, "name": "Schmetterling", "note": ""}, {"id": "bhktewi531", "img": "d0c4e0d896ff91d5ad2682db65bbc6ad", "min": 1, "name": "Schulterbrücke", "note": ""}], "title": ""}, {"id": "b3", "steps": [{"id": "s3", "img": "", "min": 1, "name": "Berg", "note": "Füße hüftbreit, Arme über den Kopf"}, {"id": "s4", "img": "", "min": 1, "name": "Vorbeuge", "note": "Knie weich, Rücken lang"}, {"id": "s5", "img": "33050b0659056343c1df75e96db790b1", "min": 1, "name": "Brett", "note": "Schultern über den Händen"}, {"id": "s6", "img": "", "min": 1, "name": "Kobra", "note": "Ellbogen nah am Körper"}, {"id": "s7", "img": "", "min": 2, "name": "Herabschauender Hund", "note": "Fersen Richtung Boden, 5 Atemzüge"}], "title": "Sonnengruß A"}, {"id": "b4", "steps": [{"id": "s8", "img": "", "min": 3, "name": "Krieger I", "note": "Je Seite 5 Atemzüge"}, {"id": "s9", "img": "", "min": 3, "name": "Krieger II", "note": "Blick über die vordere Hand"}, {"id": "s10", "img": "", "min": 3, "name": "Seitwinkel", "note": "Oberen Arm lang nach vorn"}], "title": "Krieger-Folge"}, {"id": "b5", "steps": [{"id": "s11", "img": "d23724797774057159cfdd8313440c07", "min": 4, "name": "Baum", "note": "Blick fixieren, Standbein weich"}, {"id": "pee10nexi1", "img": "7251df41361609c665b8f793b62cf223", "min": 1, "name": "Pawanmuktasana", "note": ""}], "title": ""}, {"id": "b6", "steps": [{"id": "s14", "img": "", "min": 10, "name": "Endentspannung", "note": "Decke bereitlegen, Stimme ruhig"}, {"id": "s12", "img": "d0c4e0d896ff91d5ad2682db65bbc6ad", "min": 5, "name": "Sitzende Vorbeuge", "note": ""}, {"id": "s13", "img": "66e71a7a301389817a719a7a1b69b581", "min": 4, "name": "Drehsitz", "note": "Je Seite 2 Minuten"}], "title": "Abschluss"}], "id": "l1", "name": "Stunde 1"}, {"blocks": [{"id": "r7a2533w02", "steps": [{"id": "icymjp3w03", "img": "66e71a7a301389817a719a7a1b69b581", "min": 4, "name": "Drehsitz", "note": "Knie heranziehen, Aufrecht"}, {"id": "9mqhh43w04", "img": "33050b0659056343c1df75e96db790b1", "min": 3, "name": "Brett", "note": "Becken nicht durchhängen"}, {"id": "qswqkt3w05", "img": "d23724797774057159cfdd8313440c07", "min": 3, "name": "Baum", "note": ""}, {"id": "a0yj1x3w06", "img": "35f2c99b619f6f3d99c475ccdbd2c7f2", "min": 4, "name": "Krieger II", "note": ""}, {"id": "u6n9na3w07", "img": "d8ddd404d4492eb958d355fcd10fd444", "min": 3, "name": "Gestreckter Seitlicher Winkel", "note": ""}], "title": "Beginn"}, {"id": "ov00yn3w08", "steps": [{"id": "wq2dxz3w09", "img": "2e635244bbe989b1a4cdeddf660b7e5d", "min": 4, "name": "Schmetterling", "note": ""}, {"id": "ip20gu3w010", "img": "d0c4e0d896ff91d5ad2682db65bbc6ad", "min": 1, "name": "Schulterbrücke", "note": ""}], "title": ""}, {"id": "9q61fb3w011", "steps": [{"id": "hc11oj3w012", "img": "", "min": 1, "name": "Berg", "note": "Füße hüftbreit, Arme über den Kopf"}, {"id": "c5cst23w013", "img": "", "min": 1, "name": "Vorbeuge", "note": "Knie weich, Rücken lang"}, {"id": "4vjllm3w014", "img": "33050b0659056343c1df75e96db790b1", "min": 1, "name": "Brett", "note": "Schultern über den Händen"}, {"id": "hqqa7a3w015", "img": "", "min": 1, "name": "Kobra", "note": "Ellbogen nah am Körper"}, {"id": "chtzgy3w016", "img": "", "min": 2, "name": "Herabschauender Hund", "note": "Fersen Richtung Boden, 5 Atemzüge"}], "title": "Sonnengruß A"}, {"id": "ec0nbm3w017", "steps": [{"id": "d61j613w018", "img": "", "min": 3, "name": "Krieger I", "note": "Je Seite 5 Atemzüge"}, {"id": "tikv0o3w019", "img": "", "min": 3, "name": "Krieger II", "note": "Blick über die vordere Hand"}, {"id": "py1sja3w020", "img": "", "min": 3, "name": "Seitwinkel", "note": "Oberen Arm lang nach vorn"}], "title": "Krieger-Folge"}, {"id": "i8ggm63w021", "steps": [{"id": "pvxz5i3w022", "img": "d23724797774057159cfdd8313440c07", "min": 4, "name": "Baum", "note": "Blick fixieren, Standbein weich"}, {"id": "hwb14k3w023", "img": "7251df41361609c665b8f793b62cf223", "min": 1, "name": "Pawanmuktasana", "note": ""}], "title": ""}, {"id": "8u09go3w024", "steps": [{"id": "l6x6bd3w025", "img": "", "min": 10, "name": "Endentspannung", "note": "Decke bereitlegen, Stimme ruhig"}, {"id": "z72p4j3w026", "img": "d0c4e0d896ff91d5ad2682db65bbc6ad", "min": 5, "name": "Sitzende Vorbeuge", "note": ""}, {"id": "o7acwu3w027", "img": "66e71a7a301389817a719a7a1b69b581", "min": 4, "name": "Drehsitz", "note": "Je Seite 2 Minuten"}], "title": "Abschluss"}], "id": "r43il83w01", "name": "Stunde 2"}], "lib": [{"id": "66e71a7a301389817a719a7a1b69b581", "name": "drehsitz"}, {"id": "33050b0659056343c1df75e96db790b1", "name": "Brett"}, {"id": "d23724797774057159cfdd8313440c07", "name": "baum"}, {"id": "7251df41361609c665b8f793b62cf223", "name": "pawanmuktasana"}, {"id": "2e635244bbe989b1a4cdeddf660b7e5d", "name": "schmetterling-baddha-konasana"}, {"id": "d0c4e0d896ff91d5ad2682db65bbc6ad", "name": "schulterbruecke"}, {"id": "35f2c99b619f6f3d99c475ccdbd2c7f2", "name": "krieger-ii"}, {"id": "d8ddd404d4492eb958d355fcd10fd444", "name": "gestreckter-seitlicher-winkel"}]};
+  var SEED_IMG = {}; SEED.lib.forEach(function (x) { SEED_IMG[x.id] = true; });
+  var PFX = "yoga.local.db.", subs = {};
+  function read(p) { try { var r = localStorage.getItem(PFX + p); return r ? JSON.parse(r) : null; } catch (e) { return null; } }
+  function write(p, d) { localStorage.setItem(PFX + p, JSON.stringify(d)); }
+  try {
+    if (!localStorage.getItem(PFX + "seeded")) {
+      write("yoga/lessons", { v: 2, lessons: SEED.lessons }); write("yoga/lib", { images: SEED.lib });
+      localStorage.setItem(PFX + "seeded", "1");
+    }
+  } catch (e) {}
+  function snap(p) { var d = read(p); return { exists: !!d, data: function () { return d ? JSON.parse(JSON.stringify(d)) : undefined; } }; }
+  function notify(p) { (subs[p] || []).forEach(function (f) { setTimeout(function () { f(snap(p)); }, 0); }); }
+  function doc(p) {
+    return {
+      set: function (d) { return new Promise(function (res, rej) { try { write(p, d); } catch (e) { rej(e); return; } notify(p); res(); }); },
+      onSnapshot: function (f) { (subs[p] = subs[p] || []).push(f); setTimeout(function () { f(snap(p)); }, 0); return function () { subs[p] = (subs[p] || []).filter(function (x) { return x !== f; }); }; }
+    };
+  }
+  function idb() { return new Promise(function (res, rej) { var r = indexedDB.open("yoga-assets", 1); r.onupgradeneeded = function () { r.result.createObjectStore("b"); }; r.onsuccess = function () { res(r.result); }; r.onerror = function () { rej(r.error); }; }); }
+  function tx(mode, fn) { return idb().then(function (db) { return new Promise(function (res, rej) { var t = db.transaction("b", mode), out = fn(t.objectStore("b")); t.oncomplete = function () { res(out && out.result); }; t.onerror = function () { rej(t.error); }; }); }); }
+  function rid() { var a = new Uint8Array(16); crypto.getRandomValues(a); return Array.prototype.map.call(a, function (x) { return ("0" + x.toString(16)).slice(-2); }).join(""); }
+  var assets = {
+    upload: function (blob) { var id = rid(); return tx("readwrite", function (s) { return s.put(blob, id); }).then(function () { return { id: id, url: "", sizeBytes: blob.size, contentType: blob.type }; }); },
+    delete: function (id) { return tx("readwrite", function (s) { return s.delete(id); }).then(function () { return { deleted: true }; }); }
+  };
+  window.__srcFor = function (id) {
+    if (SEED_IMG[id]) return Promise.resolve("img/" + id + ".png");
+    return tx("readonly", function (s) { return s.get(id); }).then(function (b) { return b ? URL.createObjectURL(b) : null; }).catch(function () { return null; });
+  };
+  window.claude = { use: function (n) { return Promise.resolve(n === "db" ? { doc: doc } : n === "assets" ? assets : null); } };
+  try { if (navigator.storage && navigator.storage.persist) navigator.storage.persist(); } catch (e) {}
+  if ("serviceWorker" in navigator) window.addEventListener("load", function () { navigator.serviceWorker.register("sw.js").catch(function () {}); });
+})();
+</script>
+<script>
+(function () {
+  var LS_PLAN = "yoga.plan.cache.v2", LS_LESSONS = "yoga.lessons.cache.v3", LS_ACTIVE = "yoga.active.v1", LS_RUN = "yoga.run.v2", RUN_MAX_AGE = 6 * 3600 * 1000;
+  var ID_RE = /^[0-9a-f]{32}$/;
+  var DOUBLE_MS = 300, LEFT_ZONE = 0.22;
+  var uidN = 0;
+  function uid() { uidN++; return Math.random().toString(36).slice(2, 8) + Date.now().toString(36).slice(-3) + uidN; }
+  function $(id) { return document.getElementById(id); }
+  function el(tag, cls, text) { var n = document.createElement(tag); if (cls) n.className = cls; if (text != null) n.textContent = text; return n; }
+  function clone(x) { return JSON.parse(JSON.stringify(x)); }
+  function lsGet(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
+  function lsSet(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
+  function lsDel(k) { try { localStorage.removeItem(k); } catch (e) {} }
+
+  /* ---------- data ---------- */
+  function stp(id, name, min, note) { return { id: id, name: name, min: min, note: note || "", img: "" }; }
+  function exampleBlocks() {
+    return [
+      { id: "b1", title: "", steps: [stp("s1", "Ankommen", 4, "Rückenlage, Augen schließen, Körper wahrnehmen")] },
+      { id: "b2", title: "", steps: [stp("s2", "Atemübung", 4, "Bauchatmung, 4 ein / 6 aus")] },
+      { id: "b3", title: "Sonnengruß A", steps: [
+        stp("s3", "Berg", 1, "Füße hüftbreit, Arme über den Kopf"),
+        stp("s4", "Vorbeuge", 1, "Knie weich, Rücken lang"),
+        stp("s5", "Brett", 1, "Schultern über den Händen"),
+        stp("s6", "Kobra", 1, "Ellbogen nah am Körper"),
+        stp("s7", "Herabschauender Hund", 2, "Fersen Richtung Boden, 5 Atemzüge")
+      ] },
+      { id: "b4", title: "Krieger-Folge", steps: [
+        stp("s8", "Krieger I", 3, "Je Seite 5 Atemzüge"),
+        stp("s9", "Krieger II", 3, "Blick über die vordere Hand"),
+        stp("s10", "Seitwinkel", 3, "Oberen Arm lang nach vorn")
+      ] },
+      { id: "b5", title: "", steps: [stp("s11", "Baum", 4, "Blick fixieren, Standbein weich")] },
+      { id: "b6", title: "Abschluss", steps: [
+        stp("s12", "Sitzende Vorbeuge", 5, ""),
+        stp("s13", "Drehsitz", 4, "Je Seite 2 Minuten"),
+        stp("s14", "Endentspannung", 10, "Decke bereitlegen, Stimme ruhig")
+      ] }
+    ];
+  }
+  function normalize(raw) {
+    var out = [];
+    if (!Array.isArray(raw)) return out;
+    raw.forEach(function (b) {
+      if (!b || !Array.isArray(b.steps)) return;
+      var steps = [];
+      b.steps.forEach(function (s) {
+        if (!s) return;
+        var min = parseFloat(s.min);
+        steps.push({
+          id: String(s.id || uid()),
+          name: String(s.name || "").trim() || "Übung",
+          min: min > 0 ? min : 1,
+          note: String(s.note || "").trim(),
+          img: ID_RE.test(String(s.img || "")) ? String(s.img) : ""
+        });
+      });
+      if (steps.length) out.push({ id: String(b.id || uid()), title: String(b.title || "").trim(), steps: steps });
+    });
+    return out;
+  }
+  function flatten(blocks) {
+    var f = [];
+    blocks.forEach(function (b) {
+      var bMin = b.steps.reduce(function (a, x) { return a + x.min; }, 0);
+      b.steps.forEach(function (s, i) {
+        f.push({ id: s.id, name: s.name, min: s.min, note: s.note, img: s.img, bTitle: b.title, si: i, bLen: b.steps.length, bMin: bMin });
+      });
+    });
+    return f;
+  }
+  function signature(blocks) { return blocks.map(function (b) { return b.steps.map(function (s) { return s.id + ":" + s.min; }).join(","); }).join("|"); }
+
+  var blocks = exampleBlocks(), flat = flatten(blocks), isExample = true, sig = signature(blocks);
+  var lessons = [], curId = "";
+  var lib = [];
+  var planDoc = null, lessonsDoc = null, libDoc = null, assetsApi = null;
+  var editing = false, draft = null, pendingLessons = null;
+  var st;
+
+  /* ---------- run state ---------- */
+  function freshRun() { st = { idx: 0, ms: flat.map(function () { return 0; }), running: false, startedAt: 0, finished: false }; }
+  function restoreRun() {
+    freshRun();
+    var raw = lsGet(runKey()); if (!raw) return;
+    try {
+      var r = JSON.parse(raw);
+      if (r.key === sig && Date.now() - r.savedAt < RUN_MAX_AGE && r.ms.length === flat.length) {
+        st.idx = Math.min(r.idx, flat.length - 1); st.ms = r.ms; st.finished = !!r.finished;
+      }
+    } catch (e) {}
+  }
+  function runKey() { return LS_RUN + "." + (curId || "x"); }
+  function saveRun() { lsSet(runKey(), JSON.stringify({ key: sig, idx: st.idx, ms: st.ms, finished: st.finished, savedAt: Date.now() })); }
+
+  function normalizeLessons(raw) {
+    var out = [];
+    if (!Array.isArray(raw)) return out;
+    raw.forEach(function (l) {
+      if (!l) return;
+      var bl = normalize(l.blocks);
+      if (bl.length) out.push({ id: String(l.id || uid()), name: String(l.name || "").trim() || "Stunde", blocks: bl });
+    });
+    return out;
+  }
+  function curLesson() { for (var i = 0; i < lessons.length; i++) if (lessons[i].id === curId) return lessons[i]; return null; }
+  function totalMin(bl) { return bl.reduce(function (a, b) { return a + b.steps.reduce(function (c, x) { return c + x.min; }, 0); }, 0); }
+  function persist(nl) {
+    lsSet(LS_LESSONS, JSON.stringify(nl));
+    return lessonsDoc ? lessonsDoc.set({ v: 2, lessons: nl }) : Promise.resolve();
+  }
+  function applyLessons(nl) {
+    var prevId = curId, prevSig = sig, prevJson = JSON.stringify(blocks);
+    lessons = nl;
+    var want = lsGet(LS_ACTIVE) || curId, l = null;
+    lessons.forEach(function (x) { if (x.id === want) l = x; });
+    if (!l) l = lessons[0] || null;
+    if (!l) { renderLessonUi(); return; }
+    curId = l.id; blocks = l.blocks; flat = flatten(blocks); isExample = false; sig = signature(blocks);
+    if (curId !== prevId || sig !== prevSig) { releaseWake(); restoreRun(); renderAll(); }
+    else if (JSON.stringify(blocks) !== prevJson) renderAll();
+    renderLessonUi();
+  }
+  function selectLesson(id) {
+    commit(); st.running = false; saveRun();
+    lsSet(LS_ACTIVE, id); applyLessons(lessons);
+  }
+
+  /* ---------- time helpers ---------- */
+  function fmt(ms) {
+    var s = Math.floor(Math.abs(ms) / 1000), h = Math.floor(s / 3600), m = Math.floor((s % 3600) / 60), sec = s % 60;
+    return (h ? h + ":" + String(m).padStart(2, "0") : String(m)) + ":" + String(sec).padStart(2, "0");
+  }
+  function fmtMin(min) { return (Math.round(min * 10) / 10).toString().replace(".", ",") + " min"; }
+  function planMs(i) { return flat[i].min * 60000; }
+  function live(i) { return st.ms[i] + (st.running && i === st.idx ? Date.now() - st.startedAt : 0); }
+  function commit() { if (st.running) { var n = Date.now(); st.ms[st.idx] += n - st.startedAt; st.startedAt = n; } }
+
+  var wake = null;
+  function requestWake() { try { if (navigator.wakeLock) navigator.wakeLock.request("screen").then(function (l) { wake = l; }).catch(function () {}); } catch (e) {} }
+  function releaseWake() { try { if (wake) wake.release(); } catch (e) {} wake = null; }
+  document.addEventListener("visibilitychange", function () { if (document.visibilityState === "visible" && st.running) requestWake(); });
+
+  /* ---------- actions ---------- */
+  function go(i) { commit(); st.idx = Math.max(0, Math.min(flat.length - 1, i)); st.finished = false; saveRun(); renderAll(); }
+  function next() {
+    if (st.finished) return;
+    if (st.idx >= flat.length - 1) { commit(); st.running = false; st.finished = true; releaseWake(); saveRun(); renderAll(); }
+    else go(st.idx + 1);
+  }
+  function prev() { if (st.finished) { st.finished = false; saveRun(); renderAll(); } else go(st.idx - 1); }
+  function toggle() {
+    if (st.finished) return;
+    if (st.running) { commit(); st.running = false; releaseWake(); }
+    else { st.startedAt = Date.now(); st.running = true; requestWake(); }
+    saveRun(); renderAll();
+  }
+  function reset() { releaseWake(); freshRun(); lsDel(runKey()); renderAll(); }
+
+  /* ---------- images ---------- */
+  /* Pictograms often carry empty margins; crop them away so the figure fills its tile. */
+  var trimCache = {};
+  var srcFor = window.__srcFor || function (id) { return Promise.resolve("/_blob/" + id); };
+  function trimmed(id) {
+    if (trimCache[id]) return trimCache[id];
+    trimCache[id] = srcFor(id).then(function (src) { if (!src) return null; return new Promise(function (resolve) {
+      var im = new Image();
+      im.onload = function () {
+        try {
+          var w = im.naturalWidth, h = im.naturalHeight, s = Math.min(1, 400 / Math.max(w, h));
+          var sw = Math.max(1, Math.round(w * s)), sh = Math.max(1, Math.round(h * s));
+          var c = document.createElement("canvas"); c.width = sw; c.height = sh;
+          var cx = c.getContext("2d", { willReadFrequently: true }); cx.drawImage(im, 0, 0, sw, sh);
+          var d = cx.getImageData(0, 0, sw, sh).data;
+          var br = d[0], bg = d[1], bb = d[2], ba = d[3];
+          var minX = sw, minY = sh, maxX = -1, maxY = -1, xx, yy, k, a;
+          for (yy = 0; yy < sh; yy++) for (xx = 0; xx < sw; xx++) {
+            k = (yy * sw + xx) * 4; a = d[k + 3];
+            var isBg = a < 20 || (ba >= 20 && Math.abs(d[k] - br) + Math.abs(d[k + 1] - bg) + Math.abs(d[k + 2] - bb) < 40);
+            if (!isBg) { if (xx < minX) minX = xx; if (xx > maxX) maxX = xx; if (yy < minY) minY = yy; if (yy > maxY) maxY = yy; }
+          }
+          if (maxX < 0) { resolve(src); return; }
+          var pad = Math.round(Math.max(sw, sh) * 0.02), f = 1 / s;
+          var x0 = Math.max(0, Math.floor((minX - pad) * f)), y0 = Math.max(0, Math.floor((minY - pad) * f));
+          var x1 = Math.min(w, Math.ceil((maxX + pad + 1) * f)), y1 = Math.min(h, Math.ceil((maxY + pad + 1) * f));
+          var oc = document.createElement("canvas"); oc.width = Math.max(1, x1 - x0); oc.height = Math.max(1, y1 - y0);
+          oc.getContext("2d").drawImage(im, x0, y0, oc.width, oc.height, 0, 0, oc.width, oc.height);
+          oc.toBlob(function (b) { resolve(b ? URL.createObjectURL(b) : src); }, "image/png");
+        } catch (e) { resolve(src); }
+      };
+      im.onerror = function () { resolve(null); };
+      im.src = src;
+    }); });
+    return trimCache[id];
+  }
+  function setImg(im, id, onFail) {
+    im.style.visibility = "hidden";
+    trimmed(id).then(function (u) { if (!u) { if (onFail) onFail(); return; } im.src = u; im.style.visibility = ""; });
+  }
+  function thumbEl(imgId, cls, alt) {
+    var t = el("span", "thumb " + (cls || ""));
+    var im = document.createElement("img"); im.alt = alt || "";
+    setImg(im, imgId, function () { t.remove(); });
+    t.appendChild(im); return t;
+  }
+
+  /* ---------- play view ---------- */
+  /* One tile: header (sequence, name, note) top left, current pictogram large, next exercise smaller on the right, countdown bottom right. */
+  function upcomingBlock(label, n, small) {
+    var b = el("div", "nxb" + (small ? " small" : ""));
+    if (!n) { b.appendChild(el("div", "nm", "Ende der Stunde")); return b; }
+    if (n.bTitle && n.si === 0) b.appendChild(el("div", "eyebrow", n.bTitle));
+    if (n.img) b.appendChild(thumbEl(n.img, "", n.name));
+    var row = el("div", "nmrow");
+    row.appendChild(el("div", "nm", n.name));
+    row.appendChild(el("div", "dur", fmtMin(n.min)));
+    b.appendChild(row);
+    return b;
+  }
+  function renderStage() {
+    var body = $("tilebody"); body.textContent = "";
+    $("example-tag").hidden = !isExample;
+    var head = el("div", "tl-head"), pic = el("div", "tl-pic"), side = el("div", "tl-side"), timer = el("div", "tl-timer timer");
+    if (st.finished) {
+      var planned = flat.reduce(function (a, x) { return a + x.min * 60000; }, 0), total = st.ms.reduce(function (a, b) { return a + b; }, 0);
+      head.appendChild(el("div", "eyebrow", "Stunde beendet"));
+      var fin = el("div", "bigname", "Fertig");
+      fin.appendChild(el("span", "bignote", "Gesamtzeit " + fmt(total) + " · Differenz zur Planung " + (total > planned ? "+" : "−") + fmt(total - planned)));
+      pic.appendChild(fin);
+    } else {
+      var e = flat[st.idx];
+      var count = (st.idx + 1) + "/" + flat.length;
+      if (e.bTitle || !e.img) head.appendChild(el("div", "eyebrow", (e.bTitle ? e.bTitle : "") + (e.img ? "" : (e.bTitle ? " · " : "") + count)));
+      if (e.img) {
+        var nrow = el("div", "namerow");
+        nrow.appendChild(el("h1", "name", e.name));
+        nrow.appendChild(el("span", "count", count));
+        head.appendChild(nrow);
+        if (e.note) head.appendChild(el("p", "note", e.note));
+        var im = document.createElement("img"); im.alt = e.name;
+        setImg(im, e.img, function () { pic.textContent = ""; pic.appendChild(textTile(e)); });
+        pic.appendChild(im);
+      } else pic.appendChild(textTile(e));
+
+      side.appendChild(upcomingBlock("Als Nächstes", flat[st.idx + 1], false));
+      if (st.idx < flat.length - 2) side.appendChild(upcomingBlock("Danach", flat[st.idx + 2], true));
+      var dg = el("div", "digits"); dg.id = "digits"; timer.appendChild(dg);
+      var sub = el("div", "sub"); sub.id = "sub"; timer.appendChild(sub);
+    }
+    body.appendChild(head); body.appendChild(pic); body.appendChild(side); body.appendChild(timer);
+  }
+  function textTile(e) {
+    var d = el("div", "bigname", e.name);
+    if (e.note) d.appendChild(el("span", "bignote", e.note));
+    return d;
+  }
+
+  function renderList() {
+    var list = $("list"); list.textContent = "";
+    flat.forEach(function (e, i) {
+      if (e.si === 0 && e.bTitle) {
+        var g = el("div", "grp"); g.appendChild(el("span", null, e.bTitle)); g.appendChild(el("span", null, fmtMin(e.bMin))); list.appendChild(g);
+      }
+      var isCur = !st.finished && i === st.idx, isDone = st.finished || i < st.idx;
+      var btn = el("button", "item" + (isCur ? " cur" : "") + (isDone ? " done" : "")); btn.type = "button";
+      btn.appendChild(el("span", "n", String(i + 1)));
+      if (e.img) btn.appendChild(thumbEl(e.img, "", ""));
+      btn.appendChild(el("span", "t", e.name));
+      btn.appendChild(el("span", "d", st.ms[i] > 0 && (isDone || isCur) ? fmt(st.ms[i]) : fmtMin(e.min)));
+      btn.addEventListener("click", function () { closeDrawer(); go(i); });
+      list.appendChild(btn);
+    });
+  }
+
+  function renderAll() { renderStage(); renderList(); tick(); }
+
+  function tick() {
+    var totalMs = 0, plannedTotal = 0, i;
+    for (i = 0; i < flat.length; i++) { totalMs += live(i); plannedTotal += planMs(i); }
+    var remaining = 0;
+    if (!st.finished) {
+      remaining = Math.max(0, planMs(st.idx) - live(st.idx));
+      for (i = st.idx + 1; i < flat.length; i++) remaining += planMs(i);
+    }
+    var clock = $("clock"); clock.textContent = "";
+    var g = el("span", null, "Gesamt "); g.appendChild(el("b", null, fmt(totalMs))); g.appendChild(document.createTextNode(" / " + fmt(plannedTotal)));
+    clock.appendChild(g);
+    if (!st.finished) {
+      var endAt = new Date(Date.now() + remaining);
+      var en = el("span", null, "Ende ca. "); en.appendChild(el("b", null, endAt.toLocaleTimeString("de-AT", { hour: "2-digit", minute: "2-digit" })));
+      clock.appendChild(en);
+    }
+    var tb = $("total-bar"); tb.firstChild.style.width = Math.min(100, totalMs / plannedTotal * 100) + "%";
+    tb.classList.toggle("over", totalMs > plannedTotal);
+
+    var chip = $("chip"), started = st.ms.some(function (x) { return x > 0; });
+    chip.classList.remove("warn");
+    if (st.finished) chip.textContent = "Fertig";
+    else if (st.running) chip.textContent = "● läuft";
+    else if (started) chip.textContent = "❚❚ pausiert";
+    else chip.textContent = "Doppeltippen = Start";
+
+    var bar = $("bar");
+    if (st.finished) { bar.firstChild.style.width = "100%"; bar.classList.remove("over"); return; }
+    var cur = live(st.idx), pl = planMs(st.idx), over = cur > pl;
+    bar.firstChild.style.width = Math.min(100, cur / pl * 100) + "%"; bar.classList.toggle("over", over);
+    var dg = $("digits"); if (!dg) return;
+    dg.textContent = (over ? "+" : "") + fmt(pl - cur);
+    dg.className = "digits" + (over ? " over" : (!st.running && cur === 0 ? " idle" : ""));
+    $("sub").textContent = "Geplant " + fmt(pl) + " · vergangen " + fmt(cur);
+  }
+
+  var ticks = 0;
+  setInterval(function () { if (st.running && !editing) { tick(); if (++ticks % 20 === 0) { commit(); saveRun(); } } }, 250);
+
+  /* ---------- tap gestures on the picture ---------- */
+  var flashTimer = 0;
+  function flash(symbol) {
+    var f = $("flash"); f.textContent = symbol; f.classList.remove("on"); void f.offsetWidth; f.classList.add("on");
+    clearTimeout(flashTimer); flashTimer = setTimeout(function () { f.classList.remove("on"); }, 800);
+  }
+  var tapTimer = 0, lastTapAt = 0;
+  $("stagebox").addEventListener("click", function (ev) {
+    var rect = this.getBoundingClientRect(), x = (ev.clientX - rect.left) / rect.width, now = Date.now();
+    if (tapTimer && now - lastTapAt < DOUBLE_MS) {
+      clearTimeout(tapTimer); tapTimer = 0;
+      if (!st.finished) { toggle(); flash(st.running ? "▶" : "❚❚"); }
+      return;
+    }
+    lastTapAt = now;
+    tapTimer = setTimeout(function () {
+      tapTimer = 0;
+      if (x < LEFT_ZONE) { prev(); flash("‹"); } else { next(); flash("›"); }
+    }, DOUBLE_MS);
+  });
+
+  /* ---------- drawer ---------- */
+  function openDrawer() { $("drawer").hidden = false; renderList(); var c = $("list").querySelector(".item.cur"); if (c) $("list").scrollTop = Math.max(0, c.offsetTop - 120); }
+  function closeDrawer() { $("drawer").hidden = true; }
+  $("list-btn").addEventListener("click", openDrawer);
+  $("drawer-close").addEventListener("click", closeDrawer);
+  $("drawer").addEventListener("click", function (ev) { if (ev.target === this) closeDrawer(); });
+  $("reset-btn").addEventListener("click", function () { reset(); closeDrawer(); });
+
+  /* ---------- lessons ---------- */
+  var delConfirm = "", delTimer = 0;
+  function lessonStatus(t) { $("lesson-status").textContent = t || ""; }
+  function renderLessonUi() {
+    var l = curLesson();
+    $("lesson-btn").textContent = (l ? l.name : "Stunden") + " ▾";
+    if (!$("lessons-wrap").hidden) renderLessons();
+  }
+  function openLessons() { closeDrawer(); lessonStatus(""); $("lessons-wrap").hidden = false; renderLessons(); }
+  function closeLessons() { $("lessons-wrap").hidden = true; delConfirm = ""; }
+  function renderLessons() {
+    var box = $("lesson-list"); box.textContent = "";
+    if (!lessons.length) box.appendChild(el("p", "hint", "Noch keine eigene Stunde gespeichert. „Neue Stunde“ oder „Bearbeiten“ legt sie an."));
+    lessons.forEach(function (l) {
+      var row = el("div", "lrow");
+      var b = el("button", "item" + (l.id === curId ? " cur" : "")); b.type = "button";
+      b.appendChild(el("span", "t", l.name));
+      b.appendChild(el("span", "lmin", fmtMin(totalMin(l.blocks))));
+      b.addEventListener("click", function () { selectLesson(l.id); closeLessons(); });
+      row.appendChild(b);
+      var d = el("button", "mini", delConfirm === l.id ? "Wirklich?" : "Löschen"); d.type = "button";
+      if (lessons.length < 2) d.disabled = true;
+      d.addEventListener("click", function () {
+        if (delConfirm === l.id) { delConfirm = ""; removeLesson(l.id); return; }
+        delConfirm = l.id; clearTimeout(delTimer); delTimer = setTimeout(function () { delConfirm = ""; renderLessons(); }, 3000); renderLessons();
+      });
+      row.appendChild(d);
+      box.appendChild(row);
+    });
+  }
+  async function removeLesson(id) {
+    var nl = lessons.filter(function (x) { return x.id !== id; });
+    if (!nl.length) return;
+    lessonStatus("Lösche …");
+    try { await persist(nl); } catch (e) { lessonStatus("Löschen fehlgeschlagen."); return; }
+    lsDel(LS_RUN + "." + id);
+    if (curId === id) lsSet(LS_ACTIVE, nl[0].id);
+    applyLessons(nl); lessonStatus("Stunde gelöscht."); renderLessons();
+  }
+  async function addLesson(l) {
+    var nl = lessons.concat([l]);
+    try { await persist(nl); } catch (e) { lessonStatus("Speichern fehlgeschlagen."); return false; }
+    commit(); st.running = false; saveRun();
+    lsSet(LS_ACTIVE, l.id); applyLessons(nl); closeLessons(); return true;
+  }
+  $("lesson-new").addEventListener("click", async function () {
+    var ok = await addLesson({ id: uid(), name: "Neue Stunde", blocks: [{ id: uid(), title: "", steps: [{ id: uid(), name: "", min: 5, note: "", img: "" }] }] });
+    if (ok) openEditor();
+  });
+  $("lesson-dup").addEventListener("click", function () {
+    var l = curLesson(); if (!l) { lessonStatus("Erst die aktuelle Stunde speichern (Bearbeiten)."); return; }
+    var c = clone(l); c.id = uid(); c.name = l.name + " (Kopie)";
+    c.blocks.forEach(function (b) { b.id = uid(); b.steps.forEach(function (x) { x.id = uid(); }); });
+    addLesson(c);
+  });
+  $("lesson-btn").addEventListener("click", openLessons);
+  $("lessons-close").addEventListener("click", closeLessons);
+  $("lessons-wrap").addEventListener("click", function (ev) { if (ev.target === this) closeLessons(); });
+
+  /* ---------- editor ---------- */
+  function setStatus(t) { $("ed-status").textContent = t || ""; }
+  function showEditor(on) {
+    $("editor").hidden = !on; $("play").hidden = on; $("edit-btn").hidden = on; $("list-btn").hidden = on; $("lesson-btn").hidden = on;
+    $("images-btn").hidden = !(on && assetsApi && libDoc);
+  }
+  function openEditor() {
+    closeDrawer(); closeLessons(); draft = clone(blocks); editing = true; setStatus(lessonsDoc ? "" : "Wird nur auf diesem Gerät gespeichert.");
+    $("lesson-name").value = curLesson() ? curLesson().name : "Stunde 1";
+    showEditor(true); renderEditor();
+  }
+  function closeEditor() {
+    editing = false; draft = null; showEditor(false);
+    if (pendingLessons) { var p = pendingLessons; pendingLessons = null; applyLessons(p); } else renderAll();
+  }
+  function move(arr, i, d) { var j = i + d; if (j < 0 || j >= arr.length) return; var t = arr[i]; arr[i] = arr[j]; arr[j] = t; }
+  function sqBtn(label, title, fn, cls, disabled) {
+    var b = el("button", "sq" + (cls ? " " + cls : ""), label); b.type = "button"; b.title = title; b.setAttribute("aria-label", title);
+    if (disabled) b.disabled = true; else b.addEventListener("click", fn);
+    return b;
+  }
+  function textField(cls, value, placeholder, onInput) {
+    var i = el("input", "field " + cls); i.type = "text"; i.value = value; i.placeholder = placeholder; i.autocomplete = "off"; i.spellcheck = false;
+    i.addEventListener("input", function () { onInput(i.value); });
+    return i;
+  }
+
+  function renderEditor() {
+    var box = $("ed-body"), keep = box.scrollTop; box.textContent = "";
+    draft.forEach(function (b, bi) {
+      var card = el("div", "blk");
+      var head = el("div", "blk-head");
+      var sum = el("span", "sum");
+      function updSum() { sum.textContent = fmtMin(b.steps.reduce(function (a, x) { return a + (parseFloat(x.min) > 0 ? parseFloat(x.min) : 0); }, 0)); }
+      updSum();
+      head.appendChild(textField("title", b.title, "Sequenz-Name (leer lassen für eine einzelne Übung)", function (v) { b.title = v; }));
+      head.appendChild(sum);
+      head.appendChild(sqBtn("↑", "Sequenz nach oben", function () { move(draft, bi, -1); renderEditor(); }, "", bi === 0));
+      head.appendChild(sqBtn("↓", "Sequenz nach unten", function () { move(draft, bi, 1); renderEditor(); }, "", bi === draft.length - 1));
+      head.appendChild(sqBtn("✕", "Sequenz löschen", function () { draft.splice(bi, 1); renderEditor(); }, "del"));
+      card.appendChild(head);
+
+      b.steps.forEach(function (s, si) {
+        var r = el("div", "srow");
+        var pic = el("button", "pic"); pic.type = "button"; pic.setAttribute("aria-label", "Bild wählen");
+        if (s.img) { var im = document.createElement("img"); im.alt = ""; setImg(im, s.img, function () { pic.textContent = "Bild"; }); pic.appendChild(im); }
+        else pic.textContent = assetsApi && libDoc ? "+ Bild" : "Bild";
+        pic.addEventListener("click", function () { if (assetsApi && libDoc || lib.length) openChooser("pick", s); });
+        r.appendChild(pic);
+        r.appendChild(textField("nm", s.name, "Übung", function (v) { s.name = v; }));
+        var mn = el("input", "field mn"); mn.type = "text"; mn.inputMode = "decimal"; mn.value = String(s.min).replace(".", ","); mn.setAttribute("aria-label", "Minuten"); mn.title = "Minuten";
+        mn.addEventListener("input", function () { var v = parseFloat(mn.value.replace(",", ".")); s.min = v > 0 ? v : 0; updSum(); });
+        r.appendChild(mn);
+        r.appendChild(textField("nt", s.note, "Hinweis (optional)", function (v) { s.note = v; }));
+        r.appendChild(sqBtn("↑", "Übung nach oben", function () { move(b.steps, si, -1); renderEditor(); }, "", si === 0));
+        r.appendChild(sqBtn("↓", "Übung nach unten", function () { move(b.steps, si, 1); renderEditor(); }, "", si === b.steps.length - 1));
+        r.appendChild(sqBtn("✕", "Übung löschen", function () { b.steps.splice(si, 1); if (!b.steps.length) draft.splice(bi, 1); renderEditor(); }, "del"));
+        card.appendChild(r);
+      });
+
+      var add = el("div", "addrow");
+      var ab = el("button", "btn small", "+ Übung in dieser Sequenz"); ab.type = "button";
+      ab.addEventListener("click", function () { b.steps.push({ id: uid(), name: "", min: 1, note: "", img: "" }); renderEditor(); });
+      add.appendChild(ab); card.appendChild(add);
+      box.appendChild(card);
+    });
+    var addB = el("div", "addrow");
+    var nbtn = el("button", "btn small", "+ Neue Sequenz oder Übung"); nbtn.type = "button";
+    nbtn.addEventListener("click", function () { draft.push({ id: uid(), title: "", steps: [{ id: uid(), name: "", min: 1, note: "", img: "" }] }); renderEditor(); box.scrollTop = box.scrollHeight; });
+    addB.appendChild(nbtn); box.appendChild(addB);
+    box.scrollTop = keep;
+  }
+
+  async function savePlan() {
+    var nb = normalize(draft);
+    if (!nb.length) { setStatus("Bitte mindestens eine Übung eintragen."); return; }
+    setStatus("Speichere …");
+    var nm = ($("lesson-name").value || "").trim() || "Stunde";
+    var nl = clone(lessons), l = null;
+    nl.forEach(function (x) { if (x.id === curId) l = x; });
+    if (!l) { l = { id: curId || uid(), name: nm, blocks: nb }; nl.push(l); } else { l.name = nm; l.blocks = nb; }
+    try { await persist(nl); }
+    catch (e) { setStatus("Speichern fehlgeschlagen. Bitte noch einmal versuchen."); return; }
+    lsSet(LS_ACTIVE, l.id);
+    pendingLessons = null; editing = false; draft = null; showEditor(false);
+    applyLessons(nl);
+  }
+  $("edit-btn").addEventListener("click", openEditor);
+
+  /* fullscreen (hidden when the browser or embedding does not allow it) */
+  (function () {
+    var root = document.documentElement, btn = $("fs-btn");
+    var req = root.requestFullscreen || root.webkitRequestFullscreen;
+    var exit = document.exitFullscreen || document.webkitExitFullscreen;
+    var standalone = window.navigator.standalone === true || (window.matchMedia && matchMedia("(display-mode: standalone)").matches);
+    var allowed = true;
+    try { allowed = document.fullscreenEnabled !== false && (document.webkitFullscreenEnabled !== false); } catch (e) {}
+    if (!req || !exit || !allowed || standalone) return;
+    function isFs() { return !!(document.fullscreenElement || document.webkitFullscreenElement); }
+    function label() { btn.textContent = isFs() ? "Vollbild beenden" : "Vollbild"; }
+    btn.hidden = false; label();
+    btn.addEventListener("click", function () {
+      try {
+        var p = isFs() ? exit.call(document) : req.call(root);
+        if (p && p.catch) p.catch(function () { btn.hidden = true; });
+      } catch (e) { btn.hidden = true; }
+    });
+    document.addEventListener("fullscreenchange", label);
+    document.addEventListener("webkitfullscreenchange", label);
+  })();
+  $("cancel-plan").addEventListener("click", closeEditor);
+  $("save-plan").addEventListener("click", savePlan);
+  $("images-btn").addEventListener("click", function () { openChooser("manage", null); });
+
+  /* ---------- image library ---------- */
+  /* Exercise name from an image name: "schulterbruecke" -> "Schulterbrücke", "drehsitz-ein-bein-gestreckt" -> "Drehsitz ein Bein gestreckt". */
+  var LOWER_WORDS = {};
+  ("ein eine einem einen einer und oder mit ohne im in am an auf aus zur zum zu der die das den dem des vor nach bei von für über unter " +
+   "gestreckt gebeugt gebogen leicht tief hoch offen geschlossen seitlich rechts links gerade aufrecht sitzend stehend liegend vorne hinten oben unten einbeinig").split(" ")
+    .forEach(function (w) { LOWER_WORDS[w] = true; });
+  function titleFromImageName(raw) {
+    var words = String(raw).replace(/\.[^.]+$/, "").replace(/\s*\(\d+\)\s*$/, "").replace(/[-_]+/g, " ").trim().split(/\s+/).filter(Boolean);
+    return words.map(function (w, i) {
+      var l = w.toLowerCase().replace(/([bcdfhjklmnprstvwxz])ue/g, "$1ü");
+      if (i > 0 && LOWER_WORDS[l]) return l;
+      return l.charAt(0).toUpperCase() + l.slice(1);
+    }).join(" ");
+  }
+  function setStepImage(step, img) {
+    step.img = img.id;
+    if (!String(step.name || "").trim()) step.name = titleFromImageName(img.name);
+  }
+
+  var chooser = { mode: "pick", step: null, confirmId: "", confirmTimer: 0 };
+  function openChooser(mode, step) {
+    chooser.mode = mode; chooser.step = step; chooser.confirmId = "";
+    $("ov-title").textContent = mode === "pick" ? "Bild wählen" : "Bilder verwalten";
+    $("no-image").hidden = mode !== "pick";
+    $("upload-label").hidden = !(assetsApi && libDoc);
+    $("ov-status").textContent = "";
+    $("overlay").hidden = false; renderChooser();
+  }
+  function closeChooser() { $("overlay").hidden = true; chooser.step = null; if (editing) renderEditor(); }
+  function renderChooser() {
+    var g = $("ov-grid"); g.textContent = "";
+    if (!lib.length) {
+      g.appendChild(el("p", "hint", "Noch keine Bilder. Mit „Bild hinzufügen“ lädst du Piktogramme aus Fotos oder Dateien hoch. Sie lassen sich bei mehreren Übungen verwenden."));
+      return;
+    }
+    lib.forEach(function (img) {
+      var c = el("div", "cell" + (chooser.mode === "pick" && chooser.step && chooser.step.img === img.id ? " sel" : ""));
+      c.setAttribute("role", "button"); c.tabIndex = 0;
+      c.appendChild(thumbEl(img.id, "", img.name));
+      c.appendChild(el("span", null, img.name));
+      function pick() { if (chooser.mode === "pick" && chooser.step) { setStepImage(chooser.step, img); closeChooser(); } }
+      c.addEventListener("click", pick);
+      c.addEventListener("keydown", function (ev) { if (ev.key === "Enter") pick(); });
+      if (chooser.mode === "manage" && assetsApi) {
+        var x = el("button", "x", chooser.confirmId === img.id ? "Sicher?" : "Löschen"); x.type = "button";
+        x.addEventListener("click", function (ev) {
+          ev.stopPropagation();
+          if (chooser.confirmId === img.id) { removeImage(img.id); }
+          else { chooser.confirmId = img.id; clearTimeout(chooser.confirmTimer); chooser.confirmTimer = setTimeout(function () { chooser.confirmId = ""; renderChooser(); }, 3500); renderChooser(); }
+        });
+        c.appendChild(x);
+      }
+      g.appendChild(c);
+    });
+  }
+  $("ov-close").addEventListener("click", closeChooser);
+  $("no-image").addEventListener("click", function () { if (chooser.step) chooser.step.img = ""; closeChooser(); });
+
+  function saveLib() { return libDoc ? libDoc.set({ images: lib }) : Promise.resolve(); }
+  async function removeImage(id) {
+    $("ov-status").textContent = "Lösche …";
+    try {
+      await assetsApi.delete(id);
+      lib = lib.filter(function (x) { return x.id !== id; });
+      await saveLib();
+      function strip(bl) { var ch = false; bl.forEach(function (b) { b.steps.forEach(function (s) { if (s.img === id) { s.img = ""; ch = true; } }); }); return ch; }
+      if (draft) strip(draft);
+      var nl = clone(lessons), changed = false;
+      nl.forEach(function (l) { if (strip(l.blocks)) changed = true; });
+      if (changed) { await persist(nl); applyLessons(nl); }
+      $("ov-status").textContent = "Bild gelöscht.";
+    } catch (e) { $("ov-status").textContent = "Löschen fehlgeschlagen."; }
+    chooser.confirmId = ""; renderChooser();
+  }
+
+  function loadImage(file) {
+    return new Promise(function (resolve, reject) {
+      var url = URL.createObjectURL(file), im = new Image();
+      im.onload = function () { URL.revokeObjectURL(url); resolve(im); };
+      im.onerror = function () { URL.revokeObjectURL(url); reject(new Error("decode")); };
+      im.src = url;
+    });
+  }
+  async function prepareImage(file) {
+    if (file.type === "image/svg+xml") return { blob: file, type: "image/svg+xml" };
+    var im = await loadImage(file), max = 1000, scale = Math.min(1, max / Math.max(im.naturalWidth, im.naturalHeight));
+    var c = document.createElement("canvas"); c.width = Math.max(1, Math.round(im.naturalWidth * scale)); c.height = Math.max(1, Math.round(im.naturalHeight * scale));
+    var ctx = c.getContext("2d"); var alpha = /png|webp|gif/.test(file.type);
+    if (!alpha) { ctx.fillStyle = "#fafaf6"; ctx.fillRect(0, 0, c.width, c.height); }
+    ctx.drawImage(im, 0, 0, c.width, c.height);
+    var type = alpha ? "image/png" : "image/jpeg";
+    var blob = await new Promise(function (res) { c.toBlob(res, type, 0.88); });
+    if (!blob) throw new Error("encode");
+    return { blob: blob, type: type };
+  }
+  var UPLOAD_MSG = { too_large: "Datei zu groß.", unsupported_type: "Dateityp wird nicht unterstützt.", quota_or_state: "Speicherplatz voll.", rate_limited: "Zu viele Uploads auf einmal. Kurz warten.", not_granted: "Hochladen ist hier nicht erlaubt." };
+  $("file-input").addEventListener("change", async function (ev) {
+    var files = Array.prototype.slice.call(ev.target.files || []); ev.target.value = "";
+    if (!files.length || !assetsApi) return;
+    var ok = 0, fail = "";
+    for (var i = 0; i < files.length; i++) {
+      $("ov-status").textContent = "Lade hoch " + (i + 1) + " von " + files.length + " …";
+      try {
+        var p = await prepareImage(files[i]);
+        var res = await assetsApi.upload(p.blob, { type: p.type });
+        lib.push({ id: res.id, name: files[i].name.replace(/\.[^.]+$/, "").slice(0, 60) || "Bild" });
+        await saveLib(); ok++;
+        if (chooser.mode === "pick" && chooser.step && files.length === 1) { setStepImage(chooser.step, lib[lib.length - 1]); closeChooser(); $("ov-status").textContent = ""; return; }
+        renderChooser();
+      } catch (e) { fail = UPLOAD_MSG[e && e.code] || "Bild konnte nicht verarbeitet werden."; }
+    }
+    $("ov-status").textContent = (ok ? ok + " Bild(er) hinzugefügt. " : "") + fail;
+    renderChooser();
+  });
+
+  /* ---------- keyboard ---------- */
+  document.addEventListener("keydown", function (ev) {
+    if (ev.key === "Escape") { closeDrawer(); closeLessons(); return; }
+    if (editing || !$("overlay").hidden || !$("drawer").hidden || !$("lessons-wrap").hidden) return;
+    var t = ev.target && ev.target.tagName; if (t === "INPUT" || t === "TEXTAREA") return;
+    if (ev.key === "ArrowRight") next();
+    else if (ev.key === "ArrowLeft") prev();
+    else if (ev.key === " ") { ev.preventDefault(); toggle(); }
+  });
+
+  /* ---------- start ---------- */
+  var initial = [], cachedL = lsGet(LS_LESSONS), cachedP = lsGet(LS_PLAN);
+  if (cachedL) { try { initial = normalizeLessons(JSON.parse(cachedL)); } catch (e) {} }
+  if (!initial.length && cachedP) { try { var cb = normalize(JSON.parse(cachedP)); if (cb.length) initial = [{ id: "l1", name: "Stunde 1", blocks: cb }]; } catch (e) {} }
+  if (initial.length) applyLessons(initial); else { restoreRun(); renderAll(); renderLessonUi(); }
+
+  (async function connect() {
+    if (!window.claude || !window.claude.use) return;
+    var db = null;
+    try { db = await window.claude.use("db"); } catch (e) {}
+    try { assetsApi = await window.claude.use("assets"); } catch (e) {}
+    if (!db) return;
+    planDoc = db.doc("yoga/plan"); lessonsDoc = db.doc("yoga/lessons"); libDoc = db.doc("yoga/lib");
+    if (editing) $("images-btn").hidden = !(assetsApi && libDoc);
+    libDoc.onSnapshot(function (snap) {
+      var d = snap.exists ? snap.data() : null;
+      lib = d && Array.isArray(d.images) ? d.images.filter(function (x) { return x && ID_RE.test(String(x.id)); }).map(function (x) { return { id: String(x.id), name: String(x.name || "Bild") }; }) : [];
+      if (!$("overlay").hidden) renderChooser();
+    }, function () {});
+
+    /* one-time migration of the former single plan (yoga/plan) into the lessons list */
+    var lessonsMissing = false, planSeen = false, planBlocks = [], migrated = false;
+    function tryMigrate() {
+      if (!lessonsMissing || !planSeen || migrated) return;
+      migrated = true;
+      var bl = planBlocks.length ? planBlocks : (isExample ? [] : blocks);
+      if (!bl.length) return;
+      var nl = [{ id: "l1", name: "Stunde 1", blocks: bl }];
+      persist(nl).then(function () { if (editing) pendingLessons = nl; else applyLessons(nl); }).catch(function () {});
+    }
+    planDoc.onSnapshot(function (snap) {
+      planSeen = true;
+      planBlocks = snap.exists ? normalize(snap.data() && snap.data().blocks ? clone(snap.data().blocks) : []) : [];
+      tryMigrate();
+    }, function () { planSeen = true; tryMigrate(); });
+    lessonsDoc.onSnapshot(function (snap) {
+      if (!snap.exists) { lessonsMissing = true; tryMigrate(); return; }
+      var d = snap.data(), nl = normalizeLessons(d && d.lessons ? clone(d.lessons) : []);
+      if (!nl.length) return;
+      lessonsMissing = false;
+      lsSet(LS_LESSONS, JSON.stringify(nl));
+      if (editing) { pendingLessons = nl; return; }
+      applyLessons(nl);
+    }, function () {});
+  })();
+})();
+</script>
+
+</body>
+</html>
