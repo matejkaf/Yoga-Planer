@@ -211,6 +211,10 @@ button:focus-visible, input:focus-visible, label:focus-within { outline: 3px sol
 .lrow .item { flex: 1; min-width: 0; }
 .lmin { font-family: var(--font-mono); font-size: 0.85rem; opacity: 0.7; margin-left: auto; white-space: nowrap; }
 .ed-head .field.lname { flex: 1 1 160px; min-width: 120px; max-width: 360px; }
+.appbox { display: none; margin-top: 18px; padding-top: 12px; border-top: 1px solid var(--line); }
+.ro .appbox { display: block; }
+.appbox .hint { margin-bottom: 8px; line-height: 1.4; }
+.toast { position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%); z-index: 30; background: var(--fg); color: var(--bg); padding: 12px 20px; border-radius: 14px; font-weight: 600; max-width: 90vw; text-align: center; }
 .ro #edit-btn, .ro #lesson-new, .ro #lesson-dup, .ro .lrow .mini, .ro #pub-btn { display: none !important; }
 @media (prefers-reduced-motion: reduce) { .bar > i, .total-bar > i { transition: none; } .flash.on { animation-duration: 0.01s; } }
 </style>
@@ -277,8 +281,15 @@ button:focus-visible, input:focus-visible, label:focus-within { outline: 3px sol
     </div>
     <p class="hint" id="lesson-status"></p>
     <div id="lesson-list"></div>
+    <div class="appbox" id="appbox">
+      <p class="hint" id="app-info"></p>
+      <button class="mini" id="app-update" type="button">Auf Update prüfen</button>
+      <button class="mini" id="app-reload" type="button" hidden>Neue Version laden</button>
+    </div>
   </aside>
 </div>
+
+<div class="toast" id="toast" hidden></div>
 
 <div class="overlay" id="pub-ov" hidden>
   <div class="panel" role="dialog" aria-modal="true" aria-labelledby="pub-title">
@@ -287,6 +298,7 @@ button:focus-visible, input:focus-visible, label:focus-within { outline: 3px sol
       <button class="btn small" id="pub-close" type="button">Schließen</button>
     </div>
     <p class="hint">Überträgt den gespeicherten Stand aller Stunden und Bilder ins GitHub-Repository. Die iPad-App übernimmt ihn beim nächsten Start. Vorher Änderungen mit „Speichern“ sichern.</p>
+    <p class="hint" id="pub-state"></p>
     <button class="btn go" id="pub-go" type="button">Veröffentlichung anfordern</button>
     <pre class="hint" id="pub-log" style="white-space: pre-wrap; margin: 0; font-family: var(--font-mono); font-size: 0.9rem;"></pre>
   </div>
@@ -327,16 +339,30 @@ button:focus-visible, input:focus-visible, label:focus-within { outline: 3px sol
       onSnapshot: function (f) { (subs[p] = subs[p] || []).push(f); setTimeout(function () { f(snap(p)); }, 0); return function () { subs[p] = (subs[p] || []).filter(function (x) { return x !== f; }); }; }
     };
   }
-  var ready = fetch("data/published.json", { cache: "no-store" }).then(function (r) { return r.ok ? r.json() : null; }).catch(function () { return null; }).then(function (d) {
-    if (!d || !Array.isArray(d.lessons) || !d.lessons.length) return;
-    pub = d; index();
-    try { localStorage.setItem(LSKEY, JSON.stringify(d)); } catch (e) {}
-    notify("yoga/lessons"); notify("yoga/lib");
-    if (navigator.onLine) Object.keys(FILES).forEach(function (id) { fetch("img/" + FILES[id]).catch(function () {}); });
-  });
+  var status = { publishedAt: pub && pub.publishedAt, checkedAt: Date.now(), state: "checking", appUpdate: false }, swReg = null;
+  function emit() { window.__appStatus = status; window.dispatchEvent(new Event("appstatus")); }
+  function check() {
+    status.state = "checking"; emit();
+    return fetch("data/published.json", { cache: "no-store" }).then(function (r) { return r.ok ? r.json() : null; }).catch(function () { return null; }).then(function (d) {
+      status.checkedAt = Date.now();
+      if (!d || !Array.isArray(d.lessons) || !d.lessons.length) { status.state = navigator.onLine && pub ? "ok" : "offline"; emit(); return; }
+      var changed = !!pub && d.publishedAt !== pub.publishedAt;
+      pub = d; index(); status.publishedAt = d.publishedAt; status.state = !navigator.onLine ? "offline" : changed ? "new" : "ok";
+      try { localStorage.setItem(LSKEY, JSON.stringify(d)); } catch (e) {}
+      notify("yoga/lessons"); notify("yoga/lib"); emit();
+      if (navigator.onLine) Object.keys(FILES).forEach(function (id) { fetch("img/" + FILES[id]).catch(function () {}); });
+    });
+  }
+  var ready = check();
+  window.__appCheck = function () { check(); if (swReg) swReg.update().catch(function () {}); };
   window.__srcFor = function (id) { return ready.then(function () { return FILES[id] ? "img/" + FILES[id] : null; }); };
   window.claude = { use: function (n) { return Promise.resolve(n === "db" ? { doc: doc } : null); } };
-  if ("serviceWorker" in navigator) window.addEventListener("load", function () { navigator.serviceWorker.register("sw.js").catch(function () {}); });
+  if ("serviceWorker" in navigator) {
+    var hadController = !!navigator.serviceWorker.controller;
+    navigator.serviceWorker.addEventListener("controllerchange", function () { if (hadController) { status.appUpdate = true; emit(); } hadController = true; });
+    navigator.serviceWorker.addEventListener("message", function (e) { if (e.data && e.data.type === "app-updated") { status.appUpdate = true; emit(); } });
+    window.addEventListener("load", function () { navigator.serviceWorker.register("sw.js").then(function (r) { swReg = r; }).catch(function () {}); });
+  }
 })();
 </script>
 <script>
@@ -972,21 +998,54 @@ button:focus-visible, input:focus-visible, label:focus-within { outline: 3px sol
     renderChooser();
   });
 
+  /* ---------- status: time stamps, update info ---------- */
+  function fmtStamp(iso) {
+    var d = new Date(iso); if (isNaN(d)) return "unbekannt";
+    return d.toLocaleString("de-AT", { weekday: "short", day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" });
+  }
+  var toastTimer = 0;
+  function toast(t) { var n = $("toast"); n.textContent = t; n.hidden = false; clearTimeout(toastTimer); toastTimer = setTimeout(function () { n.hidden = true; }, 6000); }
+  var lastToast = "";
+  function renderAppInfo() {
+    var a = window.__appStatus; if (!a) return;
+    var lines = [];
+    lines.push(a.publishedAt ? "Stand der Stunden: " + fmtStamp(a.publishedAt) : "Stand der Stunden: unbekannt");
+    if (a.state === "checking") lines.push("Prüfe auf Update …");
+    else if (a.state === "offline") lines.push("Kein Netz – gespeicherter Stand wird verwendet.");
+    else if (a.state === "new") lines.push("Neuer Stand wurde übernommen.");
+    else lines.push("Aktuell. Geprüft um " + new Date(a.checkedAt).toLocaleTimeString("de-AT", { hour: "2-digit", minute: "2-digit" }) + " Uhr.");
+    if (a.appUpdate) lines.push("Neue App-Version geladen – bitte neu laden.");
+    $("app-info").textContent = lines.join("\n"); $("app-info").style.whiteSpace = "pre-line";
+    $("app-reload").hidden = !a.appUpdate;
+    var key = a.state + "|" + a.publishedAt + "|" + a.appUpdate;
+    if (key !== lastToast && (a.state === "new" || a.appUpdate)) { toast(a.appUpdate ? "Neue App-Version bereit – im Menü „Stunden“ neu laden." : "Neuer Stand vom " + fmtStamp(a.publishedAt) + " übernommen."); }
+    lastToast = key;
+  }
+  window.addEventListener("appstatus", renderAppInfo);
+  $("app-update").addEventListener("click", function () { if (window.__appCheck) window.__appCheck(); });
+  $("app-reload").addEventListener("click", function () { location.reload(); });
+
   /* ---------- publish ---------- */
   /* The page cannot reach GitHub itself, so "Veröffentlichen" records a request next to the data; Claude pushes the saved state to the repository on request. */
-  var pubDoc = null;
+  var pubDoc = null, pubState = {};
+  function renderPubState() {
+    var r = pubState.requestedAt, d = pubState.publishedAt, pending = r && (!d || r > d);
+    $("pub-state").textContent = pending ? "Angefordert am " + fmtStamp(r) + " – wartet auf Veröffentlichung durch Claude." : d ? "Zuletzt veröffentlicht: " + fmtStamp(d) + "." : "Noch nie veröffentlicht.";
+    $("pub-btn").textContent = pending ? "Veröffentlichen ●" : "Veröffentlichen";
+  }
   async function requestPublish() {
     var log = $("pub-log"), btn = $("pub-go");
     if (!lessons.length) { log.textContent = "Es ist noch keine Stunde gespeichert (Bearbeiten → Speichern)."; return; }
     btn.disabled = true;
     try {
       if (!pubDoc) throw new Error("nodb");
-      await pubDoc.set({ requestedAt: new Date().toISOString(), lessons: lessons.length, images: lib.length });
+      pubState = { requestedAt: new Date().toISOString(), publishedAt: pubState.publishedAt || null, lessons: lessons.length, images: lib.length };
+      await pubDoc.set(pubState); renderPubState();
       log.textContent = "Vermerkt. Jetzt im Chat „veröffentlichen“ schreiben: Claude überträgt den gespeicherten Stand ins Repository. Die iPad-App übernimmt ihn beim nächsten Start.";
     } catch (e) { log.textContent = "Konnte nicht vermerken (kein Zugriff auf die Datenbank)."; }
     btn.disabled = false;
   }
-  function openPub() { $("pub-ov").hidden = false; $("pub-log").textContent = ""; }
+  function openPub() { $("pub-ov").hidden = false; $("pub-log").textContent = ""; renderPubState(); }
   $("pub-btn").addEventListener("click", openPub);
   $("pub-close").addEventListener("click", function () { $("pub-ov").hidden = true; });
   $("pub-go").addEventListener("click", requestPublish);
@@ -1014,6 +1073,7 @@ button:focus-visible, input:focus-visible, label:focus-within { outline: 3px sol
     try { assetsApi = await window.claude.use("assets"); } catch (e) {}
     if (!db) return;
     planDoc = db.doc("yoga/plan"); lessonsDoc = db.doc("yoga/lessons"); libDoc = db.doc("yoga/lib"); pubDoc = db.doc("yoga/publish");
+    if (!READONLY) pubDoc.onSnapshot(function (snap) { pubState = snap.exists ? (snap.data() || {}) : {}; renderPubState(); }, function () {});
     if (editing) $("images-btn").hidden = !(assetsApi && libDoc);
     libDoc.onSnapshot(function (snap) {
       var d = snap.exists ? snap.data() : null;
