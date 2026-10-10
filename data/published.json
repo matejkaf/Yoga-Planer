@@ -1,0 +1,417 @@
+{
+ "v": 1,
+ "publishedAt": "2026-10-10T20:00:00Z",
+ "lessons": [
+  {
+   "blocks": [
+    {
+     "id": "b1",
+     "steps": [
+      {
+       "id": "s1",
+       "img": "66e71a7a301389817a719a7a1b69b581",
+       "min": 4,
+       "name": "Drehsitz",
+       "note": "Knie heranziehen, Aufrecht"
+      },
+      {
+       "id": "oyqj9w8py1",
+       "img": "33050b0659056343c1df75e96db790b1",
+       "min": 3,
+       "name": "Brett",
+       "note": "Becken nicht durchhängen"
+      },
+      {
+       "id": "dddnfwuq91",
+       "img": "d23724797774057159cfdd8313440c07",
+       "min": 3,
+       "name": "Baum",
+       "note": ""
+      },
+      {
+       "id": "wj6qt5plv1",
+       "img": "35f2c99b619f6f3d99c475ccdbd2c7f2",
+       "min": 4,
+       "name": "Krieger II",
+       "note": ""
+      },
+      {
+       "id": "b23b0evcx2",
+       "img": "d8ddd404d4492eb958d355fcd10fd444",
+       "min": 3,
+       "name": "Gestreckter Seitlicher Winkel",
+       "note": ""
+      }
+     ],
+     "title": "Beginn"
+    },
+    {
+     "id": "b2",
+     "steps": [
+      {
+       "id": "s2",
+       "img": "2e635244bbe989b1a4cdeddf660b7e5d",
+       "min": 4,
+       "name": "Schmetterling",
+       "note": ""
+      },
+      {
+       "id": "bhktewi531",
+       "img": "d0c4e0d896ff91d5ad2682db65bbc6ad",
+       "min": 1,
+       "name": "Schulterbrücke",
+       "note": ""
+      }
+     ],
+     "title": ""
+    },
+    {
+     "id": "b3",
+     "steps": [
+      {
+       "id": "s3",
+       "img": "",
+       "min": 1,
+       "name": "Berg",
+       "note": "Füße hüftbreit, Arme über den Kopf"
+      },
+      {
+       "id": "s4",
+       "img": "",
+       "min": 1,
+       "name": "Vorbeuge",
+       "note": "Knie weich, Rücken lang"
+      },
+      {
+       "id": "s5",
+       "img": "33050b0659056343c1df75e96db790b1",
+       "min": 1,
+       "name": "Brett",
+       "note": "Schultern über den Händen"
+      },
+      {
+       "id": "s6",
+       "img": "",
+       "min": 1,
+       "name": "Kobra",
+       "note": "Ellbogen nah am Körper"
+      },
+      {
+       "id": "s7",
+       "img": "",
+       "min": 2,
+       "name": "Herabschauender Hund",
+       "note": "Fersen Richtung Boden, 5 Atemzüge"
+      }
+     ],
+     "title": "Sonnengruß A"
+    },
+    {
+     "id": "b4",
+     "steps": [
+      {
+       "id": "s8",
+       "img": "",
+       "min": 3,
+       "name": "Krieger I",
+       "note": "Je Seite 5 Atemzüge"
+      },
+      {
+       "id": "s9",
+       "img": "",
+       "min": 3,
+       "name": "Krieger II",
+       "note": "Blick über die vordere Hand"
+      },
+      {
+       "id": "s10",
+       "img": "",
+       "min": 3,
+       "name": "Seitwinkel",
+       "note": "Oberen Arm lang nach vorn"
+      }
+     ],
+     "title": "Krieger-Folge"
+    },
+    {
+     "id": "b5",
+     "steps": [
+      {
+       "id": "s11",
+       "img": "d23724797774057159cfdd8313440c07",
+       "min": 4,
+       "name": "Baum",
+       "note": "Blick fixieren, Standbein weich"
+      },
+      {
+       "id": "pee10nexi1",
+       "img": "7251df41361609c665b8f793b62cf223",
+       "min": 1,
+       "name": "Pawanmuktasana",
+       "note": ""
+      }
+     ],
+     "title": ""
+    },
+    {
+     "id": "b6",
+     "steps": [
+      {
+       "id": "s14",
+       "img": "",
+       "min": 10,
+       "name": "Endentspannung",
+       "note": "Decke bereitlegen, Stimme ruhig"
+      },
+      {
+       "id": "s12",
+       "img": "d0c4e0d896ff91d5ad2682db65bbc6ad",
+       "min": 5,
+       "name": "Sitzende Vorbeuge",
+       "note": ""
+      },
+      {
+       "id": "s13",
+       "img": "66e71a7a301389817a719a7a1b69b581",
+       "min": 4,
+       "name": "Drehsitz",
+       "note": "Je Seite 2 Minuten"
+      }
+     ],
+     "title": "Abschluss"
+    }
+   ],
+   "id": "l1",
+   "name": "Stunde 1"
+  },
+  {
+   "blocks": [
+    {
+     "id": "r7a2533w02",
+     "steps": [
+      {
+       "id": "icymjp3w03",
+       "img": "66e71a7a301389817a719a7a1b69b581",
+       "min": 4,
+       "name": "Drehsitz",
+       "note": "Knie heranziehen, Aufrecht"
+      },
+      {
+       "id": "9mqhh43w04",
+       "img": "33050b0659056343c1df75e96db790b1",
+       "min": 3,
+       "name": "Brett",
+       "note": "Becken nicht durchhängen"
+      },
+      {
+       "id": "qswqkt3w05",
+       "img": "d23724797774057159cfdd8313440c07",
+       "min": 3,
+       "name": "Baum",
+       "note": ""
+      },
+      {
+       "id": "a0yj1x3w06",
+       "img": "35f2c99b619f6f3d99c475ccdbd2c7f2",
+       "min": 4,
+       "name": "Krieger II",
+       "note": ""
+      },
+      {
+       "id": "u6n9na3w07",
+       "img": "d8ddd404d4492eb958d355fcd10fd444",
+       "min": 3,
+       "name": "Gestreckter Seitlicher Winkel",
+       "note": ""
+      }
+     ],
+     "title": "Beginn"
+    },
+    {
+     "id": "ov00yn3w08",
+     "steps": [
+      {
+       "id": "wq2dxz3w09",
+       "img": "2e635244bbe989b1a4cdeddf660b7e5d",
+       "min": 4,
+       "name": "Schmetterling",
+       "note": ""
+      },
+      {
+       "id": "ip20gu3w010",
+       "img": "d0c4e0d896ff91d5ad2682db65bbc6ad",
+       "min": 1,
+       "name": "Schulterbrücke",
+       "note": ""
+      }
+     ],
+     "title": ""
+    },
+    {
+     "id": "9q61fb3w011",
+     "steps": [
+      {
+       "id": "hc11oj3w012",
+       "img": "",
+       "min": 1,
+       "name": "Berg",
+       "note": "Füße hüftbreit, Arme über den Kopf"
+      },
+      {
+       "id": "c5cst23w013",
+       "img": "",
+       "min": 1,
+       "name": "Vorbeuge",
+       "note": "Knie weich, Rücken lang"
+      },
+      {
+       "id": "4vjllm3w014",
+       "img": "33050b0659056343c1df75e96db790b1",
+       "min": 1,
+       "name": "Brett",
+       "note": "Schultern über den Händen"
+      },
+      {
+       "id": "hqqa7a3w015",
+       "img": "",
+       "min": 1,
+       "name": "Kobra",
+       "note": "Ellbogen nah am Körper"
+      },
+      {
+       "id": "chtzgy3w016",
+       "img": "",
+       "min": 2,
+       "name": "Herabschauender Hund",
+       "note": "Fersen Richtung Boden, 5 Atemzüge"
+      }
+     ],
+     "title": "Sonnengruß A"
+    },
+    {
+     "id": "ec0nbm3w017",
+     "steps": [
+      {
+       "id": "d61j613w018",
+       "img": "",
+       "min": 3,
+       "name": "Krieger I",
+       "note": "Je Seite 5 Atemzüge"
+      },
+      {
+       "id": "tikv0o3w019",
+       "img": "",
+       "min": 3,
+       "name": "Krieger II",
+       "note": "Blick über die vordere Hand"
+      },
+      {
+       "id": "py1sja3w020",
+       "img": "",
+       "min": 3,
+       "name": "Seitwinkel",
+       "note": "Oberen Arm lang nach vorn"
+      }
+     ],
+     "title": "Krieger-Folge"
+    },
+    {
+     "id": "i8ggm63w021",
+     "steps": [
+      {
+       "id": "pvxz5i3w022",
+       "img": "d23724797774057159cfdd8313440c07",
+       "min": 4,
+       "name": "Baum",
+       "note": "Blick fixieren, Standbein weich"
+      },
+      {
+       "id": "hwb14k3w023",
+       "img": "7251df41361609c665b8f793b62cf223",
+       "min": 1,
+       "name": "Pawanmuktasana",
+       "note": ""
+      }
+     ],
+     "title": ""
+    },
+    {
+     "id": "8u09go3w024",
+     "steps": [
+      {
+       "id": "l6x6bd3w025",
+       "img": "",
+       "min": 10,
+       "name": "Endentspannung",
+       "note": "Decke bereitlegen, Stimme ruhig"
+      },
+      {
+       "id": "z72p4j3w026",
+       "img": "d0c4e0d896ff91d5ad2682db65bbc6ad",
+       "min": 5,
+       "name": "Sitzende Vorbeuge",
+       "note": ""
+      },
+      {
+       "id": "o7acwu3w027",
+       "img": "66e71a7a301389817a719a7a1b69b581",
+       "min": 4,
+       "name": "Drehsitz",
+       "note": "Je Seite 2 Minuten"
+      }
+     ],
+     "title": "Abschluss"
+    }
+   ],
+   "id": "r43il83w01",
+   "name": "Stunde 2"
+  }
+ ],
+ "lib": [
+  {
+   "id": "66e71a7a301389817a719a7a1b69b581",
+   "name": "drehsitz",
+   "file": "66e71a7a301389817a719a7a1b69b581.png"
+  },
+  {
+   "id": "33050b0659056343c1df75e96db790b1",
+   "name": "Brett",
+   "file": "33050b0659056343c1df75e96db790b1.png"
+  },
+  {
+   "id": "d23724797774057159cfdd8313440c07",
+   "name": "baum",
+   "file": "d23724797774057159cfdd8313440c07.png"
+  },
+  {
+   "id": "7251df41361609c665b8f793b62cf223",
+   "name": "pawanmuktasana",
+   "file": "7251df41361609c665b8f793b62cf223.png"
+  },
+  {
+   "id": "2e635244bbe989b1a4cdeddf660b7e5d",
+   "name": "schmetterling-baddha-konasana",
+   "file": "2e635244bbe989b1a4cdeddf660b7e5d.png"
+  },
+  {
+   "id": "d0c4e0d896ff91d5ad2682db65bbc6ad",
+   "name": "schulterbruecke",
+   "file": "d0c4e0d896ff91d5ad2682db65bbc6ad.png"
+  },
+  {
+   "id": "35f2c99b619f6f3d99c475ccdbd2c7f2",
+   "name": "krieger-ii",
+   "file": "35f2c99b619f6f3d99c475ccdbd2c7f2.png"
+  },
+  {
+   "id": "d8ddd404d4492eb958d355fcd10fd444",
+   "name": "gestreckter-seitlicher-winkel",
+   "file": "d8ddd404d4492eb958d355fcd10fd444.png"
+  },
+  {
+   "id": "f8946153e15f22e763d3ecda4e378d58",
+   "name": "schiefe-ebene-purvottanasana",
+   "file": "f8946153e15f22e763d3ecda4e378d58.png"
+  }
+ ]
+}

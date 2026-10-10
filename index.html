@@ -211,6 +211,7 @@ button:focus-visible, input:focus-visible, label:focus-within { outline: 3px sol
 .lrow .item { flex: 1; min-width: 0; }
 .lmin { font-family: var(--font-mono); font-size: 0.85rem; opacity: 0.7; margin-left: auto; white-space: nowrap; }
 .ed-head .field.lname { flex: 1 1 160px; min-width: 120px; max-width: 360px; }
+.ro #edit-btn, .ro #lesson-new, .ro #lesson-dup, .ro .lrow .mini, .ro #pub-btn { display: none !important; }
 @media (prefers-reduced-motion: reduce) { .bar > i, .total-bar > i { transition: none; } .flash.on { animation-duration: 0.01s; } }
 </style>
 </head>
@@ -224,6 +225,7 @@ button:focus-visible, input:focus-visible, label:focus-within { outline: 3px sol
     <button class="ghost" id="list-btn" type="button">Ablauf</button>
     <button class="ghost" id="edit-btn" type="button">Bearbeiten</button>
     <button class="ghost" id="fs-btn" type="button" hidden>Vollbild</button>
+    <button class="ghost" id="pub-btn" type="button">Veröffentlichen</button>
     <div class="total-bar" id="total-bar"><i></i></div>
   </header>
 
@@ -278,6 +280,20 @@ button:focus-visible, input:focus-visible, label:focus-within { outline: 3px sol
   </aside>
 </div>
 
+<div class="overlay" id="pub-ov" hidden>
+  <div class="panel" role="dialog" aria-modal="true" aria-labelledby="pub-title">
+    <div class="bar-row">
+      <h3 id="pub-title">Veröffentlichen</h3>
+      <button class="btn small" id="pub-close" type="button">Schließen</button>
+    </div>
+    <p class="hint">Überträgt alle Stunden und Bilder ins GitHub-Repository. Die iPad-App übernimmt den Stand beim nächsten Start.</p>
+    <input class="field" id="pub-token" type="password" autocomplete="off" spellcheck="false" placeholder="GitHub-Token einfügen (nur beim ersten Mal)">
+    <p class="hint">Token: GitHub → Settings → Developer settings → Fine-grained tokens. Nur Repository „Yoga-Planer“, Berechtigung „Contents: Read and write“. Er wird nur in diesem Browser gespeichert.</p>
+    <button class="btn go" id="pub-go" type="button">Jetzt veröffentlichen</button>
+    <pre class="hint" id="pub-log" style="white-space: pre-wrap; margin: 0; font-family: var(--font-mono); font-size: 0.9rem;"></pre>
+  </div>
+</div>
+
 <div class="overlay" id="overlay" hidden>
   <div class="panel" role="dialog" aria-modal="true" aria-labelledby="ov-title">
     <div class="bar-row">
@@ -292,63 +308,36 @@ button:focus-visible, input:focus-visible, label:focus-within { outline: 3px sol
 </div>
 
 <script>
-/* Offline build: replaces the claude.ai storage with this device's own storage (localStorage for plan and image list, IndexedDB for uploaded images). */
+/* Read-only app: shows the state published from the planner (data/published.json). Nothing can be edited here. */
 (function () {
-  var SEED = {"lessons": [{"blocks": [{"id": "b1", "steps": [{"id": "s1", "img": "66e71a7a301389817a719a7a1b69b581", "min": 4, "name": "Drehsitz", "note": "Knie heranziehen, Aufrecht"}, {"id": "oyqj9w8py1", "img": "33050b0659056343c1df75e96db790b1", "min": 3, "name": "Brett", "note": "Becken nicht durchhängen"}, {"id": "dddnfwuq91", "img": "d23724797774057159cfdd8313440c07", "min": 3, "name": "Baum", "note": ""}, {"id": "wj6qt5plv1", "img": "35f2c99b619f6f3d99c475ccdbd2c7f2", "min": 4, "name": "Krieger II", "note": ""}, {"id": "b23b0evcx2", "img": "d8ddd404d4492eb958d355fcd10fd444", "min": 3, "name": "Gestreckter Seitlicher Winkel", "note": ""}], "title": "Beginn"}, {"id": "b2", "steps": [{"id": "s2", "img": "2e635244bbe989b1a4cdeddf660b7e5d", "min": 4, "name": "Schmetterling", "note": ""}, {"id": "bhktewi531", "img": "d0c4e0d896ff91d5ad2682db65bbc6ad", "min": 1, "name": "Schulterbrücke", "note": ""}], "title": ""}, {"id": "b3", "steps": [{"id": "s3", "img": "", "min": 1, "name": "Berg", "note": "Füße hüftbreit, Arme über den Kopf"}, {"id": "s4", "img": "", "min": 1, "name": "Vorbeuge", "note": "Knie weich, Rücken lang"}, {"id": "s5", "img": "33050b0659056343c1df75e96db790b1", "min": 1, "name": "Brett", "note": "Schultern über den Händen"}, {"id": "s6", "img": "", "min": 1, "name": "Kobra", "note": "Ellbogen nah am Körper"}, {"id": "s7", "img": "", "min": 2, "name": "Herabschauender Hund", "note": "Fersen Richtung Boden, 5 Atemzüge"}], "title": "Sonnengruß A"}, {"id": "b4", "steps": [{"id": "s8", "img": "", "min": 3, "name": "Krieger I", "note": "Je Seite 5 Atemzüge"}, {"id": "s9", "img": "", "min": 3, "name": "Krieger II", "note": "Blick über die vordere Hand"}, {"id": "s10", "img": "", "min": 3, "name": "Seitwinkel", "note": "Oberen Arm lang nach vorn"}], "title": "Krieger-Folge"}, {"id": "b5", "steps": [{"id": "s11", "img": "d23724797774057159cfdd8313440c07", "min": 4, "name": "Baum", "note": "Blick fixieren, Standbein weich"}, {"id": "pee10nexi1", "img": "7251df41361609c665b8f793b62cf223", "min": 1, "name": "Pawanmuktasana", "note": ""}], "title": ""}, {"id": "b6", "steps": [{"id": "s14", "img": "", "min": 10, "name": "Endentspannung", "note": "Decke bereitlegen, Stimme ruhig"}, {"id": "s12", "img": "d0c4e0d896ff91d5ad2682db65bbc6ad", "min": 5, "name": "Sitzende Vorbeuge", "note": ""}, {"id": "s13", "img": "66e71a7a301389817a719a7a1b69b581", "min": 4, "name": "Drehsitz", "note": "Je Seite 2 Minuten"}], "title": "Abschluss"}], "id": "l1", "name": "Stunde 1"}, {"blocks": [{"id": "r7a2533w02", "steps": [{"id": "icymjp3w03", "img": "66e71a7a301389817a719a7a1b69b581", "min": 4, "name": "Drehsitz", "note": "Knie heranziehen, Aufrecht"}, {"id": "9mqhh43w04", "img": "33050b0659056343c1df75e96db790b1", "min": 3, "name": "Brett", "note": "Becken nicht durchhängen"}, {"id": "qswqkt3w05", "img": "d23724797774057159cfdd8313440c07", "min": 3, "name": "Baum", "note": ""}, {"id": "a0yj1x3w06", "img": "35f2c99b619f6f3d99c475ccdbd2c7f2", "min": 4, "name": "Krieger II", "note": ""}, {"id": "u6n9na3w07", "img": "d8ddd404d4492eb958d355fcd10fd444", "min": 3, "name": "Gestreckter Seitlicher Winkel", "note": ""}], "title": "Beginn"}, {"id": "ov00yn3w08", "steps": [{"id": "wq2dxz3w09", "img": "2e635244bbe989b1a4cdeddf660b7e5d", "min": 4, "name": "Schmetterling", "note": ""}, {"id": "ip20gu3w010", "img": "d0c4e0d896ff91d5ad2682db65bbc6ad", "min": 1, "name": "Schulterbrücke", "note": ""}], "title": ""}, {"id": "9q61fb3w011", "steps": [{"id": "hc11oj3w012", "img": "", "min": 1, "name": "Berg", "note": "Füße hüftbreit, Arme über den Kopf"}, {"id": "c5cst23w013", "img": "", "min": 1, "name": "Vorbeuge", "note": "Knie weich, Rücken lang"}, {"id": "4vjllm3w014", "img": "33050b0659056343c1df75e96db790b1", "min": 1, "name": "Brett", "note": "Schultern über den Händen"}, {"id": "hqqa7a3w015", "img": "", "min": 1, "name": "Kobra", "note": "Ellbogen nah am Körper"}, {"id": "chtzgy3w016", "img": "", "min": 2, "name": "Herabschauender Hund", "note": "Fersen Richtung Boden, 5 Atemzüge"}], "title": "Sonnengruß A"}, {"id": "ec0nbm3w017", "steps": [{"id": "d61j613w018", "img": "", "min": 3, "name": "Krieger I", "note": "Je Seite 5 Atemzüge"}, {"id": "tikv0o3w019", "img": "", "min": 3, "name": "Krieger II", "note": "Blick über die vordere Hand"}, {"id": "py1sja3w020", "img": "", "min": 3, "name": "Seitwinkel", "note": "Oberen Arm lang nach vorn"}], "title": "Krieger-Folge"}, {"id": "i8ggm63w021", "steps": [{"id": "pvxz5i3w022", "img": "d23724797774057159cfdd8313440c07", "min": 4, "name": "Baum", "note": "Blick fixieren, Standbein weich"}, {"id": "hwb14k3w023", "img": "7251df41361609c665b8f793b62cf223", "min": 1, "name": "Pawanmuktasana", "note": ""}], "title": ""}, {"id": "8u09go3w024", "steps": [{"id": "l6x6bd3w025", "img": "", "min": 10, "name": "Endentspannung", "note": "Decke bereitlegen, Stimme ruhig"}, {"id": "z72p4j3w026", "img": "d0c4e0d896ff91d5ad2682db65bbc6ad", "min": 5, "name": "Sitzende Vorbeuge", "note": ""}, {"id": "o7acwu3w027", "img": "66e71a7a301389817a719a7a1b69b581", "min": 4, "name": "Drehsitz", "note": "Je Seite 2 Minuten"}], "title": "Abschluss"}], "id": "r43il83w01", "name": "Stunde 2"}], "lib": [{"id": "66e71a7a301389817a719a7a1b69b581", "name": "drehsitz"}, {"id": "33050b0659056343c1df75e96db790b1", "name": "Brett"}, {"id": "d23724797774057159cfdd8313440c07", "name": "baum"}, {"id": "7251df41361609c665b8f793b62cf223", "name": "pawanmuktasana"}, {"id": "2e635244bbe989b1a4cdeddf660b7e5d", "name": "schmetterling-baddha-konasana"}, {"id": "d0c4e0d896ff91d5ad2682db65bbc6ad", "name": "schulterbruecke"}, {"id": "35f2c99b619f6f3d99c475ccdbd2c7f2", "name": "krieger-ii"}, {"id": "d8ddd404d4492eb958d355fcd10fd444", "name": "gestreckter-seitlicher-winkel"}]};
-  var FILES = {}; SEED.lib.forEach(function (x) { FILES[x.id] = x.id + ".png"; });
-  var PFX = "yoga.local.db.", subs = {};
-  function read(p) { try { var r = localStorage.getItem(PFX + p); return r ? JSON.parse(r) : null; } catch (e) { return null; } }
-  function write(p, d) { localStorage.setItem(PFX + p, JSON.stringify(d)); }
-  try {
-    if (!localStorage.getItem(PFX + "seeded")) {
-      write("yoga/lessons", { v: 2, lessons: SEED.lessons }); write("yoga/lib", { images: SEED.lib });
-      localStorage.setItem(PFX + "seeded", "1");
-    }
-  } catch (e) {}
-  function snap(p) { var d = read(p); return { exists: !!d, data: function () { return d ? JSON.parse(JSON.stringify(d)) : undefined; } }; }
+  window.__readonly = true; document.documentElement.classList.add("ro");
+  var LSKEY = "yoga.published.v1", subs = {}, FILES = {}, pub = null;
+  try { pub = JSON.parse(localStorage.getItem(LSKEY)); } catch (e) {}
+  function index() { FILES = {}; if (pub && Array.isArray(pub.lib)) pub.lib.forEach(function (x) { FILES[x.id] = x.file; }); }
+  index();
+  function docData(p) {
+    if (!pub) return null;
+    if (p === "yoga/lessons") return { v: 2, lessons: pub.lessons };
+    if (p === "yoga/lib") return { images: (pub.lib || []).map(function (x) { return { id: x.id, name: x.name }; }) };
+    return null;
+  }
+  function snap(p) { var d = docData(p); return { exists: !!d, data: function () { return d ? JSON.parse(JSON.stringify(d)) : undefined; } }; }
   function notify(p) { (subs[p] || []).forEach(function (f) { setTimeout(function () { f(snap(p)); }, 0); }); }
   function doc(p) {
     return {
-      set: function (d) { return new Promise(function (res, rej) { try { write(p, d); } catch (e) { rej(e); return; } notify(p); res(); }); },
+      set: function () { return Promise.reject(new Error("read-only")); },
       onSnapshot: function (f) { (subs[p] = subs[p] || []).push(f); setTimeout(function () { f(snap(p)); }, 0); return function () { subs[p] = (subs[p] || []).filter(function (x) { return x !== f; }); }; }
     };
   }
-  function idb() { return new Promise(function (res, rej) { var r = indexedDB.open("yoga-assets", 1); r.onupgradeneeded = function () { r.result.createObjectStore("b"); }; r.onsuccess = function () { res(r.result); }; r.onerror = function () { rej(r.error); }; }); }
-  function tx(mode, fn) { return idb().then(function (db) { return new Promise(function (res, rej) { var t = db.transaction("b", mode), out = fn(t.objectStore("b")); t.oncomplete = function () { res(out && out.result); }; t.onerror = function () { rej(t.error); }; }); }); }
-  function rid() { var a = new Uint8Array(16); crypto.getRandomValues(a); return Array.prototype.map.call(a, function (x) { return ("0" + x.toString(16)).slice(-2); }).join(""); }
-  var assets = {
-    upload: function (blob) { var id = rid(); return tx("readwrite", function (s) { return s.put(blob, id); }).then(function () { return { id: id, url: "", sizeBytes: blob.size, contentType: blob.type }; }); },
-    delete: function (id) {
-      if (FILES[id]) { var d = read("deleted") || []; if (d.indexOf(id) < 0) d.push(id); try { write("deleted", d); } catch (e) {} }
-      return tx("readwrite", function (s) { return s.delete(id); }).then(function () { return { deleted: true }; });
-    }
-  };
-  /* bundled images: img/images.json lists the files shipped with the app; new entries are added to the image list on every start */
-  function hid(str) {
-    var h = [0x811c9dc5, 0x1b873593, 0xcc9e2d51, 0x85ebca6b], i, k;
-    for (i = 0; i < str.length; i++) for (k = 0; k < 4; k++) h[k] = Math.imul(h[k] ^ str.charCodeAt(i), 0x01000193 + 2 * k) >>> 0;
-    return h.map(function (x) { x = Math.imul(x ^ (x >>> 15), 0x2c1b3c6d) >>> 0; return ("00000000" + x.toString(16)).slice(-8); }).join("");
-  }
-  var manifestReady = fetch("img/images.json").then(function (r) { return r.ok ? r.json() : []; }).catch(function () { return []; }).then(function (list) {
-    if (!Array.isArray(list)) return;
-    var cur = read("yoga/lib"), imgs = cur && Array.isArray(cur.images) ? cur.images.slice() : [], gone = read("deleted") || [], changed = false;
-    list.forEach(function (e) {
-      if (!e || !e.file) return;
-      var id = e.id || hid(String(e.file)); FILES[id] = String(e.file);
-      if (gone.indexOf(id) >= 0 || imgs.some(function (x) { return x.id === id; })) return;
-      imgs.push({ id: id, name: String(e.name || e.file).replace(/\.[^.]+$/, "").slice(0, 60) }); changed = true;
-    });
-    if (changed) { try { write("yoga/lib", { images: imgs }); notify("yoga/lib"); } catch (e) {} }
+  var ready = fetch("data/published.json", { cache: "no-store" }).then(function (r) { return r.ok ? r.json() : null; }).catch(function () { return null; }).then(function (d) {
+    if (!d || !Array.isArray(d.lessons) || !d.lessons.length) return;
+    pub = d; index();
+    try { localStorage.setItem(LSKEY, JSON.stringify(d)); } catch (e) {}
+    notify("yoga/lessons"); notify("yoga/lib");
     if (navigator.onLine) Object.keys(FILES).forEach(function (id) { fetch("img/" + FILES[id]).catch(function () {}); });
   });
-  window.__srcFor = function (id) {
-    return manifestReady.then(function () {
-      if (FILES[id]) return "img/" + FILES[id];
-      return tx("readonly", function (s) { return s.get(id); }).then(function (b) { return b ? URL.createObjectURL(b) : null; }).catch(function () { return null; });
-    });
-  };
-  window.claude = { use: function (n) { return Promise.resolve(n === "db" ? { doc: doc } : n === "assets" ? assets : null); } };
-  try { if (navigator.storage && navigator.storage.persist) navigator.storage.persist(); } catch (e) {}
+  window.__srcFor = function (id) { return ready.then(function () { return FILES[id] ? "img/" + FILES[id] : null; }); };
+  window.claude = { use: function (n) { return Promise.resolve(n === "db" ? { doc: doc } : null); } };
   if ("serviceWorker" in navigator) window.addEventListener("load", function () { navigator.serviceWorker.register("sw.js").catch(function () {}); });
 })();
 </script>
@@ -357,6 +346,7 @@ button:focus-visible, input:focus-visible, label:focus-within { outline: 3px sol
   var LS_PLAN = "yoga.plan.cache.v2", LS_LESSONS = "yoga.lessons.cache.v3", LS_ACTIVE = "yoga.active.v1", LS_RUN = "yoga.run.v2", RUN_MAX_AGE = 6 * 3600 * 1000;
   var ID_RE = /^[0-9a-f]{32}$/;
   var DOUBLE_MS = 300, LEFT_ZONE = 0.22;
+  var READONLY = !!window.__readonly;
   var uidN = 0;
   function uid() { uidN++; return Math.random().toString(36).slice(2, 8) + Date.now().toString(36).slice(-3) + uidN; }
   function $(id) { return document.getElementById(id); }
@@ -758,7 +748,7 @@ button:focus-visible, input:focus-visible, label:focus-within { outline: 3px sol
   /* ---------- editor ---------- */
   function setStatus(t) { $("ed-status").textContent = t || ""; }
   function showEditor(on) {
-    $("editor").hidden = !on; $("play").hidden = on; $("edit-btn").hidden = on; $("list-btn").hidden = on; $("lesson-btn").hidden = on;
+    $("editor").hidden = !on; $("play").hidden = on; $("edit-btn").hidden = on; $("list-btn").hidden = on; $("lesson-btn").hidden = on; $("pub-btn").hidden = on;
     $("images-btn").hidden = !(on && assetsApi && libDoc);
   }
   function openEditor() {
@@ -984,10 +974,75 @@ button:focus-visible, input:focus-visible, label:focus-within { outline: 3px sol
     renderChooser();
   });
 
+  /* ---------- publish to GitHub ---------- */
+  var GH_REPO = "matejkaf/Yoga-Planer", GH_BRANCH = "main", LS_TOKEN = "yoga.gh.token.v1";
+  var EXT = { "image/png": "png", "image/jpeg": "jpg", "image/gif": "gif", "image/webp": "webp", "image/svg+xml": "svg" };
+  function pubLog(t) { var l = $("pub-log"); l.textContent += (l.textContent ? "\n" : "") + t; }
+  function toBase64(buf) {
+    var bytes = new Uint8Array(buf), bin = "", i;
+    for (i = 0; i < bytes.length; i += 0x8000) bin += String.fromCharCode.apply(null, bytes.subarray(i, i + 0x8000));
+    return btoa(bin);
+  }
+  function utf8Base64(str) { return toBase64(new TextEncoder().encode(str)); }
+  async function gh(token, method, path, body) {
+    var res = await fetch("https://api.github.com/repos/" + GH_REPO + path, {
+      method: method,
+      headers: { Authorization: "Bearer " + token, Accept: "application/vnd.github+json", "X-GitHub-Api-Version": "2022-11-28", "Content-Type": "application/json" },
+      body: body ? JSON.stringify(body) : undefined
+    });
+    if (res.status === 401 || res.status === 403) { var e1 = new Error("auth"); e1.code = "auth"; throw e1; }
+    if (res.status === 404) return null;
+    if (!res.ok) { var e2 = new Error("http " + res.status); e2.code = "http"; throw e2; }
+    return res.json();
+  }
+  async function putFile(token, path, base64, message) {
+    var cur = await gh(token, "GET", "/contents/" + path + "?ref=" + GH_BRANCH), body = { message: message, content: base64, branch: GH_BRANCH };
+    if (cur && cur.sha) body.sha = cur.sha;
+    await gh(token, "PUT", "/contents/" + path, body);
+  }
+  async function publishToGithub() {
+    var typed = $("pub-token").value.trim(), token = typed || lsGet(LS_TOKEN) || "";
+    if (!token) { pubLog("Bitte zuerst den GitHub-Token einfügen."); return; }
+    var btn = $("pub-go"); btn.disabled = true; $("pub-log").textContent = "";
+    try {
+      var stateLessons = clone(lessons);
+      if (!stateLessons.length) { pubLog("Es ist noch keine Stunde gespeichert."); return; }
+      pubLog("Prüfe Repository …");
+      var dir = await gh(token, "GET", "/contents/img?ref=" + GH_BRANCH), have = {};
+      (dir || []).forEach(function (f) { have[f.name.replace(/\.[^.]+$/, "")] = f.name; });
+      var out = [], n = 0;
+      for (var i = 0; i < lib.length; i++) {
+        var im = lib[i], file = have[im.id];
+        if (!file) {
+          pubLog("Lade Bild hoch: " + im.name);
+          var r = await fetch("/_blob/" + im.id);
+          if (!r.ok) { pubLog("Bild nicht lesbar, übersprungen: " + im.name); continue; }
+          var blob = await r.blob(), ext = EXT[blob.type] || "png";
+          file = im.id + "." + ext;
+          await putFile(token, "img/" + file, toBase64(await blob.arrayBuffer()), "Bild " + im.name); n++;
+        }
+        out.push({ id: im.id, name: im.name, file: file });
+      }
+      pubLog("Schreibe Stundenplan …");
+      var data = { v: 1, publishedAt: new Date().toISOString(), lessons: stateLessons, lib: out };
+      await putFile(token, "data/published.json", utf8Base64(JSON.stringify(data, null, 1)), "Planer veröffentlicht");
+      if (typed) { lsSet(LS_TOKEN, typed); $("pub-token").value = ""; }
+      pubLog("Fertig: " + stateLessons.length + " Stunde(n), " + n + " neue(s) Bild(er). Die iPad-App übernimmt den Stand beim nächsten Start (nach etwa einer Minute online).");
+    } catch (e) {
+      if (e && e.code === "auth") { pubLog("GitHub lehnt den Token ab (ungültig oder keine Schreibrechte auf Yoga-Planer)."); lsDel(LS_TOKEN); }
+      else if (e && e.code === "http") pubLog("GitHub-Fehler: " + e.message);
+      else pubLog("Keine Verbindung zu GitHub (offline oder hier blockiert).");
+    } finally { btn.disabled = false; }
+  }
+  function openPub() { $("pub-ov").hidden = false; $("pub-log").textContent = ""; $("pub-token").placeholder = lsGet(LS_TOKEN) ? "Token gespeichert ✓ (zum Ändern neu einfügen)" : "GitHub-Token einfügen (nur beim ersten Mal)"; }
+  $("pub-btn").addEventListener("click", openPub);
+  $("pub-close").addEventListener("click", function () { $("pub-ov").hidden = true; });
+  $("pub-go").addEventListener("click", publishToGithub);
+
   /* ---------- keyboard ---------- */
   document.addEventListener("keydown", function (ev) {
     if (ev.key === "Escape") { closeDrawer(); closeLessons(); return; }
-    if (editing || !$("overlay").hidden || !$("drawer").hidden || !$("lessons-wrap").hidden) return;
+    if (editing || !$("pub-ov").hidden || !$("overlay").hidden || !$("drawer").hidden || !$("lessons-wrap").hidden) return;
     var t = ev.target && ev.target.tagName; if (t === "INPUT" || t === "TEXTAREA") return;
     if (ev.key === "ArrowRight") next();
     else if (ev.key === "ArrowLeft") prev();
@@ -1017,7 +1072,7 @@ button:focus-visible, input:focus-visible, label:focus-within { outline: 3px sol
     /* one-time migration of the former single plan (yoga/plan) into the lessons list */
     var lessonsMissing = false, planSeen = false, planBlocks = [], migrated = false;
     function tryMigrate() {
-      if (!lessonsMissing || !planSeen || migrated) return;
+      if (READONLY || !lessonsMissing || !planSeen || migrated) return;
       migrated = true;
       var bl = planBlocks.length ? planBlocks : (isExample ? [] : blocks);
       if (!bl.length) return;

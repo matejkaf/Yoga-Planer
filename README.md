@@ -1,7 +1,3 @@
 # Yoga-Planer
 
-Offline-Web-App (GitHub Pages). Neue Standard-Bilder: Datei in den Ordner `img/` legen und in `img/images.json` eintragen:
-
-    { "file": "mein-bild.png" }
-
-Optional `"name"`. Der Name der Übung wird später aus dem Bildnamen erzeugt. Beim nächsten Start der App erscheint das Bild in der Bildauswahl (zweimal öffnen, damit die neue Version geladen wird).
+Schreibgeschützte Offline-Web-App (GitHub Pages) für das iPad. Geplant wird im Claude-Artefakt, dort „Veröffentlichen“ schreibt `data/published.json` und die Bilder in `img/` in dieses Repository. Die App übernimmt den Stand beim nächsten Start.
