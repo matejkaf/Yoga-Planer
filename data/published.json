@@ -1,6 +1,6 @@
 {
  "v": 1,
- "publishedAt": "2026-10-10T19:45:04Z",
+ "publishedAt": "2026-10-10T19:52:53Z",
  "lessons": [
   {
    "blocks": [
@@ -365,6 +365,99 @@
    ],
    "id": "r43il83w01",
    "name": "Stunde 2"
+  },
+  {
+   "blocks": [
+    {
+     "id": "bob1",
+     "steps": [
+      {
+       "id": "bo1",
+       "img": "",
+       "min": 4,
+       "name": "Bauchatmung in Rückenlage",
+       "note": "Vorab mit Arzt oder Physio klären, was erlaubt ist. Knie aufgestellt, Hände auf dem Bauch. Jederzeit stoppen bei Schmerz, Kribbeln oder Taubheit."
+      },
+      {
+       "id": "bo2",
+       "img": "",
+       "min": 3,
+       "name": "Becken sanft kippen",
+       "note": "Kleine, langsame Bewegung. Nur im schmerzfreien Bereich."
+      }
+     ],
+     "title": "Ankommen"
+    },
+    {
+     "id": "bob2",
+     "steps": [
+      {
+       "id": "bo3",
+       "img": "d0c4e0d896ff91d5ad2682db65bbc6ad",
+       "min": 3,
+       "name": "Schulterbrücke, kleiner Hub",
+       "note": "Nur wenig anheben, Gesäß aktiv, kein Hohlkreuz. Langsam ablegen."
+      },
+      {
+       "id": "bo4",
+       "img": "7251df41361609c665b8f793b62cf223",
+       "min": 3,
+       "name": "Ein Knie zur Brust",
+       "note": "Nur ein Bein, sanft, im schmerzfreien Bereich. Kein Ziehen mit Kraft."
+      },
+      {
+       "id": "bo5",
+       "img": "",
+       "min": 3,
+       "name": "Fersen gleiten",
+       "note": "Abwechselnd ein Bein lang ausstrecken. Rücken bleibt ruhig am Boden."
+      }
+     ],
+     "title": "Aktivierung am Boden"
+    },
+    {
+     "id": "bob3",
+     "steps": [
+      {
+       "id": "bo6",
+       "img": "",
+       "min": 2,
+       "name": "Berg, aufrechte Haltung",
+       "note": "Füße hüftbreit, Wirbelsäule lang, locker atmen. Kein Hohlkreuz."
+      },
+      {
+       "id": "bo7",
+       "img": "35f2c99b619f6f3d99c475ccdbd2c7f2",
+       "min": 3,
+       "name": "Krieger II, flach",
+       "note": "Nur kurz und flach, Rumpf aufrecht, nicht tief gehen. Hände auch an die Hüften möglich."
+      },
+      {
+       "id": "bo8",
+       "img": "d23724797774057159cfdd8313440c07",
+       "min": 3,
+       "name": "Baum an der Wand",
+       "note": "Eine Hand an Wand oder Stuhl. Fuß am Unterschenkel, nicht am Knie."
+      }
+     ],
+     "title": "Aufrecht stehen"
+    },
+    {
+     "id": "bob4",
+     "steps": [
+      {
+       "id": "bo9",
+       "img": "",
+       "min": 8,
+       "name": "Entspannung in Rückenlage",
+       "note": "Unterschenkel auf Stuhl oder Kissen lagern. Decke bereitlegen, ruhige Stimme."
+      }
+     ],
+     "title": "Abschluss"
+    }
+   ],
+   "id": "l3bo1",
+   "name": "Nach Bandscheiben-OP (sanft)"
   }
  ],
  "lib": [
