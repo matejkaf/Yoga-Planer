@@ -1,6 +1,6 @@
 {
  "v": 1,
- "publishedAt": "2026-10-10T20:00:00Z",
+ "publishedAt": "2026-10-10T19:40:54Z",
  "lessons": [
   {
    "blocks": [
@@ -11,15 +11,15 @@
        "id": "s1",
        "img": "66e71a7a301389817a719a7a1b69b581",
        "min": 4,
-       "name": "Drehsitz",
+       "name": "Drehsitz Test",
        "note": "Knie heranziehen, Aufrecht"
       },
       {
-       "id": "oyqj9w8py1",
-       "img": "33050b0659056343c1df75e96db790b1",
-       "min": 3,
-       "name": "Brett",
-       "note": "Becken nicht durchhängen"
+       "id": "wj6qt5plv1",
+       "img": "35f2c99b619f6f3d99c475ccdbd2c7f2",
+       "min": 4,
+       "name": "Krieger II",
+       "note": ""
       },
       {
        "id": "dddnfwuq91",
@@ -29,11 +29,11 @@
        "note": ""
       },
       {
-       "id": "wj6qt5plv1",
-       "img": "35f2c99b619f6f3d99c475ccdbd2c7f2",
-       "min": 4,
-       "name": "Krieger II",
-       "note": ""
+       "id": "oyqj9w8py1",
+       "img": "33050b0659056343c1df75e96db790b1",
+       "min": 3,
+       "name": "Brett",
+       "note": "Becken nicht durchhängen"
       },
       {
        "id": "b23b0evcx2",

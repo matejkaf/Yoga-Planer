@@ -286,10 +286,8 @@ button:focus-visible, input:focus-visible, label:focus-within { outline: 3px sol
       <h3 id="pub-title">Veröffentlichen</h3>
       <button class="btn small" id="pub-close" type="button">Schließen</button>
     </div>
-    <p class="hint">Überträgt alle Stunden und Bilder ins GitHub-Repository. Die iPad-App übernimmt den Stand beim nächsten Start.</p>
-    <input class="field" id="pub-token" type="password" autocomplete="off" spellcheck="false" placeholder="GitHub-Token einfügen (nur beim ersten Mal)">
-    <p class="hint">Token: GitHub → Settings → Developer settings → Fine-grained tokens. Nur Repository „Yoga-Planer“, Berechtigung „Contents: Read and write“. Er wird nur in diesem Browser gespeichert.</p>
-    <button class="btn go" id="pub-go" type="button">Jetzt veröffentlichen</button>
+    <p class="hint">Überträgt den gespeicherten Stand aller Stunden und Bilder ins GitHub-Repository. Die iPad-App übernimmt ihn beim nächsten Start. Vorher Änderungen mit „Speichern“ sichern.</p>
+    <button class="btn go" id="pub-go" type="button">Veröffentlichung anfordern</button>
     <pre class="hint" id="pub-log" style="white-space: pre-wrap; margin: 0; font-family: var(--font-mono); font-size: 0.9rem;"></pre>
   </div>
 </div>
@@ -974,70 +972,24 @@ button:focus-visible, input:focus-visible, label:focus-within { outline: 3px sol
     renderChooser();
   });
 
-  /* ---------- publish to GitHub ---------- */
-  var GH_REPO = "matejkaf/Yoga-Planer", GH_BRANCH = "main", LS_TOKEN = "yoga.gh.token.v1";
-  var EXT = { "image/png": "png", "image/jpeg": "jpg", "image/gif": "gif", "image/webp": "webp", "image/svg+xml": "svg" };
-  function pubLog(t) { var l = $("pub-log"); l.textContent += (l.textContent ? "\n" : "") + t; }
-  function toBase64(buf) {
-    var bytes = new Uint8Array(buf), bin = "", i;
-    for (i = 0; i < bytes.length; i += 0x8000) bin += String.fromCharCode.apply(null, bytes.subarray(i, i + 0x8000));
-    return btoa(bin);
-  }
-  function utf8Base64(str) { return toBase64(new TextEncoder().encode(str)); }
-  async function gh(token, method, path, body) {
-    var res = await fetch("https://api.github.com/repos/" + GH_REPO + path, {
-      method: method,
-      headers: { Authorization: "Bearer " + token, Accept: "application/vnd.github+json", "X-GitHub-Api-Version": "2022-11-28", "Content-Type": "application/json" },
-      body: body ? JSON.stringify(body) : undefined
-    });
-    if (res.status === 401 || res.status === 403) { var e1 = new Error("auth"); e1.code = "auth"; throw e1; }
-    if (res.status === 404) return null;
-    if (!res.ok) { var e2 = new Error("http " + res.status); e2.code = "http"; throw e2; }
-    return res.json();
-  }
-  async function putFile(token, path, base64, message) {
-    var cur = await gh(token, "GET", "/contents/" + path + "?ref=" + GH_BRANCH), body = { message: message, content: base64, branch: GH_BRANCH };
-    if (cur && cur.sha) body.sha = cur.sha;
-    await gh(token, "PUT", "/contents/" + path, body);
-  }
-  async function publishToGithub() {
-    var typed = $("pub-token").value.trim(), token = typed || lsGet(LS_TOKEN) || "";
-    if (!token) { pubLog("Bitte zuerst den GitHub-Token einfügen."); return; }
-    var btn = $("pub-go"); btn.disabled = true; $("pub-log").textContent = "";
+  /* ---------- publish ---------- */
+  /* The page cannot reach GitHub itself, so "Veröffentlichen" records a request next to the data; Claude pushes the saved state to the repository on request. */
+  var pubDoc = null;
+  async function requestPublish() {
+    var log = $("pub-log"), btn = $("pub-go");
+    if (!lessons.length) { log.textContent = "Es ist noch keine Stunde gespeichert (Bearbeiten → Speichern)."; return; }
+    btn.disabled = true;
     try {
-      var stateLessons = clone(lessons);
-      if (!stateLessons.length) { pubLog("Es ist noch keine Stunde gespeichert."); return; }
-      pubLog("Prüfe Repository …");
-      var dir = await gh(token, "GET", "/contents/img?ref=" + GH_BRANCH), have = {};
-      (dir || []).forEach(function (f) { have[f.name.replace(/\.[^.]+$/, "")] = f.name; });
-      var out = [], n = 0;
-      for (var i = 0; i < lib.length; i++) {
-        var im = lib[i], file = have[im.id];
-        if (!file) {
-          pubLog("Lade Bild hoch: " + im.name);
-          var r = await fetch("/_blob/" + im.id);
-          if (!r.ok) { pubLog("Bild nicht lesbar, übersprungen: " + im.name); continue; }
-          var blob = await r.blob(), ext = EXT[blob.type] || "png";
-          file = im.id + "." + ext;
-          await putFile(token, "img/" + file, toBase64(await blob.arrayBuffer()), "Bild " + im.name); n++;
-        }
-        out.push({ id: im.id, name: im.name, file: file });
-      }
-      pubLog("Schreibe Stundenplan …");
-      var data = { v: 1, publishedAt: new Date().toISOString(), lessons: stateLessons, lib: out };
-      await putFile(token, "data/published.json", utf8Base64(JSON.stringify(data, null, 1)), "Planer veröffentlicht");
-      if (typed) { lsSet(LS_TOKEN, typed); $("pub-token").value = ""; }
-      pubLog("Fertig: " + stateLessons.length + " Stunde(n), " + n + " neue(s) Bild(er). Die iPad-App übernimmt den Stand beim nächsten Start (nach etwa einer Minute online).");
-    } catch (e) {
-      if (e && e.code === "auth") { pubLog("GitHub lehnt den Token ab (ungültig oder keine Schreibrechte auf Yoga-Planer)."); lsDel(LS_TOKEN); }
-      else if (e && e.code === "http") pubLog("GitHub-Fehler: " + e.message);
-      else pubLog("Keine Verbindung zu GitHub (offline oder hier blockiert).");
-    } finally { btn.disabled = false; }
+      if (!pubDoc) throw new Error("nodb");
+      await pubDoc.set({ requestedAt: new Date().toISOString(), lessons: lessons.length, images: lib.length });
+      log.textContent = "Vermerkt. Jetzt im Chat „veröffentlichen“ schreiben: Claude überträgt den gespeicherten Stand ins Repository. Die iPad-App übernimmt ihn beim nächsten Start.";
+    } catch (e) { log.textContent = "Konnte nicht vermerken (kein Zugriff auf die Datenbank)."; }
+    btn.disabled = false;
   }
-  function openPub() { $("pub-ov").hidden = false; $("pub-log").textContent = ""; $("pub-token").placeholder = lsGet(LS_TOKEN) ? "Token gespeichert ✓ (zum Ändern neu einfügen)" : "GitHub-Token einfügen (nur beim ersten Mal)"; }
+  function openPub() { $("pub-ov").hidden = false; $("pub-log").textContent = ""; }
   $("pub-btn").addEventListener("click", openPub);
   $("pub-close").addEventListener("click", function () { $("pub-ov").hidden = true; });
-  $("pub-go").addEventListener("click", publishToGithub);
+  $("pub-go").addEventListener("click", requestPublish);
 
   /* ---------- keyboard ---------- */
   document.addEventListener("keydown", function (ev) {
@@ -1061,7 +1013,7 @@ button:focus-visible, input:focus-visible, label:focus-within { outline: 3px sol
     try { db = await window.claude.use("db"); } catch (e) {}
     try { assetsApi = await window.claude.use("assets"); } catch (e) {}
     if (!db) return;
-    planDoc = db.doc("yoga/plan"); lessonsDoc = db.doc("yoga/lessons"); libDoc = db.doc("yoga/lib");
+    planDoc = db.doc("yoga/plan"); lessonsDoc = db.doc("yoga/lessons"); libDoc = db.doc("yoga/lib"); pubDoc = db.doc("yoga/publish");
     if (editing) $("images-btn").hidden = !(assetsApi && libDoc);
     libDoc.onSnapshot(function (snap) {
       var d = snap.exists ? snap.data() : null;
