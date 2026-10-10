@@ -1,6 +1,6 @@
 {
  "v": 1,
- "publishedAt": "2026-10-10T19:52:53Z",
+ "publishedAt": "2026-10-10T20:01:18Z",
  "lessons": [
   {
    "blocks": [
@@ -70,7 +70,7 @@
      "steps": [
       {
        "id": "s3",
-       "img": "",
+       "img": "f18411c82842bcbdfb8de8084adc7cb4",
        "min": 1,
        "name": "Berg",
        "note": "Füße hüftbreit, Arme über den Kopf"
@@ -158,7 +158,7 @@
      "steps": [
       {
        "id": "s14",
-       "img": "",
+       "img": "8251143a188ffb73c1a4f0768888f35b",
        "min": 10,
        "name": "Endentspannung",
        "note": "Decke bereitlegen, Stimme ruhig"
@@ -252,7 +252,7 @@
      "steps": [
       {
        "id": "hc11oj3w012",
-       "img": "",
+       "img": "f18411c82842bcbdfb8de8084adc7cb4",
        "min": 1,
        "name": "Berg",
        "note": "Füße hüftbreit, Arme über den Kopf"
@@ -340,7 +340,7 @@
      "steps": [
       {
        "id": "l6x6bd3w025",
-       "img": "",
+       "img": "8251143a188ffb73c1a4f0768888f35b",
        "min": 10,
        "name": "Endentspannung",
        "note": "Decke bereitlegen, Stimme ruhig"
@@ -420,7 +420,7 @@
      "steps": [
       {
        "id": "bo6",
-       "img": "",
+       "img": "f18411c82842bcbdfb8de8084adc7cb4",
        "min": 2,
        "name": "Berg, aufrechte Haltung",
        "note": "Füße hüftbreit, Wirbelsäule lang, locker atmen. Kein Hohlkreuz."
@@ -447,7 +447,7 @@
      "steps": [
       {
        "id": "bo9",
-       "img": "",
+       "img": "8251143a188ffb73c1a4f0768888f35b",
        "min": 8,
        "name": "Entspannung in Rückenlage",
        "note": "Unterschenkel auf Stuhl oder Kissen lagern. Decke bereitlegen, ruhige Stimme."
@@ -502,9 +502,19 @@
    "file": "d8ddd404d4492eb958d355fcd10fd444.png"
   },
   {
-   "id": "f8946153e15f22e763d3ecda4e378d58",
+   "id": "f85877f2824096a270f5df3a70fafffc",
    "name": "schiefe-ebene-purvottanasana",
-   "file": "f8946153e15f22e763d3ecda4e378d58.png"
+   "file": "f85877f2824096a270f5df3a70fafffc.png"
+  },
+  {
+   "id": "f18411c82842bcbdfb8de8084adc7cb4",
+   "name": "berghaltung",
+   "file": "f18411c82842bcbdfb8de8084adc7cb4.png"
+  },
+  {
+   "id": "8251143a188ffb73c1a4f0768888f35b",
+   "name": "shavasna",
+   "file": "8251143a188ffb73c1a4f0768888f35b.png"
   }
  ]
 }
