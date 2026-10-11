@@ -221,6 +221,7 @@ button:focus-visible, input:focus-visible, label:focus-within { outline: 3px sol
 .overlay { position: fixed; inset: 0; background: var(--scrim); z-index: 10; display: flex; align-items: center; justify-content: center; padding: 16px; }
 .panel { background: var(--surface); border-radius: 18px; padding: 16px; width: min(960px, 100%); max-height: 100%; display: flex; flex-direction: column; gap: 12px; }
 .panel h3 { font-family: var(--font-display); margin: 0 auto 0 0; font-size: 1.3rem; }
+.ov-search { flex: 1 1 200px; max-width: 360px; min-height: 48px; }
 .panel .bar-row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 10px; }
 .grid { overflow-y: auto; display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 10px; min-height: 0; }
 .cell { position: relative; background: var(--surface2); border-radius: 12px; border: 2px solid transparent; padding: 6px; display: flex; flex-direction: column; gap: 4px; align-items: stretch; cursor: pointer; text-align: center; }
@@ -392,6 +393,7 @@ button:focus-visible, input:focus-visible, label:focus-within { outline: 3px sol
   <div class="panel" role="dialog" aria-modal="true" aria-labelledby="ov-title">
     <div class="bar-row">
       <h3 id="ov-title">Bild wählen</h3>
+      <input class="field ov-search" id="ov-search" type="search" placeholder="Bild suchen …" autocomplete="off" spellcheck="false" aria-label="Bild suchen">
       <label class="btn small filebtn" id="upload-label" hidden>Bild hinzufügen<input id="file-input" type="file" accept="image/*" multiple></label>
       <button class="btn small" id="no-image" type="button">Kein Bild</button>
       <button class="btn small go" id="ov-close" type="button">Schließen</button>
@@ -1213,6 +1215,7 @@ button:focus-visible, input:focus-visible, label:focus-within { outline: 3px sol
     $("ov-title").textContent = mode === "pick" ? "Bild wählen" : "Bilder verwalten";
     $("no-image").hidden = mode !== "pick";
     $("upload-label").hidden = true;
+    $("ov-search").value = "";
     $("ov-status").textContent = mode === "pick" ? "" : "Neue Bilder: in den Ordner „Piktogramme“ legen und Claude im Chat „übernimm die neuen Bilder“ sagen.";
     $("overlay").hidden = false; renderChooser();
   }
@@ -1223,7 +1226,10 @@ button:focus-visible, input:focus-visible, label:focus-within { outline: 3px sol
       g.appendChild(el("p", "hint", "Noch keine Bilder."));
       return;
     }
-    lib.forEach(function (img) {
+    var q = normSearch($("ov-search").value).split(" ").filter(Boolean);
+    var shown = lib.filter(function (img) { var n = normSearch(img.name); return q.every(function (t) { return n.indexOf(t) >= 0; }); });
+    if (!shown.length) { g.appendChild(el("p", "hint", "Keine Treffer.")); return; }
+    shown.forEach(function (img) {
       var c = el("div", "cell" + (chooser.mode === "pick" && chooser.step && chooser.step.img === img.id ? " sel" : ""));
       c.setAttribute("role", "button"); c.tabIndex = 0;
       c.appendChild(thumbEl(img.id, "", img.name));
@@ -1234,6 +1240,11 @@ button:focus-visible, input:focus-visible, label:focus-within { outline: 3px sol
       g.appendChild(c);
     });
   }
+  /* search: lower case, umlauts and ß folded (ü = ue), dashes/underscores as spaces; every typed word must occur */
+  function normSearch(t) {
+    return String(t || "").toLowerCase().replace(/ä/g, "ae").replace(/ö/g, "oe").replace(/ü/g, "ue").replace(/ß/g, "ss").replace(/[-_.,/]+/g, " ").replace(/\s+/g, " ").trim();
+  }
+  $("ov-search").addEventListener("input", renderChooser);
   $("ov-close").addEventListener("click", closeChooser);
   $("no-image").addEventListener("click", function () { if (chooser.step) chooser.step.img = ""; closeChooser(); });
 
