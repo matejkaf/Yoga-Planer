@@ -134,6 +134,7 @@ button:focus-visible, input:focus-visible, label:focus-within { outline: 3px sol
 @media (max-width: 760px), (orientation: portrait) {
   .tl-pic.both, .sc-pic.both { grid-template-columns: minmax(0, 1fr); grid-template-rows: minmax(0, 1fr) minmax(0, 1fr); gap: 12px; }
 }
+.tl-side .nm, .tl-head .name, .sc-name { overflow-wrap: normal !important; word-break: keep-all; }
 .tilebody .bigname, .sc-bigname { max-width: 100%; overflow-wrap: normal; word-break: keep-all; hyphens: manual; }
 .tilebody .bigname { font-family: var(--font-display); font-weight: 700; font-size: clamp(2.6rem, 13vh, 8rem); line-height: 1.02; letter-spacing: -0.02em; color: #1c2032; text-wrap: balance; }
 .tilebody .bignote { display: block; margin-top: 12px; font-family: var(--font-body); font-weight: 400; font-size: clamp(1.1rem, 3vh, 1.8rem); letter-spacing: 0; color: var(--tile-ink); }
@@ -700,7 +701,7 @@ button:focus-visible, input:focus-visible, label:focus-within { outline: 3px sol
   window.addEventListener("resize", function () {
     clearTimeout(refitTimer);
     refitTimer = setTimeout(function () {
-      Array.prototype.forEach.call(document.querySelectorAll(".bigname, .sc-bigname"), fitWidth);
+      Array.prototype.forEach.call(document.querySelectorAll(".bigname, .sc-bigname, .tl-side .nm, .tl-head .name, .sc-name"), fitWidth);
       Array.prototype.forEach.call(document.querySelectorAll(".tl-md, .sc-md"), fitText);
     }, 200);
   });
@@ -723,7 +724,7 @@ button:focus-visible, input:focus-visible, label:focus-within { outline: 3px sol
     if (n.img) b.appendChild(thumbEl(n.img, "", n.name));
     else if (n.text) b.appendChild(mdBlock(n.text, "md-thumb"));
     var row = el("div", "nmrow");
-    row.appendChild(el("div", "nm", n.name));
+    row.appendChild(fitWidth(el("div", "nm", n.name)));
     row.appendChild(el("div", "dur", fmtMin(n.min)));
     b.appendChild(row);
     return b;
@@ -745,7 +746,7 @@ button:focus-visible, input:focus-visible, label:focus-within { outline: 3px sol
       if (e.bTitle || !media) head.appendChild(el("div", "eyebrow", (e.bTitle ? e.bTitle : "") + (media ? "" : (e.bTitle ? " · " : "") + count)));
       if (e.text) {
         var nrow2 = el("div", "namerow");
-        nrow2.appendChild(el("h1", "name", e.name));
+        nrow2.appendChild(fitWidth(el("h1", "name", e.name)));
         nrow2.appendChild(el("span", "count", count));
         head.appendChild(nrow2);
         if (e.note) head.appendChild(el("p", "note", e.note));
@@ -758,7 +759,7 @@ button:focus-visible, input:focus-visible, label:focus-within { outline: 3px sol
         var md = mdBlock(e.text, "tl-md"); pic.appendChild(md); fitText(md);
       } else if (e.img) {
         var nrow = el("div", "namerow");
-        nrow.appendChild(el("h1", "name", e.name));
+        nrow.appendChild(fitWidth(el("h1", "name", e.name)));
         nrow.appendChild(el("span", "count", count));
         head.appendChild(nrow);
         if (e.note) head.appendChild(el("p", "note", e.note));
@@ -897,7 +898,7 @@ button:focus-visible, input:focus-visible, label:focus-within { outline: 3px sol
     var info = el("div", "sc-info");
     if (e.bTitle) info.appendChild(el("div", "eyebrow", e.bTitle + " · " + (e.si + 1) + "/" + e.bLen));
     var nr = el("div", "namerow");
-    if (e.img || e.text) nr.appendChild(el("div", "sc-name", e.name));
+    if (e.img || e.text) nr.appendChild(fitWidth(el("div", "sc-name", e.name)));
     nr.appendChild(el("span", "count", (i + 1) + "/" + flat.length));
     info.appendChild(nr);
     info.appendChild(el("div", "sc-dur", fmtMin(e.min)));
