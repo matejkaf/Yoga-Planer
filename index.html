@@ -115,6 +115,18 @@ button:focus-visible, input:focus-visible, label:focus-within { outline: 3px sol
   .tl-side .nxb.small { width: auto; }
   .tl-side .nxb.small .thumb { width: 64px; height: 64px; }
 }
+.md { color: #1c2032; text-align: left; line-height: 1.32; overflow: hidden; overflow-wrap: anywhere; }
+.md p { margin: 0 0 0.35em; }
+.md ul, .md ol { margin: 0 0 0.35em; padding-left: 1.25em; }
+.md li { margin: 0.12em 0; }
+.md li::marker { color: var(--accent); }
+.md .md-h { font-family: var(--font-display); font-weight: 700; font-size: 1.15em; margin: 0 0 0.25em; }
+.md .md-gap { height: 0.5em; }
+.md strong { font-weight: 700; }
+.tl-md { max-width: min(100%, 60ch); max-height: 100%; font-size: clamp(1.5rem, 4.6vh, 2.8rem); }
+.sc-md { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: center; font-size: clamp(1.2rem, 3.4vh, 2.1rem); }
+.md-thumb { font-size: 1rem; max-height: 7.5em; border: 1px solid #e6e6df; border-radius: 10px; padding: 8px 10px; background: #fff; }
+.tl-side .nxb.small .md-thumb { font-size: 0.85rem; max-height: 5.5em; }
 .tilebody .bigname { font-family: var(--font-display); font-weight: 700; font-size: clamp(2.6rem, 13vh, 8rem); line-height: 1.02; letter-spacing: -0.02em; color: #1c2032; text-wrap: balance; overflow-wrap: anywhere; }
 .tilebody .bignote { display: block; margin-top: 12px; font-family: var(--font-body); font-weight: 400; font-size: clamp(1.1rem, 3vh, 1.8rem); letter-spacing: 0; color: var(--tile-ink); }
 .chev { position: absolute; top: 50%; transform: translateY(-50%); font-size: 3rem; line-height: 1; color: var(--tile-ink); opacity: 0.28; pointer-events: none; font-family: var(--font-display); }
@@ -187,6 +199,7 @@ button:focus-visible, input:focus-visible, label:focus-within { outline: 3px sol
 .srow .nm { flex: 2 1 200px; }
 .srow .mn { flex: 0 0 84px; width: 84px; text-align: center; font-family: var(--font-mono); }
 .srow .nt { flex: 3 1 240px; }
+.srow .tx { flex: 1 1 100%; min-height: 0; resize: vertical; font-size: 0.95rem; line-height: 1.35; padding: 8px 12px; }
 .sq { width: 44px; height: 44px; flex: none; border-radius: 10px; border: 1px solid var(--line); background: var(--surface); cursor: pointer; font-size: 1.05rem; line-height: 1; }
 .sq[disabled] { opacity: 0.35; cursor: default; }
 .sq.del { color: var(--warn); }
@@ -479,7 +492,8 @@ button:focus-visible, input:focus-visible, label:focus-within { outline: 3px sol
           name: String(s.name || "").trim() || "Übung",
           min: min > 0 ? min : 1,
           note: String(s.note || "").trim(),
-          img: ID_RE.test(String(s.img || "")) ? String(s.img) : ""
+          img: ID_RE.test(String(s.img || "")) ? String(s.img) : "",
+          text: String(s.text || "").replace(/\r/g, "").replace(/\s+$/, "").slice(0, 4000)
         });
       });
       if (steps.length) out.push({ id: String(b.id || uid()), title: String(b.title || "").trim(), steps: steps });
@@ -491,7 +505,7 @@ button:focus-visible, input:focus-visible, label:focus-within { outline: 3px sol
     blocks.forEach(function (b) {
       var bMin = b.steps.reduce(function (a, x) { return a + x.min; }, 0);
       b.steps.forEach(function (s, i) {
-        f.push({ id: s.id, name: s.name, min: s.min, note: s.note, img: s.img, bTitle: b.title, si: i, bLen: b.steps.length, bMin: bMin });
+        f.push({ id: s.id, name: s.name, min: s.min, note: s.note, img: s.img, text: s.text || "", bTitle: b.title, si: i, bLen: b.steps.length, bMin: bMin });
       });
     });
     return f;
@@ -631,13 +645,52 @@ button:focus-visible, input:focus-visible, label:focus-within { outline: 3px sol
     t.appendChild(im); return t;
   }
 
+  /* ---------- text instead of a picture: line breaks kept, "- " / "* " bullets, "1. " numbered lists, "# " heading, **bold**, *italic* ---------- */
+  function mdInline(node, text) {
+    var re = /(\*\*[^*]+\*\*|\*[^*\s][^*]*\*)/g, last = 0, m;
+    while ((m = re.exec(text))) {
+      if (m.index > last) node.appendChild(document.createTextNode(text.slice(last, m.index)));
+      var bold = m[0].charAt(1) === "*";
+      node.appendChild(el(bold ? "strong" : "em", null, m[0].slice(bold ? 2 : 1, bold ? -2 : -1)));
+      last = re.lastIndex;
+    }
+    if (last < text.length) node.appendChild(document.createTextNode(text.slice(last)));
+  }
+  function mdBlock(src, cls) {
+    var root = el("div", "md" + (cls ? " " + cls : "")), list = null, listType = "", para = null;
+    String(src || "").split("\n").forEach(function (line) {
+      var m;
+      if ((m = line.match(/^\s*[-*•]\s+(.*)$/)) || (m = line.match(/^\s*(\d+)[.)]\s+(.*)$/))) {
+        var ordered = m.length === 3, type = ordered ? "ol" : "ul";
+        if (listType !== type) { list = el(type); if (ordered) list.start = parseInt(m[1], 10); root.appendChild(list); listType = type; }
+        var li = el("li"); mdInline(li, ordered ? m[2] : m[1]); list.appendChild(li); para = null; return;
+      }
+      list = null; listType = "";
+      if (!line.trim()) { para = null; root.appendChild(el("div", "md-gap")); return; }
+      if ((m = line.match(/^\s*#{1,3}\s+(.*)$/))) { var h = el("div", "md-h"); mdInline(h, m[1]); root.appendChild(h); para = null; return; }
+      if (para) para.appendChild(document.createElement("br")); else { para = el("p"); root.appendChild(para); }
+      mdInline(para, line);
+    });
+    return root;
+  }
+  /* shrink the text until it fits its box (never below 55 % of the start size) */
+  function fitText(node) {
+    requestAnimationFrame(function () {
+      if (!node.isConnected || !node.clientHeight) return;
+      node.style.fontSize = "";
+      var size = parseFloat(getComputedStyle(node).fontSize), min = size * 0.55;
+      while (node.scrollHeight > node.clientHeight + 1 && size > min) { size *= 0.92; node.style.fontSize = size + "px"; }
+    });
+  }
+
   /* ---------- play view ---------- */
   /* One tile: header (sequence, name, note) top left, current pictogram large, next exercise smaller on the right, countdown bottom right. */
   function upcomingBlock(label, n, small) {
     var b = el("div", "nxb" + (small ? " small" : ""));
     if (!n) { b.appendChild(el("div", "nm", "Ende der Stunde")); return b; }
     if (n.bTitle && n.si === 0) b.appendChild(el("div", "eyebrow", n.bTitle));
-    if (n.img) b.appendChild(thumbEl(n.img, "", n.name));
+    if (n.text) b.appendChild(mdBlock(n.text, "md-thumb"));
+    else if (n.img) b.appendChild(thumbEl(n.img, "", n.name));
     var row = el("div", "nmrow");
     row.appendChild(el("div", "nm", n.name));
     row.appendChild(el("div", "dur", fmtMin(n.min)));
@@ -657,8 +710,16 @@ button:focus-visible, input:focus-visible, label:focus-within { outline: 3px sol
     } else {
       var e = flat[st.idx];
       var count = (st.idx + 1) + "/" + flat.length;
-      if (e.bTitle || !e.img) head.appendChild(el("div", "eyebrow", (e.bTitle ? e.bTitle : "") + (e.img ? "" : (e.bTitle ? " · " : "") + count)));
-      if (e.img) {
+      var media = e.text || e.img;
+      if (e.bTitle || !media) head.appendChild(el("div", "eyebrow", (e.bTitle ? e.bTitle : "") + (media ? "" : (e.bTitle ? " · " : "") + count)));
+      if (e.text) {
+        var nrow2 = el("div", "namerow");
+        nrow2.appendChild(el("h1", "name", e.name));
+        nrow2.appendChild(el("span", "count", count));
+        head.appendChild(nrow2);
+        if (e.note) head.appendChild(el("p", "note", e.note));
+        var md = mdBlock(e.text, "tl-md"); pic.appendChild(md); fitText(md);
+      } else if (e.img) {
         var nrow = el("div", "namerow");
         nrow.appendChild(el("h1", "name", e.name));
         nrow.appendChild(el("span", "count", count));
@@ -781,7 +842,8 @@ button:focus-visible, input:focus-visible, label:focus-within { outline: 3px sol
   function scItem(e, i) {
     var it = el("div", "sc-item");
     var pic = el("div", "sc-pic");
-    if (e.img) {
+    if (e.text) { var md = mdBlock(e.text, "sc-md"); pic.appendChild(md); requestAnimationFrame(function () { fitText(md); }); }
+    else if (e.img) {
       var im = document.createElement("img"); im.alt = e.name;
       setImg(im, e.img, function () { pic.textContent = ""; pic.appendChild(el("div", "sc-bigname", e.name)); });
       pic.appendChild(im);
@@ -789,7 +851,7 @@ button:focus-visible, input:focus-visible, label:focus-within { outline: 3px sol
     var info = el("div", "sc-info");
     if (e.bTitle) info.appendChild(el("div", "eyebrow", e.bTitle + " · " + (e.si + 1) + "/" + e.bLen));
     var nr = el("div", "namerow");
-    if (e.img) nr.appendChild(el("div", "sc-name", e.name));
+    if (e.img || e.text) nr.appendChild(el("div", "sc-name", e.name));
     nr.appendChild(el("span", "count", (i + 1) + "/" + flat.length));
     info.appendChild(nr);
     info.appendChild(el("div", "sc-dur", fmtMin(e.min)));
@@ -800,7 +862,7 @@ button:focus-visible, input:focus-visible, label:focus-within { outline: 3px sol
   }
   function renderScroll() {
     var list = $("sc-list");
-    var key = curId + "|" + JSON.stringify(flat.map(function (e) { return [e.id, e.name, e.img, e.note, e.min, e.bTitle]; }));
+    var key = curId + "|" + JSON.stringify(flat.map(function (e) { return [e.id, e.name, e.img, e.text, e.note, e.min, e.bTitle]; }));
     if (key !== scKey) {
       scKey = key; list.textContent = ""; clearPending();
       scItems = flat.map(function (e, i) { var it = scItem(e, i); list.appendChild(it); return it; });
@@ -991,6 +1053,10 @@ button:focus-visible, input:focus-visible, label:focus-within { outline: 3px sol
       head.appendChild(sum);
       head.appendChild(sqBtn("↑", "Sequenz nach oben", function () { move(draft, bi, -1); renderEditor(); }, "", bi === 0));
       head.appendChild(sqBtn("↓", "Sequenz nach unten", function () { move(draft, bi, 1); renderEditor(); }, "", bi === draft.length - 1));
+      head.appendChild(sqBtn("⧉", "Sequenz duplizieren", function () {
+        var c = clone(b); c.id = uid(); c.steps.forEach(function (x) { x.id = uid(); });
+        draft.splice(bi + 1, 0, c); renderEditor();
+      }));
       head.appendChild(sqBtn("✕", "Sequenz löschen", function () { draft.splice(bi, 1); renderEditor(); }, "del"));
       card.appendChild(head);
 
@@ -1006,9 +1072,14 @@ button:focus-visible, input:focus-visible, label:focus-within { outline: 3px sol
         mn.addEventListener("input", function () { var v = parseFloat(mn.value.replace(",", ".")); s.min = v > 0 ? v : 0; updSum(); });
         r.appendChild(mn);
         r.appendChild(textField("nt", s.note, "Hinweis (optional)", function (v) { s.note = v; }));
+        var tx = el("textarea", "field tx"); tx.value = s.text || ""; tx.rows = Math.min(8, Math.max(2, (s.text || "").split("\n").length + 1));
+        tx.placeholder = "Text statt Bild (optional, mehrzeilig). Zeilen mit „- “ werden Aufzählungen, „1. “ nummeriert, **fett**.";
+        tx.spellcheck = false; tx.setAttribute("aria-label", "Text statt Bild");
+        tx.addEventListener("input", function () { s.text = tx.value; });
         r.appendChild(sqBtn("↑", "Übung nach oben", function () { move(b.steps, si, -1); renderEditor(); }, "", si === 0));
         r.appendChild(sqBtn("↓", "Übung nach unten", function () { move(b.steps, si, 1); renderEditor(); }, "", si === b.steps.length - 1));
         r.appendChild(sqBtn("✕", "Übung löschen", function () { b.steps.splice(si, 1); if (!b.steps.length) draft.splice(bi, 1); renderEditor(); }, "del"));
+        r.appendChild(tx);
         card.appendChild(r);
       });
 
