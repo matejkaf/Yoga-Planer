@@ -1239,6 +1239,7 @@ button:focus-visible, input:focus-visible, label:focus-within { outline: 3px sol
     }
     var q = normSearch($("ov-search").value).split(" ").filter(Boolean);
     var shown = lib.filter(function (img) { var n = normSearch(img.name); return q.every(function (t) { return n.indexOf(t) >= 0; }); });
+    shown.sort(function (a, b) { return a.name.localeCompare(b.name, "de", { sensitivity: "base" }); });
     if (!shown.length) { g.appendChild(el("p", "hint", "Keine Treffer.")); return; }
     shown.forEach(function (img) {
       var c = el("div", "cell" + (chooser.mode === "pick" && chooser.step && chooser.step.img === img.id ? " sel" : ""));
