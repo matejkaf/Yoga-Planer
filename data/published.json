@@ -1,6 +1,6 @@
 {
  "v": 1,
- "publishedAt": "2026-10-10T20:01:18Z",
+ "publishedAt": "2026-10-11T10:41:49Z",
  "lessons": [
   {
    "blocks": [
@@ -12,35 +12,40 @@
        "img": "66e71a7a301389817a719a7a1b69b581",
        "min": 4,
        "name": "Drehsitz Test",
-       "note": "Knie heranziehen, Aufrecht"
+       "note": "Knie heranziehen, Aufrecht",
+       "text": ""
       },
       {
        "id": "wj6qt5plv1",
        "img": "35f2c99b619f6f3d99c475ccdbd2c7f2",
        "min": 4,
        "name": "Krieger II",
-       "note": ""
+       "note": "",
+       "text": ""
       },
       {
        "id": "dddnfwuq91",
        "img": "d23724797774057159cfdd8313440c07",
        "min": 3,
        "name": "Baum",
-       "note": ""
+       "note": "",
+       "text": ""
       },
       {
        "id": "oyqj9w8py1",
        "img": "33050b0659056343c1df75e96db790b1",
        "min": 3,
        "name": "Brett",
-       "note": "Becken nicht durchhängen"
+       "note": "Becken nicht durchhängen",
+       "text": ""
       },
       {
        "id": "b23b0evcx2",
        "img": "d8ddd404d4492eb958d355fcd10fd444",
        "min": 3,
        "name": "Gestreckter Seitlicher Winkel",
-       "note": ""
+       "note": "",
+       "text": ""
       }
      ],
      "title": "Beginn"
@@ -53,14 +58,16 @@
        "img": "2e635244bbe989b1a4cdeddf660b7e5d",
        "min": 4,
        "name": "Schmetterling",
-       "note": ""
+       "note": "",
+       "text": ""
       },
       {
        "id": "bhktewi531",
        "img": "d0c4e0d896ff91d5ad2682db65bbc6ad",
        "min": 1,
        "name": "Schulterbrücke",
-       "note": ""
+       "note": "",
+       "text": ""
       }
      ],
      "title": ""
@@ -73,35 +80,40 @@
        "img": "f18411c82842bcbdfb8de8084adc7cb4",
        "min": 1,
        "name": "Berg",
-       "note": "Füße hüftbreit, Arme über den Kopf"
+       "note": "Füße hüftbreit, Arme über den Kopf",
+       "text": ""
       },
       {
        "id": "s4",
        "img": "",
        "min": 1,
        "name": "Vorbeuge",
-       "note": "Knie weich, Rücken lang"
+       "note": "Knie weich, Rücken lang",
+       "text": ""
       },
       {
        "id": "s5",
        "img": "33050b0659056343c1df75e96db790b1",
        "min": 1,
        "name": "Brett",
-       "note": "Schultern über den Händen"
+       "note": "Schultern über den Händen",
+       "text": ""
       },
       {
        "id": "s6",
        "img": "",
        "min": 1,
        "name": "Kobra",
-       "note": "Ellbogen nah am Körper"
+       "note": "Ellbogen nah am Körper",
+       "text": ""
       },
       {
        "id": "s7",
        "img": "",
        "min": 2,
        "name": "Herabschauender Hund",
-       "note": "Fersen Richtung Boden, 5 Atemzüge"
+       "note": "Fersen Richtung Boden, 5 Atemzüge",
+       "text": ""
       }
      ],
      "title": "Sonnengruß A"
@@ -114,21 +126,24 @@
        "img": "",
        "min": 3,
        "name": "Krieger I",
-       "note": "Je Seite 5 Atemzüge"
+       "note": "Je Seite 5 Atemzüge",
+       "text": ""
       },
       {
        "id": "s9",
        "img": "",
        "min": 3,
        "name": "Krieger II",
-       "note": "Blick über die vordere Hand"
+       "note": "Blick über die vordere Hand",
+       "text": ""
       },
       {
        "id": "s10",
        "img": "",
        "min": 3,
        "name": "Seitwinkel",
-       "note": "Oberen Arm lang nach vorn"
+       "note": "Oberen Arm lang nach vorn",
+       "text": ""
       }
      ],
      "title": "Krieger-Folge"
@@ -141,14 +156,16 @@
        "img": "d23724797774057159cfdd8313440c07",
        "min": 4,
        "name": "Baum",
-       "note": "Blick fixieren, Standbein weich"
+       "note": "Blick fixieren, Standbein weich",
+       "text": ""
       },
       {
        "id": "pee10nexi1",
        "img": "7251df41361609c665b8f793b62cf223",
        "min": 1,
        "name": "Pawanmuktasana",
-       "note": ""
+       "note": "",
+       "text": ""
       }
      ],
      "title": ""
@@ -161,21 +178,24 @@
        "img": "8251143a188ffb73c1a4f0768888f35b",
        "min": 10,
        "name": "Endentspannung",
-       "note": "Decke bereitlegen, Stimme ruhig"
+       "note": "Decke bereitlegen, Stimme ruhig",
+       "text": ""
       },
       {
        "id": "s12",
        "img": "d0c4e0d896ff91d5ad2682db65bbc6ad",
        "min": 5,
        "name": "Sitzende Vorbeuge",
-       "note": ""
+       "note": "",
+       "text": ""
       },
       {
        "id": "s13",
        "img": "66e71a7a301389817a719a7a1b69b581",
        "min": 4,
        "name": "Drehsitz",
-       "note": "Je Seite 2 Minuten"
+       "note": "Je Seite 2 Minuten",
+       "text": ""
       }
      ],
      "title": "Abschluss"
@@ -194,35 +214,40 @@
        "img": "66e71a7a301389817a719a7a1b69b581",
        "min": 4,
        "name": "Drehsitz",
-       "note": "Knie heranziehen, Aufrecht"
+       "note": "Knie heranziehen, Aufrecht",
+       "text": ""
       },
       {
        "id": "9mqhh43w04",
        "img": "33050b0659056343c1df75e96db790b1",
        "min": 3,
        "name": "Brett",
-       "note": "Becken nicht durchhängen"
+       "note": "Becken nicht durchhängen",
+       "text": ""
       },
       {
        "id": "qswqkt3w05",
        "img": "d23724797774057159cfdd8313440c07",
        "min": 3,
        "name": "Baum",
-       "note": ""
+       "note": "",
+       "text": ""
       },
       {
        "id": "a0yj1x3w06",
        "img": "35f2c99b619f6f3d99c475ccdbd2c7f2",
        "min": 4,
        "name": "Krieger II",
-       "note": ""
+       "note": "",
+       "text": ""
       },
       {
        "id": "u6n9na3w07",
        "img": "d8ddd404d4492eb958d355fcd10fd444",
        "min": 3,
        "name": "Gestreckter Seitlicher Winkel",
-       "note": ""
+       "note": "",
+       "text": ""
       }
      ],
      "title": "Beginn"
@@ -235,14 +260,16 @@
        "img": "2e635244bbe989b1a4cdeddf660b7e5d",
        "min": 4,
        "name": "Schmetterling",
-       "note": ""
+       "note": "",
+       "text": ""
       },
       {
        "id": "ip20gu3w010",
        "img": "d0c4e0d896ff91d5ad2682db65bbc6ad",
        "min": 1,
        "name": "Schulterbrücke",
-       "note": ""
+       "note": "",
+       "text": ""
       }
      ],
      "title": ""
@@ -255,35 +282,40 @@
        "img": "f18411c82842bcbdfb8de8084adc7cb4",
        "min": 1,
        "name": "Berg",
-       "note": "Füße hüftbreit, Arme über den Kopf"
+       "note": "Füße hüftbreit, Arme über den Kopf",
+       "text": ""
       },
       {
        "id": "c5cst23w013",
        "img": "",
        "min": 1,
        "name": "Vorbeuge",
-       "note": "Knie weich, Rücken lang"
+       "note": "Knie weich, Rücken lang",
+       "text": ""
       },
       {
        "id": "4vjllm3w014",
        "img": "33050b0659056343c1df75e96db790b1",
        "min": 1,
        "name": "Brett",
-       "note": "Schultern über den Händen"
+       "note": "Schultern über den Händen",
+       "text": ""
       },
       {
        "id": "hqqa7a3w015",
        "img": "",
        "min": 1,
        "name": "Kobra",
-       "note": "Ellbogen nah am Körper"
+       "note": "Ellbogen nah am Körper",
+       "text": ""
       },
       {
        "id": "chtzgy3w016",
        "img": "",
        "min": 2,
        "name": "Herabschauender Hund",
-       "note": "Fersen Richtung Boden, 5 Atemzüge"
+       "note": "Fersen Richtung Boden, 5 Atemzüge",
+       "text": ""
       }
      ],
      "title": "Sonnengruß A"
@@ -296,21 +328,24 @@
        "img": "",
        "min": 3,
        "name": "Krieger I",
-       "note": "Je Seite 5 Atemzüge"
+       "note": "Je Seite 5 Atemzüge",
+       "text": ""
       },
       {
        "id": "tikv0o3w019",
        "img": "",
        "min": 3,
        "name": "Krieger II",
-       "note": "Blick über die vordere Hand"
+       "note": "Blick über die vordere Hand",
+       "text": ""
       },
       {
        "id": "py1sja3w020",
        "img": "",
        "min": 3,
        "name": "Seitwinkel",
-       "note": "Oberen Arm lang nach vorn"
+       "note": "Oberen Arm lang nach vorn",
+       "text": ""
       }
      ],
      "title": "Krieger-Folge"
@@ -323,14 +358,16 @@
        "img": "d23724797774057159cfdd8313440c07",
        "min": 4,
        "name": "Baum",
-       "note": "Blick fixieren, Standbein weich"
+       "note": "Blick fixieren, Standbein weich",
+       "text": ""
       },
       {
        "id": "hwb14k3w023",
        "img": "7251df41361609c665b8f793b62cf223",
        "min": 1,
        "name": "Pawanmuktasana",
-       "note": ""
+       "note": "",
+       "text": ""
       }
      ],
      "title": ""
@@ -343,21 +380,24 @@
        "img": "8251143a188ffb73c1a4f0768888f35b",
        "min": 10,
        "name": "Endentspannung",
-       "note": "Decke bereitlegen, Stimme ruhig"
+       "note": "Decke bereitlegen, Stimme ruhig",
+       "text": ""
       },
       {
        "id": "z72p4j3w026",
        "img": "d0c4e0d896ff91d5ad2682db65bbc6ad",
        "min": 5,
        "name": "Sitzende Vorbeuge",
-       "note": ""
+       "note": "",
+       "text": ""
       },
       {
        "id": "o7acwu3w027",
        "img": "66e71a7a301389817a719a7a1b69b581",
        "min": 4,
        "name": "Drehsitz",
-       "note": "Je Seite 2 Minuten"
+       "note": "Je Seite 2 Minuten",
+       "text": ""
       }
      ],
      "title": "Abschluss"
@@ -373,17 +413,19 @@
      "steps": [
       {
        "id": "bo1",
-       "img": "",
+       "img": "8251143a188ffb73c1a4f0768888f35b",
        "min": 4,
        "name": "Bauchatmung in Rückenlage",
-       "note": "Vorab mit Arzt oder Physio klären, was erlaubt ist. Knie aufgestellt, Hände auf dem Bauch. Jederzeit stoppen bei Schmerz, Kribbeln oder Taubheit."
+       "note": "Vorab mit Arzt oder Physio klären, was erlaubt ist. Knie aufgestellt, Hände auf dem Bauch. Jederzeit stoppen bei Schmerz, Kribbeln oder Taubheit.",
+       "text": "- Atmung\n- Becken kippen\n- Arme nach oben nehmen"
       },
       {
        "id": "bo2",
        "img": "",
        "min": 3,
        "name": "Becken sanft kippen",
-       "note": "Kleine, langsame Bewegung. Nur im schmerzfreien Bereich."
+       "note": "Kleine, langsame Bewegung. Nur im schmerzfreien Bereich.",
+       "text": ""
       }
      ],
      "title": "Ankommen"
@@ -396,21 +438,24 @@
        "img": "d0c4e0d896ff91d5ad2682db65bbc6ad",
        "min": 3,
        "name": "Schulterbrücke, kleiner Hub",
-       "note": "Nur wenig anheben, Gesäß aktiv, kein Hohlkreuz. Langsam ablegen."
+       "note": "Nur wenig anheben, Gesäß aktiv, kein Hohlkreuz. Langsam ablegen.",
+       "text": ""
       },
       {
        "id": "bo4",
        "img": "7251df41361609c665b8f793b62cf223",
        "min": 3,
        "name": "Ein Knie zur Brust",
-       "note": "Nur ein Bein, sanft, im schmerzfreien Bereich. Kein Ziehen mit Kraft."
+       "note": "Nur ein Bein, sanft, im schmerzfreien Bereich. Kein Ziehen mit Kraft.",
+       "text": ""
       },
       {
        "id": "bo5",
        "img": "",
        "min": 3,
        "name": "Fersen gleiten",
-       "note": "Abwechselnd ein Bein lang ausstrecken. Rücken bleibt ruhig am Boden."
+       "note": "Abwechselnd ein Bein lang ausstrecken. Rücken bleibt ruhig am Boden.",
+       "text": ""
       }
      ],
      "title": "Aktivierung am Boden"
@@ -423,21 +468,24 @@
        "img": "f18411c82842bcbdfb8de8084adc7cb4",
        "min": 2,
        "name": "Berg, aufrechte Haltung",
-       "note": "Füße hüftbreit, Wirbelsäule lang, locker atmen. Kein Hohlkreuz."
+       "note": "Füße hüftbreit, Wirbelsäule lang, locker atmen. Kein Hohlkreuz.",
+       "text": ""
       },
       {
        "id": "bo7",
        "img": "35f2c99b619f6f3d99c475ccdbd2c7f2",
        "min": 3,
        "name": "Krieger II, flach",
-       "note": "Nur kurz und flach, Rumpf aufrecht, nicht tief gehen. Hände auch an die Hüften möglich."
+       "note": "Nur kurz und flach, Rumpf aufrecht, nicht tief gehen. Hände auch an die Hüften möglich.",
+       "text": ""
       },
       {
        "id": "bo8",
        "img": "d23724797774057159cfdd8313440c07",
        "min": 3,
        "name": "Baum an der Wand",
-       "note": "Eine Hand an Wand oder Stuhl. Fuß am Unterschenkel, nicht am Knie."
+       "note": "Eine Hand an Wand oder Stuhl. Fuß am Unterschenkel, nicht am Knie.",
+       "text": ""
       }
      ],
      "title": "Aufrecht stehen"
@@ -450,7 +498,8 @@
        "img": "8251143a188ffb73c1a4f0768888f35b",
        "min": 8,
        "name": "Entspannung in Rückenlage",
-       "note": "Unterschenkel auf Stuhl oder Kissen lagern. Decke bereitlegen, ruhige Stimme."
+       "note": "Unterschenkel auf Stuhl oder Kissen lagern. Decke bereitlegen, ruhige Stimme.",
+       "text": ""
       }
      ],
      "title": "Abschluss"
@@ -515,6 +564,31 @@
    "id": "8251143a188ffb73c1a4f0768888f35b",
    "name": "shavasna",
    "file": "8251143a188ffb73c1a4f0768888f35b.png"
+  },
+  {
+   "id": "97712605e691c9440d376cd771e1e807",
+   "name": "dreieck-yoga-vidya",
+   "file": "97712605e691c9440d376cd771e1e807.png"
+  },
+  {
+   "id": "51723bc965f59ed53e328a34bd347309",
+   "name": "dreieck",
+   "file": "51723bc965f59ed53e328a34bd347309.png"
+  },
+  {
+   "id": "653d86734bcfdc3fe957249d5d3dcf4e",
+   "name": "erdgebet",
+   "file": "653d86734bcfdc3fe957249d5d3dcf4e.png"
+  },
+  {
+   "id": "ec901cd51dc6ebff3b32d307a0059dbe",
+   "name": "sitzende-vorwaertsbeuge",
+   "file": "ec901cd51dc6ebff3b32d307a0059dbe.png"
+  },
+  {
+   "id": "a7af98808edcacf48575570b700e5f93",
+   "name": "tisch",
+   "file": "a7af98808edcacf48575570b700e5f93.png"
   }
  ]
 }
