@@ -207,10 +207,54 @@ button:focus-visible, input:focus-visible, label:focus-within { outline: 3px sol
 .filebtn input { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; font-size: 0; }
 .hint { color: var(--muted); margin: 0; }
 
+.lesson-btn { font-family: var(--font-display); font-weight: 700; font-size: 1.1rem; max-width: 46vw; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+#lessons-wrap { justify-content: flex-start; }
+#lessons-wrap .list-head { flex-wrap: wrap; }
+#lessons-wrap .mini, .appbox .mini { border: 1px solid var(--line); border-radius: 10px; background: var(--bg); padding: 8px 14px; margin: 3px 2px; }
+#lesson-list { display: flex; flex-direction: column; gap: 8px; padding: 8px 4px; overflow-y: auto; min-height: 0; }
+#lesson-list .item { min-height: 60px; border: 1px solid var(--line); background: var(--bg); padding: 10px 16px; font-weight: 600; font-size: 1.05rem; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08); }
+#lesson-list .item::after { content: "›"; font-size: 1.5rem; line-height: 1; opacity: 0.5; margin-left: 4px; }
+#lesson-list .item.cur { background: var(--accent); border-color: var(--accent); }
+#lesson-list .item:active { transform: translateY(1px); box-shadow: none; }
 .lrow { display: flex; gap: 8px; align-items: center; }
 .lrow .item { flex: 1; min-width: 0; }
 .lmin { font-family: var(--font-mono); font-size: 0.85rem; opacity: 0.7; margin-left: auto; white-space: nowrap; }
 .ed-head .field.lname { flex: 1 1 160px; min-width: 120px; max-width: 360px; }
+/* scroll view: all exercises in one free-scrolling column; the one nearest the middle line becomes active after a short pause */
+.scrollview { position: relative; min-height: 0; background: var(--tile); border: 1px solid var(--line); border-radius: 18px; overflow: hidden; color: #1c2032; }
+.sc-list { position: absolute; inset: 0; overflow-y: auto; -webkit-overflow-scrolling: touch; overscroll-behavior: contain; touch-action: manipulation; padding: calc(var(--sc-h, 600px) * 0.25) 14px; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; }
+.sc-item { position: relative; height: calc(var(--sc-h, 600px) * 0.5); display: grid; grid-template-columns: minmax(0, 1fr) clamp(230px, 34%, 440px); gap: 18px; padding: 12px 14px; border-radius: 16px; border: 2px solid transparent; opacity: 0.5; transition: opacity 0.25s, border-color 0.25s, background 0.25s; overflow: hidden; }
+.sc-item + .sc-item { margin-top: 10px; }
+.sc-item.done { opacity: 0.35; }
+.sc-item.active { opacity: 1; border-color: var(--accent); background: #ffffff; }
+.sc-item.pending { opacity: 0.9; }
+.sc-pic { position: relative; min-height: 0; min-width: 0; display: flex; align-items: center; justify-content: center; text-align: center; }
+.sc-pic img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; pointer-events: none; }
+.sc-bigname { font-family: var(--font-display); font-weight: 700; font-size: clamp(1.8rem, 6vh, 4rem); line-height: 1.05; overflow-wrap: anywhere; }
+.sc-info { min-width: 0; display: flex; flex-direction: column; justify-content: center; gap: 6px; overflow: hidden; }
+.sc-info .eyebrow { color: var(--tile-ink); }
+.sc-name { font-family: var(--font-display); font-weight: 700; font-size: clamp(1.5rem, 4.2vh, 2.6rem); line-height: 1.08; overflow-wrap: anywhere; min-width: 0; }
+.sc-dur { font-family: var(--font-mono); color: var(--tile-ink); font-size: 1.05rem; }
+.sc-note { margin: 0; color: var(--tile-ink); font-size: clamp(1rem, 2.4vh, 1.25rem); }
+.sc-pend { position: absolute; left: 0; right: 0; bottom: 0; height: 6px; background: transparent; }
+.sc-pend > i { display: block; height: 100%; width: 0; background: var(--accent); }
+.sc-item.pending .sc-pend { background: #e2e5ee; }
+.sc-item.pending .sc-pend > i { animation: sc-pend var(--sc-wait, 2s) linear forwards; }
+@keyframes sc-pend { from { width: 0; } to { width: 100%; } }
+.sc-mid { position: absolute; left: 0; right: 0; top: 50%; height: 0; border-top: 2px dashed var(--accent); opacity: 0.25; pointer-events: none; }
+.sc-hud { position: absolute; right: 14px; bottom: 14px; background: rgba(250, 250, 246, 0.93); border: 1px solid #e2e2da; border-radius: 14px; padding: 8px 14px; text-align: right; pointer-events: none; box-shadow: 0 4px 18px rgba(0, 0, 0, 0.08); max-width: 46%; }
+.sc-hud .digits { font-size: clamp(2rem, 6.5vh, 3.4rem); color: #1c2032; }
+.sc-hud .digits.idle { color: var(--tile-ink); }
+.sc-hud .digits.over { color: #b4570c; }
+.sc-cur { font-weight: 600; font-size: 0.95rem; color: #1c2032; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.sc-sub, .sc-chip { display: block; font-size: 0.85rem; color: var(--tile-ink); font-family: var(--font-mono); }
+@media (max-width: 760px), (orientation: portrait) {
+  .sc-item { grid-template-columns: 1fr; grid-template-rows: minmax(0, 1fr) auto; gap: 8px; }
+  .sc-info { justify-content: flex-start; }
+  .sc-note { display: none; }
+  .sc-hud { max-width: 60%; }
+}
+@media (prefers-reduced-motion: reduce) { .sc-item { transition: none; } }
 .appbox { display: none; margin-top: 18px; padding-top: 12px; border-top: 1px solid var(--line); }
 .ro .appbox { display: block; }
 .appbox .hint { margin-bottom: 8px; line-height: 1.4; }
@@ -223,9 +267,9 @@ button:focus-visible, input:focus-visible, label:focus-within { outline: 3px sol
 
 <div class="app" id="app">
   <header class="top">
-    <div class="brand">Yoga-Ablauf <span class="example-tag" id="example-tag" hidden>Beispiel</span></div>
+    <div class="brand"><button class="ghost lesson-btn" id="lesson-btn" type="button">Stunden</button><span class="example-tag" id="example-tag" hidden>Beispiel</span></div>
     <div class="clock" id="clock"></div>
-    <button class="ghost" id="lesson-btn" type="button">Stunden</button>
+    <button class="ghost" id="view-btn" type="button">Scrollen</button>
     <button class="ghost" id="list-btn" type="button">Ablauf</button>
     <button class="ghost" id="edit-btn" type="button">Bearbeiten</button>
     <button class="ghost" id="fs-btn" type="button" hidden>Vollbild</button>
@@ -241,6 +285,18 @@ button:focus-visible, input:focus-visible, label:focus-within { outline: 3px sol
       <div class="flash" id="flash" aria-hidden="true"></div>
       <div class="bar" id="bar"><i></i></div>
     </div>
+  </section>
+
+  <section class="scrollview" id="scroll" hidden>
+    <div class="sc-list" id="sc-list" aria-label="Alle Übungen. Die Übung in der Mitte wird nach kurzer Pause aktiv. Doppelt tippen: Start oder Pause."></div>
+    <div class="sc-mid" aria-hidden="true"></div>
+    <div class="sc-hud" id="sc-hud">
+      <div class="sc-cur" id="sc-cur"></div>
+      <div class="digits" id="sc-digits"></div>
+      <div class="sc-sub" id="sc-sub"></div>
+      <span class="sc-chip" id="sc-chip"></span>
+    </div>
+    <div class="flash" id="sc-flash" aria-hidden="true"></div>
   </section>
 
   <section class="editor" id="editor" hidden>
@@ -640,9 +696,10 @@ button:focus-visible, input:focus-visible, label:focus-within { outline: 3px sol
     });
   }
 
-  function renderAll() { renderStage(); renderList(); tick(); }
+  function renderAll() { renderStage(); renderList(); if (view === "scroll" && !editing) renderScroll(); tick(); }
 
   function tick() {
+    scHud();
     var totalMs = 0, plannedTotal = 0, i;
     for (i = 0; i < flat.length; i++) { totalMs += live(i); plannedTotal += planMs(i); }
     var remaining = 0;
@@ -701,6 +758,125 @@ button:focus-visible, input:focus-visible, label:focus-within { outline: 3px sol
       if (x < LEFT_ZONE) { prev(); flash("‹"); } else { next(); flash("›"); }
     }, DOUBLE_MS);
   });
+
+  /* ---------- scroll view ---------- */
+  /* All exercises in one column. The one nearest the dashed middle line becomes the current exercise
+     (also for timing), but only after scrolling has rested for SWITCH_MS, so a quick look ahead or back changes nothing. */
+  var LS_VIEW = "yoga.view.v1", SWITCH_MS = 2000;
+  var view = lsGet(LS_VIEW) === "scroll" ? "scroll" : "tile";
+  var scKey = "", scItems = [], pendIdx = -1, pendTimer = 0, lastCentered = -1, progScroll = false, progTimer = 0, scRaf = 0;
+  function applyView() {
+    var sc = view === "scroll" && !editing;
+    $("scroll").hidden = !sc; $("play").hidden = editing || sc;
+    $("view-btn").textContent = view === "scroll" ? "Kachel" : "Scrollen";
+    if (sc) { renderScroll(); requestAnimationFrame(function () { layoutScroll(); centerOn(st.idx, false); tick(); }); }
+    else clearPending();
+  }
+  function setView(v) { view = v; lsSet(LS_VIEW, v); applyView(); }
+  $("view-btn").addEventListener("click", function () { setView(view === "scroll" ? "tile" : "scroll"); });
+
+  function scItem(e, i) {
+    var it = el("div", "sc-item");
+    var pic = el("div", "sc-pic");
+    if (e.img) {
+      var im = document.createElement("img"); im.alt = e.name;
+      setImg(im, e.img, function () { pic.textContent = ""; pic.appendChild(el("div", "sc-bigname", e.name)); });
+      pic.appendChild(im);
+    } else pic.appendChild(el("div", "sc-bigname", e.name));
+    var info = el("div", "sc-info");
+    if (e.bTitle) info.appendChild(el("div", "eyebrow", e.bTitle + " · " + (e.si + 1) + "/" + e.bLen));
+    var nr = el("div", "namerow");
+    if (e.img) nr.appendChild(el("div", "sc-name", e.name));
+    nr.appendChild(el("span", "count", (i + 1) + "/" + flat.length));
+    info.appendChild(nr);
+    info.appendChild(el("div", "sc-dur", fmtMin(e.min)));
+    if (e.note) info.appendChild(el("p", "sc-note", e.note));
+    var pb = el("div", "sc-pend"); pb.appendChild(el("i"));
+    it.appendChild(pic); it.appendChild(info); it.appendChild(pb);
+    return it;
+  }
+  function renderScroll() {
+    var list = $("sc-list");
+    var key = curId + "|" + JSON.stringify(flat.map(function (e) { return [e.id, e.name, e.img, e.note, e.min, e.bTitle]; }));
+    if (key !== scKey) {
+      scKey = key; list.textContent = ""; clearPending();
+      scItems = flat.map(function (e, i) { var it = scItem(e, i); list.appendChild(it); return it; });
+      lastCentered = -1;
+      requestAnimationFrame(function () { layoutScroll(); centerOn(st.idx, false); });
+    }
+    scItems.forEach(function (it, i) {
+      it.classList.toggle("active", !st.finished && i === st.idx);
+      it.classList.toggle("done", st.finished || i < st.idx);
+    });
+    if (lastCentered !== -1 && lastCentered !== st.idx && !$("scroll").hidden) centerOn(st.idx, true);
+  }
+  function layoutScroll() { var list = $("sc-list"); list.style.setProperty("--sc-h", list.clientHeight + "px"); }
+  function centerOn(i, smooth) {
+    var list = $("sc-list"), it = scItems[i]; if (!it) return;
+    clearPending(); lastCentered = i;
+    var top = Math.max(0, it.offsetTop + it.offsetHeight / 2 - list.clientHeight / 2);
+    if (Math.abs(list.scrollTop - top) < 2) return;
+    progScroll = true; clearTimeout(progTimer); progTimer = setTimeout(function () { progScroll = false; }, 1200);
+    try { list.scrollTo({ top: top, behavior: smooth ? "smooth" : "auto" }); } catch (e) { list.scrollTop = top; }
+  }
+  function nearestItem() {
+    var list = $("sc-list"), mid = list.scrollTop + list.clientHeight / 2, best = -1, bd = Infinity;
+    scItems.forEach(function (it, i) { var d = Math.abs(it.offsetTop + it.offsetHeight / 2 - mid); if (d < bd) { bd = d; best = i; } });
+    return best;
+  }
+  function clearPending() {
+    clearTimeout(pendTimer); pendTimer = 0;
+    if (pendIdx >= 0 && scItems[pendIdx]) scItems[pendIdx].classList.remove("pending");
+    pendIdx = -1;
+  }
+  function setPending(n) {
+    if (pendIdx !== n) { clearPending(); pendIdx = n; }
+    var it = scItems[n]; it.classList.remove("pending"); void it.offsetWidth; it.classList.add("pending");
+    clearTimeout(pendTimer);
+    pendTimer = setTimeout(function () {
+      var target = pendIdx; clearPending(); if (target < 0) return;
+      lastCentered = target; go(target);
+    }, SWITCH_MS);
+  }
+  function onScrollSettle() {
+    scRaf = 0;
+    if (progScroll || $("scroll").hidden || !scItems.length) return;
+    var n = nearestItem(); if (n < 0) return;
+    if (n === st.idx && !st.finished) { clearPending(); lastCentered = n; return; }
+    setPending(n);
+  }
+  $("sc-list").style.setProperty("--sc-wait", (SWITCH_MS / 1000) + "s");
+  $("sc-list").addEventListener("scroll", function () {
+    if (progScroll) { clearTimeout(progTimer); progTimer = setTimeout(function () { progScroll = false; }, 180); return; }
+    if (!scRaf) scRaf = requestAnimationFrame(onScrollSettle);
+  }, { passive: true });
+  ["touchstart", "wheel", "mousedown"].forEach(function (t) {
+    $("sc-list").addEventListener(t, function () { progScroll = false; clearTimeout(progTimer); }, { passive: true });
+  });
+  var scLastTap = 0;
+  $("sc-list").addEventListener("click", function () {
+    var now = Date.now();
+    if (now - scLastTap < DOUBLE_MS) {
+      scLastTap = 0;
+      if (!st.finished) {
+        toggle();
+        var f = $("sc-flash"); f.textContent = st.running ? "▶" : "❚❚"; f.classList.remove("on"); void f.offsetWidth; f.classList.add("on");
+      }
+    } else scLastTap = now;
+  });
+  if (window.ResizeObserver) new ResizeObserver(function () { if ($("scroll").hidden) return; layoutScroll(); centerOn(st.idx, false); }).observe($("scroll"));
+
+  function scHud() {
+    if ($("scroll").hidden) return;
+    var started = st.ms.some(function (x) { return x > 0; }), dg = $("sc-digits");
+    $("sc-chip").textContent = st.finished ? "Fertig" : st.running ? "● läuft" : started ? "❚❚ pausiert · Doppeltippen" : "Doppeltippen = Start";
+    if (st.finished) { $("sc-cur").textContent = "Stunde beendet"; dg.textContent = ""; $("sc-sub").textContent = ""; return; }
+    var cur = live(st.idx), pl = planMs(st.idx), over = cur > pl;
+    $("sc-cur").textContent = (st.idx + 1) + "/" + flat.length + " · " + flat[st.idx].name;
+    dg.textContent = (over ? "+" : "") + fmt(pl - cur);
+    dg.className = "digits" + (over ? " over" : (!st.running && cur === 0 ? " idle" : ""));
+    $("sc-sub").textContent = "Geplant " + fmt(pl) + " · vergangen " + fmt(cur);
+  }
 
   /* ---------- drawer ---------- */
   function openDrawer() { $("drawer").hidden = false; renderList(); var c = $("list").querySelector(".item.cur"); if (c) $("list").scrollTop = Math.max(0, c.offsetTop - 120); }
@@ -772,8 +948,9 @@ button:focus-visible, input:focus-visible, label:focus-within { outline: 3px sol
   /* ---------- editor ---------- */
   function setStatus(t) { $("ed-status").textContent = t || ""; }
   function showEditor(on) {
-    $("editor").hidden = !on; $("play").hidden = on; $("edit-btn").hidden = on; $("list-btn").hidden = on; $("lesson-btn").hidden = on; $("pub-btn").hidden = on;
+    $("editor").hidden = !on; $("view-btn").hidden = on; $("edit-btn").hidden = on; $("list-btn").hidden = on; $("lesson-btn").hidden = on; $("pub-btn").hidden = on;
     $("images-btn").hidden = !(on && assetsApi && libDoc);
+    applyView();
   }
   function openEditor() {
     closeDrawer(); closeLessons(); draft = clone(blocks); editing = true; setStatus(lessonsDoc ? "" : "Wird nur auf diesem Gerät gespeichert.");
@@ -1065,6 +1242,7 @@ button:focus-visible, input:focus-visible, label:focus-within { outline: 3px sol
   if (cachedL) { try { initial = normalizeLessons(JSON.parse(cachedL)); } catch (e) {} }
   if (!initial.length && cachedP) { try { var cb = normalize(JSON.parse(cachedP)); if (cb.length) initial = [{ id: "l1", name: "Stunde 1", blocks: cb }]; } catch (e) {} }
   if (initial.length) applyLessons(initial); else { restoreRun(); renderAll(); renderLessonUi(); }
+  applyView();
 
   (async function connect() {
     if (!window.claude || !window.claude.use) return;
