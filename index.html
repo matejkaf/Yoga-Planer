@@ -1218,6 +1218,7 @@ button:focus-visible, input:focus-visible, label:focus-within { outline: 3px sol
     $("ov-search").value = "";
     $("ov-status").textContent = mode === "pick" ? "" : "Neue Bilder: in den Ordner „Piktogramme“ legen und Claude im Chat „übernimm die neuen Bilder“ sagen.";
     $("overlay").hidden = false; renderChooser();
+    try { $("ov-search").focus({ preventScroll: true }); } catch (e) { $("ov-search").focus(); }
   }
   function closeChooser() { $("overlay").hidden = true; chooser.step = null; if (editing) renderEditor(); }
   function renderChooser() {
