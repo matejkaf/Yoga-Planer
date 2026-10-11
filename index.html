@@ -210,10 +210,16 @@ button:focus-visible, input:focus-visible, label:focus-within { outline: 3px sol
 .lesson-btn { font-family: var(--font-display); font-weight: 700; font-size: 1.1rem; max-width: 46vw; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 #lessons-wrap { justify-content: flex-start; }
 #lessons-wrap .list-head { flex-wrap: wrap; }
+#lessons-wrap .list-head .mini { border: 1.5px solid var(--accent); border-radius: 10px; background: transparent; color: var(--accent); padding: 8px 16px; margin: 3px 2px; }
+#lessons-wrap .list-head .mini:active { background: var(--accent); color: var(--accent-fg); }
+.ldel { flex: none; width: 48px; height: 48px; display: flex; align-items: center; justify-content: center; border: none; border-radius: 10px; background: none; color: var(--muted); cursor: pointer; font-weight: 600; }
+.ldel.confirm { width: auto; padding: 0 12px; background: var(--warn); color: #fff; }
+.ldel:disabled { opacity: 0.3; cursor: default; }
 #lesson-list { display: flex; flex-direction: column; gap: 8px; padding: 8px 4px; overflow-y: auto; min-height: 0; }
 #lesson-list .item { min-height: 60px; border: 1px solid var(--line); background: var(--bg); padding: 10px 16px; font-weight: 600; font-size: 1.05rem; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08); }
 #lesson-list .item::after { content: "›"; font-size: 1.5rem; line-height: 1; opacity: 0.5; margin-left: 4px; }
-#lesson-list .item.cur { background: var(--accent); border-color: var(--accent); }
+#lesson-list .item.cur { background: var(--fg); border-color: var(--fg); color: var(--bg); }
+#lesson-list .item.cur .lmin { color: var(--bg); }
 #lesson-list .item:active { transform: translateY(1px); box-shadow: none; }
 .lrow { display: flex; gap: 8px; align-items: center; }
 .lrow .item { flex: 1; min-width: 0; }
@@ -258,7 +264,7 @@ button:focus-visible, input:focus-visible, label:focus-within { outline: 3px sol
 .ro .appbox { display: block; }
 .appbox .hint { margin-bottom: 8px; line-height: 1.4; }
 .toast { position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%); z-index: 30; background: var(--fg); color: var(--bg); padding: 12px 20px; border-radius: 14px; font-weight: 600; max-width: 90vw; text-align: center; }
-.ro #edit-btn, .ro #lesson-new, .ro #lesson-dup, .ro .lrow .mini, .ro #pub-btn { display: none !important; }
+.ro #edit-btn, .ro #lesson-new, .ro #lesson-dup, .ro .lrow .ldel, .ro #pub-btn { display: none !important; }
 @media (prefers-reduced-motion: reduce) { .bar > i, .total-bar > i { transition: none; } .flash.on { animation-duration: 0.01s; } }
 </style>
 </head>
@@ -329,7 +335,7 @@ button:focus-visible, input:focus-visible, label:focus-within { outline: 3px sol
     <div class="list-head">
       <span class="eyebrow">Stunden</span>
       <span>
-        <button class="mini" id="lesson-new" type="button">Neue Stunde</button>
+        <button class="mini" id="lesson-new" type="button">Neu</button>
         <button class="mini" id="lesson-dup" type="button">Duplizieren</button>
         <button class="mini" id="lessons-close" type="button">Schließen</button>
       </span>
@@ -905,7 +911,10 @@ button:focus-visible, input:focus-visible, label:focus-within { outline: 3px sol
       b.appendChild(el("span", "lmin", fmtMin(totalMin(l.blocks))));
       b.addEventListener("click", function () { selectLesson(l.id); closeLessons(); });
       row.appendChild(b);
-      var d = el("button", "mini", delConfirm === l.id ? "Wirklich?" : "Löschen"); d.type = "button";
+      var d = el("button", "ldel" + (delConfirm === l.id ? " confirm" : "")); d.type = "button";
+      d.setAttribute("aria-label", "Stunde „" + l.name + "“ löschen"); d.title = "Löschen";
+      if (delConfirm === l.id) d.textContent = "Löschen?";
+      else d.innerHTML = '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18"/><path d="M8 6V4h8v2"/><path d="M6 6l1 14h10l1-14"/><path d="M10 11v6M14 11v6"/></svg>';
       if (lessons.length < 2) d.disabled = true;
       d.addEventListener("click", function () {
         if (delConfirm === l.id) { delConfirm = ""; removeLesson(l.id); return; }
