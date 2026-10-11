@@ -127,6 +127,13 @@ button:focus-visible, input:focus-visible, label:focus-within { outline: 3px sol
 .sc-md { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: center; font-size: clamp(1.2rem, 3.4vh, 2.1rem); }
 .md-thumb { font-size: 1rem; max-height: 7.5em; border: 1px solid #e6e6df; border-radius: 10px; padding: 8px 10px; background: #fff; }
 .tl-side .nxb.small .md-thumb { font-size: 0.85rem; max-height: 5.5em; }
+.tl-pic.both, .sc-pic.both { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 24px; align-items: center; }
+.pic-img { position: relative; height: 100%; min-height: 0; min-width: 0; }
+.pic-img img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; pointer-events: none; }
+.sc-pic.both .sc-md { position: relative; inset: auto; max-height: 100%; }
+@media (max-width: 760px), (orientation: portrait) {
+  .tl-pic.both, .sc-pic.both { grid-template-columns: minmax(0, 1fr); grid-template-rows: minmax(0, 1fr) minmax(0, 1fr); gap: 12px; }
+}
 .tilebody .bigname { font-family: var(--font-display); font-weight: 700; font-size: clamp(2.6rem, 13vh, 8rem); line-height: 1.02; letter-spacing: -0.02em; color: #1c2032; text-wrap: balance; overflow-wrap: anywhere; }
 .tilebody .bignote { display: block; margin-top: 12px; font-family: var(--font-body); font-weight: 400; font-size: clamp(1.1rem, 3vh, 1.8rem); letter-spacing: 0; color: var(--tile-ink); }
 .chev { position: absolute; top: 50%; transform: translateY(-50%); font-size: 3rem; line-height: 1; color: var(--tile-ink); opacity: 0.28; pointer-events: none; font-family: var(--font-display); }
@@ -203,6 +210,9 @@ button:focus-visible, input:focus-visible, label:focus-within { outline: 3px sol
 .sq { width: 44px; height: 44px; flex: none; border-radius: 10px; border: 1px solid var(--line); background: var(--surface); cursor: pointer; font-size: 1.05rem; line-height: 1; }
 .sq[disabled] { opacity: 0.35; cursor: default; }
 .sq.del { color: var(--warn); }
+.sq.txt { font-family: var(--font-display); font-weight: 700; color: var(--muted); }
+.sq.txt.on { color: var(--accent); border-color: var(--accent); }
+.sq.txt.open { background: var(--surface2); }
 .addrow { display: flex; flex-wrap: wrap; gap: 8px; }
 
 /* image chooser */
@@ -689,8 +699,8 @@ button:focus-visible, input:focus-visible, label:focus-within { outline: 3px sol
     var b = el("div", "nxb" + (small ? " small" : ""));
     if (!n) { b.appendChild(el("div", "nm", "Ende der Stunde")); return b; }
     if (n.bTitle && n.si === 0) b.appendChild(el("div", "eyebrow", n.bTitle));
-    if (n.text) b.appendChild(mdBlock(n.text, "md-thumb"));
-    else if (n.img) b.appendChild(thumbEl(n.img, "", n.name));
+    if (n.img) b.appendChild(thumbEl(n.img, "", n.name));
+    else if (n.text) b.appendChild(mdBlock(n.text, "md-thumb"));
     var row = el("div", "nmrow");
     row.appendChild(el("div", "nm", n.name));
     row.appendChild(el("div", "dur", fmtMin(n.min)));
@@ -718,6 +728,12 @@ button:focus-visible, input:focus-visible, label:focus-within { outline: 3px sol
         nrow2.appendChild(el("span", "count", count));
         head.appendChild(nrow2);
         if (e.note) head.appendChild(el("p", "note", e.note));
+        if (e.img) {
+          pic.classList.add("both");
+          var ib = el("div", "pic-img"), im2 = document.createElement("img"); im2.alt = e.name;
+          setImg(im2, e.img, function () { ib.remove(); pic.classList.remove("both"); });
+          ib.appendChild(im2); pic.appendChild(ib);
+        }
         var md = mdBlock(e.text, "tl-md"); pic.appendChild(md); fitText(md);
       } else if (e.img) {
         var nrow = el("div", "namerow");
@@ -842,7 +858,15 @@ button:focus-visible, input:focus-visible, label:focus-within { outline: 3px sol
   function scItem(e, i) {
     var it = el("div", "sc-item");
     var pic = el("div", "sc-pic");
-    if (e.text) { var md = mdBlock(e.text, "sc-md"); pic.appendChild(md); requestAnimationFrame(function () { fitText(md); }); }
+    if (e.text) {
+      if (e.img) {
+        pic.classList.add("both");
+        var ib = el("div", "pic-img"), im2 = document.createElement("img"); im2.alt = e.name;
+        setImg(im2, e.img, function () { ib.remove(); pic.classList.remove("both"); });
+        ib.appendChild(im2); pic.appendChild(ib);
+      }
+      var md = mdBlock(e.text, "sc-md"); pic.appendChild(md); requestAnimationFrame(function () { fitText(md); });
+    }
     else if (e.img) {
       var im = document.createElement("img"); im.alt = e.name;
       setImg(im, e.img, function () { pic.textContent = ""; pic.appendChild(el("div", "sc-bigname", e.name)); });
@@ -1020,7 +1044,9 @@ button:focus-visible, input:focus-visible, label:focus-within { outline: 3px sol
     $("images-btn").hidden = !(on && assetsApi && libDoc);
     applyView();
   }
+  var txOpen = {};
   function openEditor() {
+    txOpen = {};
     closeDrawer(); closeLessons(); draft = clone(blocks); editing = true; setStatus(lessonsDoc ? "" : "Wird nur auf diesem Gerät gespeichert.");
     $("lesson-name").value = curLesson() ? curLesson().name : "Stunde 1";
     showEditor(true); renderEditor();
@@ -1073,13 +1099,15 @@ button:focus-visible, input:focus-visible, label:focus-within { outline: 3px sol
         r.appendChild(mn);
         r.appendChild(textField("nt", s.note, "Hinweis (optional)", function (v) { s.note = v; }));
         var tx = el("textarea", "field tx"); tx.value = s.text || ""; tx.rows = Math.min(8, Math.max(2, (s.text || "").split("\n").length + 1));
-        tx.placeholder = "Text statt Bild (optional, mehrzeilig). Zeilen mit „- “ werden Aufzählungen, „1. “ nummeriert, **fett**.";
+        tx.placeholder = "Text (optional, mehrzeilig) – erscheint statt oder neben dem Bild. Zeilen mit „- “ werden Aufzählungen, „1. “ nummeriert, **fett**.";
+        var hasTx = !!(s.text || "").trim(), txShown = txOpen[s.id] !== undefined ? txOpen[s.id] : false;
+        r.appendChild(sqBtn("T", txShown ? "Text ausblenden" : (hasTx ? "Text einblenden (vorhanden)" : "Text einblenden"), function () { txOpen[s.id] = !txShown; renderEditor(); }, "txt" + (hasTx ? " on" : "") + (txShown ? " open" : "")));
         tx.spellcheck = false; tx.setAttribute("aria-label", "Text statt Bild");
         tx.addEventListener("input", function () { s.text = tx.value; });
         r.appendChild(sqBtn("↑", "Übung nach oben", function () { move(b.steps, si, -1); renderEditor(); }, "", si === 0));
         r.appendChild(sqBtn("↓", "Übung nach unten", function () { move(b.steps, si, 1); renderEditor(); }, "", si === b.steps.length - 1));
         r.appendChild(sqBtn("✕", "Übung löschen", function () { b.steps.splice(si, 1); if (!b.steps.length) draft.splice(bi, 1); renderEditor(); }, "del"));
-        r.appendChild(tx);
+        if (txShown) r.appendChild(tx);
         card.appendChild(r);
       });
 
