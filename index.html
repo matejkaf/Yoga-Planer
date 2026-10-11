@@ -333,7 +333,6 @@ button:focus-visible, input:focus-visible, label:focus-within { outline: 3px sol
       <h2>Stunde</h2>
       <input class="field lname" id="lesson-name" type="text" placeholder="Name der Stunde" autocomplete="off" spellcheck="false">
       <span class="status" id="ed-status"></span>
-      <button class="btn small" id="images-btn" type="button">Bilder verwalten</button>
       <button class="btn small" id="cancel-plan" type="button">Abbrechen</button>
       <button class="btn small go" id="save-plan" type="button">Speichern</button>
     </div>
@@ -1066,7 +1065,6 @@ button:focus-visible, input:focus-visible, label:focus-within { outline: 3px sol
   function setStatus(t) { $("ed-status").textContent = t || ""; }
   function showEditor(on) {
     $("editor").hidden = !on; $("view-btn").hidden = on; $("edit-btn").hidden = on; $("list-btn").hidden = on; $("lesson-btn").hidden = on; $("pub-btn").hidden = on;
-    $("images-btn").hidden = !(on && assetsApi && libDoc);
     applyView();
   }
   var txOpen = {};
@@ -1198,7 +1196,6 @@ button:focus-visible, input:focus-visible, label:focus-within { outline: 3px sol
   })();
   $("cancel-plan").addEventListener("click", closeEditor);
   $("save-plan").addEventListener("click", savePlan);
-  $("images-btn").addEventListener("click", function () { openChooser("manage", null); });
 
   /* ---------- image library ---------- */
   /* Exercise name from an image name: "schulterbruecke" -> "Schulterbrücke", "drehsitz-ein-bein-gestreckt" -> "Drehsitz ein Bein gestreckt". */
@@ -1394,7 +1391,6 @@ button:focus-visible, input:focus-visible, label:focus-within { outline: 3px sol
     if (!db) return;
     planDoc = db.doc("yoga/plan"); lessonsDoc = db.doc("yoga/lessons"); libDoc = db.doc("yoga/lib"); pubDoc = db.doc("yoga/publish");
     if (!READONLY) pubDoc.onSnapshot(function (snap) { pubState = snap.exists ? (snap.data() || {}) : {}; renderPubState(); }, function () {});
-    if (editing) $("images-btn").hidden = !(assetsApi && libDoc);
     libDoc.onSnapshot(function (snap) {
       var d = snap.exists ? snap.data() : null;
       lib = d && Array.isArray(d.images) ? d.images.filter(function (x) { return x && ID_RE.test(String(x.id)); }).map(function (x) { return { id: String(x.id), name: String(x.name || "Bild") }; }) : [];
