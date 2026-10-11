@@ -1080,6 +1080,16 @@ button:focus-visible, input:focus-visible, label:focus-within { outline: 3px sol
     editing = false; draft = null; showEditor(false);
     if (pendingLessons) { var p = pendingLessons; pendingLessons = null; applyLessons(p); } else renderAll();
   }
+  /* move a step up/down; at the edge of a sequence it moves into the neighbouring sequence (empty sequences disappear) */
+  function moveStep(bi, si, d) {
+    var b = draft[bi], steps = b.steps, target = si + d;
+    if (target >= 0 && target < steps.length) { move(steps, si, d); renderEditor(); return; }
+    var nb = draft[bi + d]; if (!nb) return;
+    var s = steps.splice(si, 1)[0];
+    if (d < 0) nb.steps.push(s); else nb.steps.unshift(s);
+    if (!steps.length) draft.splice(bi, 1);
+    renderEditor();
+  }
   function move(arr, i, d) { var j = i + d; if (j < 0 || j >= arr.length) return; var t = arr[i]; arr[i] = arr[j]; arr[j] = t; }
   function sqBtn(label, title, fn, cls, disabled) {
     var b = el("button", "sq" + (cls ? " " + cls : ""), label); b.type = "button"; b.title = title; b.setAttribute("aria-label", title);
@@ -1129,8 +1139,8 @@ button:focus-visible, input:focus-visible, label:focus-within { outline: 3px sol
         r.appendChild(sqBtn("T", txShown ? "Text ausblenden" : (hasTx ? "Text einblenden (vorhanden)" : "Text einblenden"), function () { txOpen[s.id] = !txShown; renderEditor(); }, "txt" + (hasTx ? " on" : "") + (txShown ? " open" : "")));
         tx.spellcheck = false; tx.setAttribute("aria-label", "Text statt Bild");
         tx.addEventListener("input", function () { s.text = tx.value; });
-        r.appendChild(sqBtn("↑", "Übung nach oben", function () { move(b.steps, si, -1); renderEditor(); }, "", si === 0));
-        r.appendChild(sqBtn("↓", "Übung nach unten", function () { move(b.steps, si, 1); renderEditor(); }, "", si === b.steps.length - 1));
+        r.appendChild(sqBtn("↑", si === 0 ? "In die vorige Sequenz verschieben" : "Übung nach oben", function () { moveStep(bi, si, -1); }, "", bi === 0 && si === 0));
+        r.appendChild(sqBtn("↓", si === b.steps.length - 1 ? "In die nächste Sequenz verschieben" : "Übung nach unten", function () { moveStep(bi, si, 1); }, "", bi === draft.length - 1 && si === b.steps.length - 1));
         r.appendChild(sqBtn("✕", "Übung löschen", function () { b.steps.splice(si, 1); if (!b.steps.length) draft.splice(bi, 1); renderEditor(); }, "del"));
         if (txShown) r.appendChild(tx);
         card.appendChild(r);
