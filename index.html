@@ -289,7 +289,7 @@ button:focus-visible, input:focus-visible, label:focus-within { outline: 3px sol
 .ro .appbox { display: block; }
 .appbox .hint { margin-bottom: 8px; line-height: 1.4; }
 .toast { position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%); z-index: 30; background: var(--fg); color: var(--bg); padding: 12px 20px; border-radius: 14px; font-weight: 600; max-width: 90vw; text-align: center; }
-.ro #edit-btn, .ro #lesson-new, .ro #lesson-dup, .ro .lrow .ldel, .ro #pub-btn { display: none !important; }
+.ro #edit-btn, .ro #lesson-new, .ro #lesson-dup, .ro .lrow .ldel, .ro #no-such-btn { display: none !important; }
 @media (prefers-reduced-motion: reduce) { .bar > i, .total-bar > i { transition: none; } .flash.on { animation-duration: 0.01s; } }
 </style>
 </head>
@@ -303,7 +303,6 @@ button:focus-visible, input:focus-visible, label:focus-within { outline: 3px sol
     <button class="ghost" id="list-btn" type="button">Ablauf</button>
     <button class="ghost" id="edit-btn" type="button">Bearbeiten</button>
     <button class="ghost" id="fs-btn" type="button" hidden>Vollbild</button>
-    <button class="ghost" id="pub-btn" type="button">Veröffentlichen</button>
     <div class="total-bar" id="total-bar"><i></i></div>
   </header>
 
@@ -374,19 +373,6 @@ button:focus-visible, input:focus-visible, label:focus-within { outline: 3px sol
 </div>
 
 <div class="toast" id="toast" hidden></div>
-
-<div class="overlay" id="pub-ov" hidden>
-  <div class="panel" role="dialog" aria-modal="true" aria-labelledby="pub-title">
-    <div class="bar-row">
-      <h3 id="pub-title">Veröffentlichen</h3>
-      <button class="btn small" id="pub-close" type="button">Schließen</button>
-    </div>
-    <p class="hint">Überträgt den gespeicherten Stand aller Stunden und Bilder ins GitHub-Repository. Die iPad-App übernimmt ihn beim nächsten Start. Vorher Änderungen mit „Speichern“ sichern.</p>
-    <p class="hint" id="pub-state"></p>
-    <button class="btn go" id="pub-go" type="button">Veröffentlichung anfordern</button>
-    <pre class="hint" id="pub-log" style="white-space: pre-wrap; margin: 0; font-family: var(--font-mono); font-size: 0.9rem;"></pre>
-  </div>
-</div>
 
 <div class="overlay" id="overlay" hidden>
   <div class="panel" role="dialog" aria-modal="true" aria-labelledby="ov-title">
@@ -1064,7 +1050,7 @@ button:focus-visible, input:focus-visible, label:focus-within { outline: 3px sol
   /* ---------- editor ---------- */
   function setStatus(t) { $("ed-status").textContent = t || ""; }
   function showEditor(on) {
-    $("editor").hidden = !on; $("view-btn").hidden = on; $("edit-btn").hidden = on; $("list-btn").hidden = on; $("lesson-btn").hidden = on; $("pub-btn").hidden = on;
+    $("editor").hidden = !on; $("view-btn").hidden = on; $("edit-btn").hidden = on; $("list-btn").hidden = on; $("lesson-btn").hidden = on;
     applyView();
   }
   var txOpen = {};
@@ -1341,35 +1327,10 @@ button:focus-visible, input:focus-visible, label:focus-within { outline: 3px sol
   $("app-update").addEventListener("click", function () { if (window.__appCheck) window.__appCheck(); });
   $("app-reload").addEventListener("click", function () { location.reload(); });
 
-  /* ---------- publish ---------- */
-  /* The page cannot reach GitHub itself, so "Veröffentlichen" records a request next to the data; Claude pushes the saved state to the repository on request. */
-  var pubDoc = null, pubState = {};
-  function renderPubState() {
-    var r = pubState.requestedAt, d = pubState.publishedAt, pending = r && (!d || r > d);
-    $("pub-state").textContent = pending ? "Angefordert am " + fmtStamp(r) + " – wartet auf Veröffentlichung durch Claude." : d ? "Zuletzt veröffentlicht: " + fmtStamp(d) + "." : "Noch nie veröffentlicht.";
-    $("pub-btn").textContent = pending ? "Veröffentlichen ●" : "Veröffentlichen";
-  }
-  async function requestPublish() {
-    var log = $("pub-log"), btn = $("pub-go");
-    if (!lessons.length) { log.textContent = "Es ist noch keine Stunde gespeichert (Bearbeiten → Speichern)."; return; }
-    btn.disabled = true;
-    try {
-      if (!pubDoc) throw new Error("nodb");
-      pubState = { requestedAt: new Date().toISOString(), publishedAt: pubState.publishedAt || null, lessons: lessons.length, images: lib.length };
-      await pubDoc.set(pubState); renderPubState();
-      log.textContent = "Vermerkt. Jetzt im Chat „veröffentlichen“ schreiben: Claude überträgt den gespeicherten Stand ins Repository. Die iPad-App übernimmt ihn beim nächsten Start.";
-    } catch (e) { log.textContent = "Konnte nicht vermerken (kein Zugriff auf die Datenbank)."; }
-    btn.disabled = false;
-  }
-  function openPub() { $("pub-ov").hidden = false; $("pub-log").textContent = ""; renderPubState(); }
-  $("pub-btn").addEventListener("click", openPub);
-  $("pub-close").addEventListener("click", function () { $("pub-ov").hidden = true; });
-  $("pub-go").addEventListener("click", requestPublish);
-
   /* ---------- keyboard ---------- */
   document.addEventListener("keydown", function (ev) {
     if (ev.key === "Escape") { closeDrawer(); closeLessons(); return; }
-    if (editing || !$("pub-ov").hidden || !$("overlay").hidden || !$("drawer").hidden || !$("lessons-wrap").hidden) return;
+    if (editing || !$("overlay").hidden || !$("drawer").hidden || !$("lessons-wrap").hidden) return;
     var t = ev.target && ev.target.tagName; if (t === "INPUT" || t === "TEXTAREA") return;
     if (ev.key === "ArrowRight") next();
     else if (ev.key === "ArrowLeft") prev();
@@ -1389,8 +1350,7 @@ button:focus-visible, input:focus-visible, label:focus-within { outline: 3px sol
     try { db = await window.claude.use("db"); } catch (e) {}
     try { assetsApi = await window.claude.use("assets"); } catch (e) {}
     if (!db) return;
-    planDoc = db.doc("yoga/plan"); lessonsDoc = db.doc("yoga/lessons"); libDoc = db.doc("yoga/lib"); pubDoc = db.doc("yoga/publish");
-    if (!READONLY) pubDoc.onSnapshot(function (snap) { pubState = snap.exists ? (snap.data() || {}) : {}; renderPubState(); }, function () {});
+    planDoc = db.doc("yoga/plan"); lessonsDoc = db.doc("yoga/lessons"); libDoc = db.doc("yoga/lib");
     libDoc.onSnapshot(function (snap) {
       var d = snap.exists ? snap.data() : null;
       lib = d && Array.isArray(d.images) ? d.images.filter(function (x) { return x && ID_RE.test(String(x.id)); }).map(function (x) { return { id: String(x.id), name: String(x.name || "Bild") }; }) : [];
