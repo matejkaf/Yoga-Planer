@@ -380,7 +380,7 @@ button:focus-visible, input:focus-visible, label:focus-within { outline: 3px sol
   <div class="panel" role="dialog" aria-modal="true" aria-labelledby="ov-title">
     <div class="bar-row">
       <h3 id="ov-title">Bild wählen</h3>
-      <label class="btn small filebtn" id="upload-label">Bild hinzufügen<input id="file-input" type="file" accept="image/*" multiple></label>
+      <label class="btn small filebtn" id="upload-label" hidden>Bild hinzufügen<input id="file-input" type="file" accept="image/*" multiple></label>
       <button class="btn small" id="no-image" type="button">Kein Bild</button>
       <button class="btn small go" id="ov-close" type="button">Schließen</button>
     </div>
@@ -1161,15 +1161,15 @@ button:focus-visible, input:focus-visible, label:focus-within { outline: 3px sol
     chooser.mode = mode; chooser.step = step; chooser.confirmId = "";
     $("ov-title").textContent = mode === "pick" ? "Bild wählen" : "Bilder verwalten";
     $("no-image").hidden = mode !== "pick";
-    $("upload-label").hidden = !(assetsApi && libDoc);
-    $("ov-status").textContent = "";
+    $("upload-label").hidden = true;
+    $("ov-status").textContent = mode === "pick" ? "" : "Neue Bilder: in den Ordner „Piktogramme“ legen und Claude im Chat „übernimm die neuen Bilder“ sagen.";
     $("overlay").hidden = false; renderChooser();
   }
   function closeChooser() { $("overlay").hidden = true; chooser.step = null; if (editing) renderEditor(); }
   function renderChooser() {
     var g = $("ov-grid"); g.textContent = "";
     if (!lib.length) {
-      g.appendChild(el("p", "hint", "Noch keine Bilder. Mit „Bild hinzufügen“ lädst du Piktogramme aus Fotos oder Dateien hoch. Sie lassen sich bei mehreren Übungen verwenden."));
+      g.appendChild(el("p", "hint", "Noch keine Bilder."));
       return;
     }
     lib.forEach(function (img) {
@@ -1180,15 +1180,6 @@ button:focus-visible, input:focus-visible, label:focus-within { outline: 3px sol
       function pick() { if (chooser.mode === "pick" && chooser.step) { setStepImage(chooser.step, img); closeChooser(); } }
       c.addEventListener("click", pick);
       c.addEventListener("keydown", function (ev) { if (ev.key === "Enter") pick(); });
-      if (chooser.mode === "manage" && assetsApi) {
-        var x = el("button", "x", chooser.confirmId === img.id ? "Sicher?" : "Löschen"); x.type = "button";
-        x.addEventListener("click", function (ev) {
-          ev.stopPropagation();
-          if (chooser.confirmId === img.id) { removeImage(img.id); }
-          else { chooser.confirmId = img.id; clearTimeout(chooser.confirmTimer); chooser.confirmTimer = setTimeout(function () { chooser.confirmId = ""; renderChooser(); }, 3500); renderChooser(); }
-        });
-        c.appendChild(x);
-      }
       g.appendChild(c);
     });
   }
