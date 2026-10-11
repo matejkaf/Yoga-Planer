@@ -99,7 +99,7 @@ button:focus-visible, input:focus-visible, label:focus-within { outline: 3px sol
 .tl-side .nxb.small .thumb { height: clamp(70px, 14vh, 150px); }
 .tl-side .nxb.small .nm { font-size: clamp(1.15rem, 2.7vh, 1.6rem); }
 .tl-side .nxb.small .dur { font-size: 0.95rem; }
-.tl-side .nm { font-family: var(--font-display); font-weight: 700; font-size: clamp(1.5rem, 4vh, 2.3rem); line-height: 1.1; overflow-wrap: anywhere; color: #1c2032; }
+.tl-side .nm { font-family: var(--font-display); font-weight: 700; font-size: clamp(1.5rem, 4vh, 2.3rem); line-height: 1.1; overflow-wrap: break-word; color: #1c2032; }
 .tl-side .dur { font-family: var(--font-mono); font-size: 1.1rem; color: var(--tile-ink); }
 .tl-timer { grid-area: timer; text-align: right; align-self: end; min-width: 0; }
 .tl-timer .digits { font-size: clamp(2.6rem, 9vh, 5rem); color: #1c2032; }
@@ -115,7 +115,7 @@ button:focus-visible, input:focus-visible, label:focus-within { outline: 3px sol
   .tl-side .nxb.small { width: auto; }
   .tl-side .nxb.small .thumb { width: 64px; height: 64px; }
 }
-.md { color: #1c2032; text-align: left; line-height: 1.32; overflow: hidden; overflow-wrap: anywhere; }
+.md { color: #1c2032; text-align: left; line-height: 1.32; overflow: hidden; overflow-wrap: break-word; }
 .md p { margin: 0 0 0.35em; }
 .md ul, .md ol { margin: 0 0 0.35em; padding-left: 1.25em; }
 .md li { margin: 0.12em 0; }
@@ -134,7 +134,8 @@ button:focus-visible, input:focus-visible, label:focus-within { outline: 3px sol
 @media (max-width: 760px), (orientation: portrait) {
   .tl-pic.both, .sc-pic.both { grid-template-columns: minmax(0, 1fr); grid-template-rows: minmax(0, 1fr) minmax(0, 1fr); gap: 12px; }
 }
-.tilebody .bigname { font-family: var(--font-display); font-weight: 700; font-size: clamp(2.6rem, 13vh, 8rem); line-height: 1.02; letter-spacing: -0.02em; color: #1c2032; text-wrap: balance; overflow-wrap: anywhere; }
+.tilebody .bigname, .sc-bigname { max-width: 100%; overflow-wrap: normal; word-break: keep-all; hyphens: manual; }
+.tilebody .bigname { font-family: var(--font-display); font-weight: 700; font-size: clamp(2.6rem, 13vh, 8rem); line-height: 1.02; letter-spacing: -0.02em; color: #1c2032; text-wrap: balance; }
 .tilebody .bignote { display: block; margin-top: 12px; font-family: var(--font-body); font-weight: 400; font-size: clamp(1.1rem, 3vh, 1.8rem); letter-spacing: 0; color: var(--tile-ink); }
 .chev { position: absolute; top: 50%; transform: translateY(-50%); font-size: 3rem; line-height: 1; color: var(--tile-ink); opacity: 0.28; pointer-events: none; font-family: var(--font-display); }
 .chev.l { left: 10px; } .chev.r { display: none; }
@@ -151,12 +152,12 @@ button:focus-visible, input:focus-visible, label:focus-within { outline: 3px sol
 .strip { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 8px 14px; display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr) auto; align-items: center; gap: 6px 20px; }
 @media (max-width: 760px) { .strip { grid-template-columns: minmax(0, 1fr) auto; } .strip .nx { grid-column: 1 / -1; grid-row: 2; } }
 .eyebrow { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.12em; color: var(--muted); font-weight: 600; }
-.name { font-family: var(--font-display); font-weight: 700; font-size: clamp(1.3rem, 3.4vh, 2rem); line-height: 1.1; letter-spacing: -0.01em; margin: 0; overflow-wrap: anywhere; }
+.name { font-family: var(--font-display); font-weight: 700; font-size: clamp(1.3rem, 3.4vh, 2rem); line-height: 1.1; letter-spacing: -0.01em; margin: 0; overflow-wrap: break-word; }
 .note { margin: 2px 0 0; color: var(--muted); font-size: 1rem; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
 .cur-info, .nx { min-width: 0; }
 .nx { display: flex; align-items: center; gap: 10px; }
 .nx .txt { min-width: 0; }
-.nx .nm { font-family: var(--font-display); font-weight: 700; font-size: 1.15rem; overflow-wrap: anywhere; }
+.nx .nm { font-family: var(--font-display); font-weight: 700; font-size: 1.15rem; overflow-wrap: break-word; }
 .nx .dur { font-family: var(--font-mono); color: var(--muted); font-size: 0.85rem; }
 .thumb { position: relative; background: var(--tile); border-radius: 8px; overflow: hidden; }
 .thumb img { position: absolute; inset: 3px; width: calc(100% - 6px); height: calc(100% - 6px); object-fit: contain; object-position: center; display: block; }
@@ -177,7 +178,7 @@ button:focus-visible, input:focus-visible, label:focus-within { outline: 3px sol
 .item { display: flex; align-items: center; gap: 10px; width: 100%; text-align: left; background: none; border: none; border-radius: 10px; padding: 4px 10px; min-height: 48px; cursor: pointer; }
 .item .n { font-family: var(--font-mono); color: var(--muted); font-size: 0.85rem; width: 1.5rem; flex: none; }
 .item .thumb { width: 40px; height: 40px; flex: none; }
-.item .t { flex: 1; min-width: 0; overflow-wrap: anywhere; }
+.item .t { flex: 1; min-width: 0; overflow-wrap: break-word; }
 .item .d { font-family: var(--font-mono); font-size: 0.85rem; color: var(--muted); font-variant-numeric: tabular-nums; flex: none; }
 .item.done .t { color: var(--muted); text-decoration: line-through; text-decoration-thickness: 1px; }
 .item.done .d { color: var(--ok); }
@@ -224,7 +225,7 @@ button:focus-visible, input:focus-visible, label:focus-within { outline: 3px sol
 .cell { position: relative; background: var(--surface2); border-radius: 12px; border: 2px solid transparent; padding: 6px; display: flex; flex-direction: column; gap: 4px; align-items: stretch; cursor: pointer; text-align: center; }
 .cell.sel { border-color: var(--accent); }
 .cell .thumb { height: 96px; }
-.cell span { font-size: 0.85rem; overflow-wrap: anywhere; }
+.cell span { font-size: 0.85rem; overflow-wrap: break-word; }
 .cell .x { position: absolute; top: 4px; right: 4px; min-width: 40px; min-height: 40px; border-radius: 10px; border: 1px solid var(--line); background: var(--surface); color: var(--warn); font-weight: 600; cursor: pointer; padding: 0 8px; }
 .filebtn { position: relative; overflow: hidden; }
 .filebtn input { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; font-size: 0; }
@@ -258,10 +259,10 @@ button:focus-visible, input:focus-visible, label:focus-within { outline: 3px sol
 .sc-item.pending { opacity: 0.9; }
 .sc-pic { position: relative; min-height: 0; min-width: 0; display: flex; align-items: center; justify-content: center; text-align: center; }
 .sc-pic img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; pointer-events: none; }
-.sc-bigname { font-family: var(--font-display); font-weight: 700; font-size: clamp(1.8rem, 6vh, 4rem); line-height: 1.05; overflow-wrap: anywhere; }
+.sc-bigname { font-family: var(--font-display); font-weight: 700; font-size: clamp(1.8rem, 6vh, 4rem); line-height: 1.05; }
 .sc-info { min-width: 0; display: flex; flex-direction: column; justify-content: center; gap: 6px; overflow: hidden; }
 .sc-info .eyebrow { color: var(--tile-ink); }
-.sc-name { font-family: var(--font-display); font-weight: 700; font-size: clamp(1.5rem, 4.2vh, 2.6rem); line-height: 1.08; overflow-wrap: anywhere; min-width: 0; }
+.sc-name { font-family: var(--font-display); font-weight: 700; font-size: clamp(1.5rem, 4.2vh, 2.6rem); line-height: 1.08; overflow-wrap: break-word; min-width: 0; }
 .sc-dur { font-family: var(--font-mono); color: var(--tile-ink); font-size: 1.05rem; }
 .sc-note { margin: 0; color: var(--tile-ink); font-size: clamp(1rem, 2.4vh, 1.25rem); }
 .sc-pend { position: absolute; left: 0; right: 0; bottom: 0; height: 6px; background: transparent; }
@@ -683,6 +684,26 @@ button:focus-visible, input:focus-visible, label:focus-within { outline: 3px sol
     });
     return root;
   }
+  /* big names: never split a word – shrink the font until the longest word fits the width (and the box height) */
+  function fitWidth(node) {
+    requestAnimationFrame(function () {
+      if (!node.isConnected || !node.clientWidth) return;
+      node.style.fontSize = "";
+      var size = parseFloat(getComputedStyle(node).fontSize), box = node.parentNode, guard = 0;
+      while ((node.scrollWidth > node.clientWidth + 1 || (box && box.clientHeight && node.offsetHeight > box.clientHeight + 1)) && size > 12 && guard++ < 60) {
+        size *= 0.93; node.style.fontSize = size + "px";
+      }
+    });
+    return node;
+  }
+  var refitTimer = 0;
+  window.addEventListener("resize", function () {
+    clearTimeout(refitTimer);
+    refitTimer = setTimeout(function () {
+      Array.prototype.forEach.call(document.querySelectorAll(".bigname, .sc-bigname"), fitWidth);
+      Array.prototype.forEach.call(document.querySelectorAll(".tl-md, .sc-md"), fitText);
+    }, 200);
+  });
   /* shrink the text until it fits its box (never below 55 % of the start size) */
   function fitText(node) {
     requestAnimationFrame(function () {
@@ -756,6 +777,7 @@ button:focus-visible, input:focus-visible, label:focus-within { outline: 3px sol
   function textTile(e) {
     var d = el("div", "bigname", e.name);
     if (e.note) d.appendChild(el("span", "bignote", e.note));
+    fitWidth(d);
     return d;
   }
 
@@ -869,9 +891,9 @@ button:focus-visible, input:focus-visible, label:focus-within { outline: 3px sol
     }
     else if (e.img) {
       var im = document.createElement("img"); im.alt = e.name;
-      setImg(im, e.img, function () { pic.textContent = ""; pic.appendChild(el("div", "sc-bigname", e.name)); });
+      setImg(im, e.img, function () { pic.textContent = ""; pic.appendChild(fitWidth(el("div", "sc-bigname", e.name))); });
       pic.appendChild(im);
-    } else pic.appendChild(el("div", "sc-bigname", e.name));
+    } else pic.appendChild(fitWidth(el("div", "sc-bigname", e.name)));
     var info = el("div", "sc-info");
     if (e.bTitle) info.appendChild(el("div", "eyebrow", e.bTitle + " · " + (e.si + 1) + "/" + e.bLen));
     var nr = el("div", "namerow");
