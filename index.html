@@ -228,7 +228,7 @@ button:focus-visible, input:focus-visible, label:focus-within { outline: 3px sol
 /* scroll view: all exercises in one free-scrolling column; the one nearest the middle line becomes active after a short pause */
 .scrollview { position: relative; min-height: 0; background: var(--tile); border: 1px solid var(--line); border-radius: 18px; overflow: hidden; color: #1c2032; }
 .sc-list { position: absolute; inset: 0; overflow-y: auto; -webkit-overflow-scrolling: touch; overscroll-behavior: contain; touch-action: manipulation; padding: calc(var(--sc-h, 600px) * 0.25) 14px; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; }
-.sc-item { position: relative; height: calc(var(--sc-h, 600px) * 0.5); display: grid; grid-template-columns: minmax(0, 1fr) clamp(230px, 34%, 440px); gap: 18px; padding: 12px 14px; border-radius: 16px; border: 2px solid transparent; opacity: 0.5; transition: opacity 0.25s, border-color 0.25s, background 0.25s; overflow: hidden; }
+.sc-item { position: relative; height: calc(var(--sc-h, 600px) * 0.5); display: grid; grid-template-columns: minmax(0, 1fr) clamp(230px, 34%, 440px); gap: 18px; padding: 12px 14px; border-radius: 16px; border: 2px solid #dcdde4; opacity: 0.5; transition: opacity 0.25s, border-color 0.25s, background 0.25s; overflow: hidden; }
 .sc-item + .sc-item { margin-top: 10px; }
 .sc-item.done { opacity: 0.35; }
 .sc-item.active { opacity: 1; border-color: var(--accent); background: #ffffff; }
@@ -246,7 +246,6 @@ button:focus-visible, input:focus-visible, label:focus-within { outline: 3px sol
 .sc-item.pending .sc-pend { background: #e2e5ee; }
 .sc-item.pending .sc-pend > i { animation: sc-pend var(--sc-wait, 2s) linear forwards; }
 @keyframes sc-pend { from { width: 0; } to { width: 100%; } }
-.sc-mid { position: absolute; left: 0; right: 0; top: 50%; height: 0; border-top: 2px dashed var(--accent); opacity: 0.25; pointer-events: none; }
 .sc-hud { position: absolute; right: 14px; bottom: 14px; background: rgba(250, 250, 246, 0.93); border: 1px solid #e2e2da; border-radius: 14px; padding: 8px 14px; text-align: right; pointer-events: none; box-shadow: 0 4px 18px rgba(0, 0, 0, 0.08); max-width: 46%; }
 .sc-hud .digits { font-size: clamp(2rem, 6.5vh, 3.4rem); color: #1c2032; }
 .sc-hud .digits.idle { color: var(--tile-ink); }
@@ -294,7 +293,6 @@ button:focus-visible, input:focus-visible, label:focus-within { outline: 3px sol
 
   <section class="scrollview" id="scroll" hidden>
     <div class="sc-list" id="sc-list" aria-label="Alle Übungen. Die Übung in der Mitte wird nach kurzer Pause aktiv. Doppelt tippen: Start oder Pause."></div>
-    <div class="sc-mid" aria-hidden="true"></div>
     <div class="sc-hud" id="sc-hud">
       <div class="sc-cur" id="sc-cur"></div>
       <div class="digits" id="sc-digits"></div>
