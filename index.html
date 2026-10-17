@@ -70,7 +70,7 @@ button:focus-visible, input:focus-visible, label:focus-within { outline: 3px sol
 .clock b { font-family: var(--font-mono); font-weight: 500; color: var(--fg); }
 .ghost { background: none; border: 1px solid var(--line); border-radius: 10px; padding: 6px 14px; min-height: 44px; cursor: pointer; }
 .total-bar { flex-basis: 100%; height: 5px; background: var(--surface2); border-radius: 3px; overflow: hidden; }
-.total-bar > i { display: block; height: 100%; width: 0; background: var(--accent); transition: width 0.3s linear; }
+.total-bar > i { display: block; height: 100%; width: 100%; background: var(--accent); transform: scaleX(0); transform-origin: left center; will-change: transform; }
 .total-bar.over > i { background: var(--warn); }
 .example-tag { display: inline-block; font-family: var(--font-body); font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.1em; font-weight: 600; background: var(--surface2); color: var(--muted); border-radius: 6px; padding: 2px 8px; margin-left: 8px; vertical-align: middle; }
 
@@ -609,7 +609,7 @@ button:focus-visible, input:focus-visible, label:focus-within { outline: 3px sol
   var wake = null;
   function requestWake() { if (wake) return; try { if (navigator.wakeLock) navigator.wakeLock.request("screen").then(function (l) { wake = l; l.addEventListener("release", function () { wake = null; }); }).catch(function () {}); } catch (e) {} }
   function releaseWake() { try { if (wake) wake.release(); } catch (e) {} wake = null; }
-  document.addEventListener("visibilitychange", function () { if (document.visibilityState === "visible") tick(); });
+  document.addEventListener("visibilitychange", function () { if (document.visibilityState === "visible" && st) { $("total-bar").firstChild.__k = ""; loop(); } });
 
   /* ---------- actions ---------- */
   function syncFromScroll() { if (!$("scroll").hidden && scItems.length) { var n = nearestItem(); if (n >= 0) st.idx = n; } }
@@ -811,28 +811,46 @@ button:focus-visible, input:focus-visible, label:focus-within { outline: 3px sol
     });
   }
 
-  function renderAll() { renderStage(); renderList(); if (view === "scroll" && !editing) renderScroll(); tick(); paint(null, true); }
+  function renderAll() { renderStage(); renderList(); if (view === "scroll" && !editing) renderScroll(); paint(null, true); loop(); }
 
   /* every second: remaining lesson time (only inside the window) and the schedule shading */
+  /* Updates only what changed. Inside the lesson window once per second (remaining time), outside once per
+     minute and exactly at the start time. Opening the app in the middle of a lesson works the same way:
+     every value is derived from the clock, nothing depends on having watched the start. */
   function tick() {
-    var sch = schedule(), inWin = !!sch && sch.now >= sch.s && sch.now <= sch.e;
-    var plan = flat.reduce(function (a, x) { return a + x.min; }, 0);
-    var clock = $("clock"); clock.textContent = "";
-    var l = curLesson();
-    if (sch) { var w = el("span", null, "Stunde "); w.appendChild(el("b", null, l.start + "–" + l.end)); clock.appendChild(w); }
-    var g = el("span", null, "Plan "); g.appendChild(el("b", null, fmtMin(plan))); clock.appendChild(g);
-    var tb = $("total-bar");
-    tb.firstChild.style.width = sch ? Math.max(0, Math.min(100, (sch.now - sch.s) / (sch.e - sch.s) * 100)) + "%" : "0%";
-    tb.classList.remove("over");
+    var sch = schedule(), n = Date.now(), inWin = !!sch && n >= sch.s && n < sch.e;
+    var plan = flat.reduce(function (a, x) { return a + x.min; }, 0), l = curLesson();
+    var clock = $("clock"), hk = (sch ? l.start + "–" + l.end : "") + "|" + plan;
+    if (clock.__k !== hk) {
+      clock.__k = hk; clock.textContent = "";
+      if (sch) { var w = el("span", null, "Stunde "); w.appendChild(el("b", null, l.start + "–" + l.end)); clock.appendChild(w); }
+      var g = el("span", null, "Plan "); g.appendChild(el("b", null, fmtMin(plan))); clock.appendChild(g);
+    }
+    var ws = !sch ? { k: "none", f: 0, rem: 0 } : n < sch.s ? { k: "future", f: 0, rem: 0 } : n >= sch.e ? { k: "past", f: 1, rem: 0 }
+      : { k: "cur:" + sch.s + ":" + sch.e, f: (n - sch.s) / (sch.e - sch.s), rem: sch.e - n };
+    applyShade($("total-bar").firstChild, "x", ws, false);
 
-    var big = inWin ? fmt(sch.e - sch.now) : "--:--";
-    var dg = $("digits"); if (dg) { dg.textContent = big; dg.className = "digits" + (inWin ? "" : " idle"); }
-    var sd = $("sc-digits"); sd.textContent = big; sd.className = "digits" + (inWin ? "" : " idle");
+    var big = inWin ? fmt(sch.e - n) : "--:--", cls = "digits" + (inWin ? "" : " idle");
+    [$("digits"), $("sc-digits")].forEach(function (d) {
+      if (!d) return;
+      if (d.textContent !== big) d.textContent = big;
+      if (d.className !== cls) d.className = cls;
+    });
 
     paint(sch);
-    if (inWin && document.visibilityState === "visible") requestWake(); else releaseWake();
+    if (inWin && document.visibilityState === "visible") requestWake(); else if (wake) releaseWake();
   }
-  setInterval(function () { if (!editing) tick(); }, 1000);
+  var tickTimer = 0;
+  function loop() {
+    clearTimeout(tickTimer);
+    if (!editing) tick();
+    var sch = schedule(), n = Date.now(), d;
+    if (sch && n >= sch.s && n < sch.e) d = 1000 - (n % 1000) + 5;
+    else { d = 60000 - (n % 60000) + 5; if (sch && n < sch.s) d = Math.min(d, sch.s - n + 5); }
+    tickTimer = setTimeout(loop, d);
+  }
+  window.addEventListener("pageshow", function () { if (st) { $("total-bar").firstChild.__k = ""; loop(); paint(null, true); } });
+
   /* grey shading: each layer gets its current fraction once and then a linear CSS transition to 100 %
      that lasts exactly until the exercise ends; it is only re-armed when the exercise (or its slot) changes */
   function shadeState(sch, i) {
