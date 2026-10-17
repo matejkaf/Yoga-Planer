@@ -301,6 +301,7 @@ button:focus-visible, input:focus-visible, label:focus-within { outline: 3px sol
 .list-sum { padding: 2px 10px 8px; line-height: 1.4; white-space: pre-line; }
 .list-sum b { color: var(--fg); }
 .list-sum .over { color: var(--warn); font-weight: 600; }
+.ed-sum { margin: 0; padding: 0 2px; white-space: normal; }
 .item.past:not(.cur) { background: var(--surface2); }
 .appbox { display: none; margin-top: 18px; padding-top: 12px; border-top: 1px solid var(--line); }
 .ro .appbox { display: block; }
@@ -350,6 +351,7 @@ button:focus-visible, input:focus-visible, label:focus-within { outline: 3px sol
       <button class="btn small" id="cancel-plan" type="button">Abbrechen</button>
       <button class="btn small go" id="save-plan" type="button">Speichern</button>
     </div>
+    <p class="hint list-sum ed-sum" id="ed-sum"></p>
     <div class="ed-body" id="ed-body"></div>
   </section>
 </div>
@@ -1084,13 +1086,34 @@ button:focus-visible, input:focus-visible, label:focus-within { outline: 3px sol
     return i;
   }
 
+  /* editor summary: planned total vs. the window from start + duration (empty duration = planned total) */
+  function updEdSum() {
+    var box = $("ed-sum"); if (!box || !draft) return;
+    var plan = Math.round(draft.reduce(function (a, b) { return a + b.steps.reduce(function (x, y) { return x + (parseFloat(y.min) > 0 ? parseFloat(y.min) : 0); }, 0); }, 0) * 10) / 10;
+    var ts = $("lesson-start").value || "", dur = parseInt($("lesson-dur").value, 10);
+    $("lesson-dur").placeholder = Math.round(plan) || "";
+    box.textContent = "";
+    box.appendChild(document.createTextNode("Geplant: ")); box.appendChild(el("b", null, fmtMin(plan)));
+    if (!HM_RE.test(ts)) { box.appendChild(document.createTextNode(" · keine Beginnzeit festgelegt")); return; }
+    if (!(dur > 0)) dur = Math.max(1, Math.round(plan));
+    var em = (hm(ts) + dur) % 1440, te = String(Math.floor(em / 60)).padStart(2, "0") + ":" + String(em % 60).padStart(2, "0");
+    var diff = Math.round((plan - dur) * 10) / 10;
+    box.appendChild(document.createTextNode(" · verfügbar: ")); box.appendChild(el("b", null, fmtMin(dur) + " (" + ts + "–" + te + ")"));
+    box.appendChild(document.createTextNode(" · "));
+    if (Math.abs(diff) < 0.05) box.appendChild(el("span", null, "Passt genau."));
+    else if (diff > 0) box.appendChild(el("span", "over", fmtMin(diff) + " zu lang"));
+    else box.appendChild(el("span", null, fmtMin(-diff) + " Reserve"));
+  }
+  $("lesson-start").addEventListener("input", updEdSum); $("lesson-start").addEventListener("change", updEdSum);
+  $("lesson-dur").addEventListener("input", updEdSum);
+
   function renderEditor() {
     var box = $("ed-body"), keep = box.scrollTop; box.textContent = "";
     draft.forEach(function (b, bi) {
       var card = el("div", "blk");
       var head = el("div", "blk-head");
       var sum = el("span", "sum");
-      function updSum() { sum.textContent = fmtMin(b.steps.reduce(function (a, x) { return a + (parseFloat(x.min) > 0 ? parseFloat(x.min) : 0); }, 0)); }
+      function updSum() { sum.textContent = fmtMin(b.steps.reduce(function (a, x) { return a + (parseFloat(x.min) > 0 ? parseFloat(x.min) : 0); }, 0)); updEdSum(); }
       updSum();
       head.appendChild(textField("title", b.title, "Sequenz-Name (leer lassen für eine einzelne Übung)", function (v) { b.title = v; }));
       head.appendChild(sum);
@@ -1138,7 +1161,7 @@ button:focus-visible, input:focus-visible, label:focus-within { outline: 3px sol
     var nbtn = el("button", "btn small", "+ Neue Sequenz oder Übung"); nbtn.type = "button";
     nbtn.addEventListener("click", function () { draft.push({ id: uid(), title: "", steps: [{ id: uid(), name: "", min: 1, note: "", img: "" }] }); renderEditor(); box.scrollTop = box.scrollHeight; });
     addB.appendChild(nbtn); box.appendChild(addB);
-    box.scrollTop = keep;
+    box.scrollTop = keep; updEdSum();
   }
 
   async function savePlan() {
