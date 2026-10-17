@@ -287,7 +287,6 @@ button:focus-visible, input:focus-visible, label:focus-within { outline: 3px sol
 @media (prefers-reduced-motion: reduce) { .sc-item { transition: none; } }
 /* schedule shading: exercises that are over by the clock turn light grey; the current one partly */
 :root { --past: #e3e3dc; }
-.stagebox { transition: background 0.4s linear; }
 .sc-item { background: #ffffff; opacity: 1 !important; border-color: #dcdde4 !important; }
 .sc-item.past { background: var(--past); }
 .tfield { display: inline-flex; align-items: center; gap: 6px; color: var(--muted); font-size: 0.95rem; }
@@ -824,15 +823,25 @@ button:focus-visible, input:focus-visible, label:focus-within { outline: 3px sol
     var dg = $("digits"); if (dg) { dg.textContent = big; dg.className = "digits" + (inWin ? "" : " idle"); }
     var sd = $("sc-digits"); sd.textContent = big; sd.className = "digits" + (inWin ? "" : " idle");
 
+    paint(sch);
+    if (inWin && document.visibilityState === "visible") requestWake(); else releaseWake();
+  }
+  setInterval(function () { if (!editing) tick(); }, 1000);
+  /* grey shading follows the clock continuously (every animation frame) so it moves smoothly instead of jumping */
+  function paint(sch) {
+    sch = sch || schedule();
     $("stagebox").style.background = shade("to right", doneFrac(sch, st.idx), "var(--tile)");
-    scItems.forEach(function (it, i) {
+    (scItems || []).forEach(function (it, i) {
       var f = doneFrac(sch, i);
       it.classList.toggle("past", f >= 1);
       it.style.background = f > 0 && f < 1 ? shade("to bottom", f, "#ffffff") : "";
     });
-    if (inWin && document.visibilityState === "visible") requestWake(); else releaseWake();
   }
-  setInterval(function () { if (!editing) tick(); }, 1000);
+  function frame() {
+    requestAnimationFrame(frame);
+    if (!editing && st && document.visibilityState === "visible") { try { paint(); } catch (e) {} }
+  }
+  requestAnimationFrame(frame);
 
   /* ---------- tap gestures on the picture: left edge = back, elsewhere = next ---------- */
   var flashTimer = 0;
