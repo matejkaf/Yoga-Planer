@@ -295,7 +295,8 @@ button:focus-visible, input:focus-visible, label:focus-within { outline: 3px sol
 .sc-item.past > .shade { display: none; }
 .tfield { display: inline-flex; align-items: center; gap: 6px; color: var(--muted); font-size: 0.95rem; }
 .field.tm { width: 7.2em; min-width: 0; font-family: var(--font-mono); }
-.field.dm { width: 5em; min-width: 0; font-family: var(--font-mono); text-align: right; }
+.field.dm { width: 4em; min-width: 0; font-family: var(--font-mono); text-align: right; -moz-appearance: textfield; appearance: textfield; }
+.field.dm::-webkit-inner-spin-button, .field.dm::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
 .tfield:focus-within { outline: none; }
 .list-sum { padding: 2px 10px 8px; line-height: 1.4; white-space: pre-line; }
 .list-sum b { color: var(--fg); }
