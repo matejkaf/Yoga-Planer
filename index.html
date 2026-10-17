@@ -287,8 +287,13 @@ button:focus-visible, input:focus-visible, label:focus-within { outline: 3px sol
 @media (prefers-reduced-motion: reduce) { .sc-item { transition: none; } }
 /* schedule shading: exercises that are over by the clock turn light grey; the current one partly */
 :root { --past: #e3e3dc; }
+/* the grey layer grows by a GPU-composited transform; one CSS transition per exercise, no per-frame script */
+.shade { position: absolute; inset: 0; background: var(--past); transform: scaleX(0); transform-origin: left center; pointer-events: none; will-change: transform; }
+.sc-item > .shade { transform: scaleY(0); transform-origin: center top; }
+.sc-info { position: relative; }
 .sc-item { background: #ffffff; opacity: 1 !important; border-color: #dcdde4 !important; }
 .sc-item.past { background: var(--past); }
+.sc-item.past > .shade { display: none; }
 .tfield { display: inline-flex; align-items: center; gap: 6px; color: var(--muted); font-size: 0.95rem; }
 .field.tm { width: 7.2em; min-width: 0; font-family: var(--font-mono); }
 .list-sum { padding: 2px 10px 8px; line-height: 1.4; white-space: pre-line; }
@@ -318,6 +323,7 @@ button:focus-visible, input:focus-visible, label:focus-within { outline: 3px sol
 
   <section class="play" id="play">
     <div class="stagebox" id="stagebox" role="button" tabindex="0" aria-label="Übung. Links tippen: zurück. Sonst tippen: nächste Übung.">
+      <div class="shade" id="shade" aria-hidden="true"></div>
       <div class="tilebody" id="tilebody"></div>
       <span class="chev l" aria-hidden="true">‹</span><span class="chev r" aria-hidden="true">›</span>
       <div class="flash" id="flash" aria-hidden="true"></div>
@@ -805,7 +811,7 @@ button:focus-visible, input:focus-visible, label:focus-within { outline: 3px sol
     });
   }
 
-  function renderAll() { renderStage(); renderList(); if (view === "scroll" && !editing) renderScroll(); tick(); }
+  function renderAll() { renderStage(); renderList(); if (view === "scroll" && !editing) renderScroll(); tick(); paint(null, true); }
 
   /* every second: remaining lesson time (only inside the window) and the schedule shading */
   function tick() {
@@ -827,21 +833,37 @@ button:focus-visible, input:focus-visible, label:focus-within { outline: 3px sol
     if (inWin && document.visibilityState === "visible") requestWake(); else releaseWake();
   }
   setInterval(function () { if (!editing) tick(); }, 1000);
-  /* grey shading follows the clock continuously (every animation frame) so it moves smoothly instead of jumping */
-  function paint(sch) {
+  /* grey shading: each layer gets its current fraction once and then a linear CSS transition to 100 %
+     that lasts exactly until the exercise ends; it is only re-armed when the exercise (or its slot) changes */
+  function shadeState(sch, i) {
+    if (!sch || !sch.items[i]) return { k: "none", f: 0, rem: 0 };
+    var it = sch.items[i], n = Date.now();
+    if (n < it.a) return { k: "future", f: 0, rem: 0 };
+    if (n >= it.b) return { k: "past", f: 1, rem: 0 };
+    return { k: "cur:" + it.a + ":" + it.b, f: (n - it.a) / (it.b - it.a), rem: it.b - n };
+  }
+  function applyShade(node, axis, ss, force) {
+    if (!node || (!force && node.__k === ss.k)) return;
+    node.__k = ss.k;
+    var fn = axis === "x" ? "scaleX" : "scaleY";
+    node.style.transition = "none";
+    node.style.transform = fn + "(" + ss.f + ")";
+    if (ss.rem > 0) {
+      void node.offsetWidth;
+      node.style.transition = "transform " + Math.round(ss.rem) + "ms linear";
+      node.style.transform = fn + "(1)";
+    }
+  }
+  function paint(sch, force) {
     sch = sch || schedule();
-    $("stagebox").style.background = shade("to right", doneFrac(sch, st.idx), "var(--tile)");
+    applyShade($("shade"), "x", shadeState(sch, st.idx), force);
     (scItems || []).forEach(function (it, i) {
-      var f = doneFrac(sch, i);
-      it.classList.toggle("past", f >= 1);
-      it.style.background = f > 0 && f < 1 ? shade("to bottom", f, "#ffffff") : "";
+      var ss = shadeState(sch, i);
+      it.classList.toggle("past", ss.k === "past");
+      applyShade(it.__shade, "y", ss, force);
     });
   }
-  function frame() {
-    requestAnimationFrame(frame);
-    if (!editing && st && document.visibilityState === "visible") { try { paint(); } catch (e) {} }
-  }
-  requestAnimationFrame(frame);
+  document.addEventListener("visibilitychange", function () { if (document.visibilityState === "visible" && st) paint(null, true); });
 
   /* ---------- tap gestures on the picture: left edge = back, elsewhere = next ---------- */
   var flashTimer = 0;
@@ -897,7 +919,8 @@ button:focus-visible, input:focus-visible, label:focus-within { outline: 3px sol
     info.appendChild(nr);
     info.appendChild(el("div", "sc-dur", fmtMin(e.min)));
     if (e.note) info.appendChild(el("p", "sc-note", e.note));
-    it.appendChild(pic); it.appendChild(info);
+    var sh = el("div", "shade"); sh.setAttribute("aria-hidden", "true"); it.__shade = sh;
+    it.appendChild(sh); it.appendChild(pic); it.appendChild(info);
     return it;
   }
   function renderScroll() {
@@ -907,7 +930,7 @@ button:focus-visible, input:focus-visible, label:focus-within { outline: 3px sol
       scKey = key; list.textContent = "";
       scItems = flat.map(function (e, i) { var it = scItem(e, i); list.appendChild(it); return it; });
       lastCentered = -1;
-      requestAnimationFrame(function () { layoutScroll(); centerOn(st.idx, false); tick(); });
+      requestAnimationFrame(function () { layoutScroll(); centerOn(st.idx, false); tick(); paint(null, true); });
     }
     if (lastCentered !== -1 && lastCentered !== st.idx && !$("scroll").hidden) centerOn(st.idx, true);
   }
