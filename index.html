@@ -102,7 +102,7 @@ button:focus-visible, input:focus-visible, label:focus-within { outline: 3px sol
 .tl-side .nm { font-family: var(--font-display); font-weight: 700; font-size: clamp(1.5rem, 4vh, 2.3rem); line-height: 1.1; overflow-wrap: break-word; color: #1c2032; }
 .tl-side .dur { font-family: var(--font-mono); font-size: 1.1rem; color: var(--tile-ink); }
 .tl-timer { grid-area: timer; text-align: right; align-self: end; min-width: 0; }
-.tl-timer .digits { font-size: clamp(2.6rem, 9vh, 5rem); color: #1c2032; }
+.tl-timer .digits { font-size: clamp(3.6rem, 15vh, 9rem); color: #1c2032; }
 .tl-timer .digits.idle { color: var(--tile-ink); }
 .tl-timer .digits.over { color: #b4570c; }
 .tl-timer .sub { color: var(--tile-ink); }
@@ -273,7 +273,7 @@ button:focus-visible, input:focus-visible, label:focus-within { outline: 3px sol
 .sc-item.pending .sc-pend > i { animation: sc-pend var(--sc-wait, 2s) linear forwards; }
 @keyframes sc-pend { from { width: 0; } to { width: 100%; } }
 .sc-hud { position: absolute; left: 14px; top: 14px; z-index: 2; background: rgba(250, 250, 246, 0.93); border: 1px solid #e2e2da; border-radius: 14px; padding: 8px 14px; text-align: left; pointer-events: none; box-shadow: 0 4px 18px rgba(0, 0, 0, 0.08); max-width: 46%; }
-.sc-hud .digits { font-size: clamp(2rem, 6.5vh, 3.4rem); color: #1c2032; }
+.sc-hud .digits { font-size: clamp(3rem, 11vh, 6.5rem); color: #1c2032; }
 .sc-hud .digits.idle { color: var(--tile-ink); }
 .sc-hud .digits.over { color: #b4570c; }
 .sc-cur { font-weight: 600; font-size: 0.95rem; color: #1c2032; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -328,9 +328,7 @@ button:focus-visible, input:focus-visible, label:focus-within { outline: 3px sol
   <section class="scrollview" id="scroll" hidden>
     <div class="sc-list" id="sc-list" aria-label="Alle Übungen"></div>
     <div class="sc-hud" id="sc-hud">
-      <div class="sc-cur" id="sc-cur"></div>
       <div class="digits" id="sc-digits"></div>
-      <div class="sc-sub" id="sc-sub"></div>
     </div>
     <div class="flash" id="sc-flash" aria-hidden="true"></div>
   </section>
@@ -586,7 +584,9 @@ button:focus-visible, input:focus-visible, label:focus-within { outline: 3px sol
     var a = hm(l.start), b = hm(l.end); if (a == null || b == null) return null;
     var d = new Date(); d.setHours(0, 0, 0, 0);
     var s = d.getTime() + a * 60000, e = d.getTime() + b * 60000; if (e <= s) e += 86400000;
-    var t = s, items = flat.map(function (x) { var it = { a: t, b: t + x.min * 60000 }; t = it.b; return it; });
+    /* the exercises share the whole window in proportion to their planned minutes */
+    var plan = flat.reduce(function (acc, x) { return acc + x.min; }, 0) || 1, k = (e - s) / plan;
+    var t = s, items = flat.map(function (x) { var it = { a: t, b: t + x.min * k }; t = it.b; return it; });
     return { s: s, e: e, items: items, now: Date.now() };
   }
   function doneFrac(sch, i) {
@@ -767,7 +767,6 @@ button:focus-visible, input:focus-visible, label:focus-within { outline: 3px sol
       side.appendChild(upcomingBlock("Als Nächstes", flat[st.idx + 1], false));
       if (st.idx < flat.length - 2) side.appendChild(upcomingBlock("Danach", flat[st.idx + 2], true));
       var dg = el("div", "digits"); dg.id = "digits"; timer.appendChild(dg);
-      var sub = el("div", "sub"); sub.id = "sub"; timer.appendChild(sub);
     }
     body.appendChild(head); body.appendChild(pic); body.appendChild(side); body.appendChild(timer);
   }
@@ -822,10 +821,8 @@ button:focus-visible, input:focus-visible, label:focus-within { outline: 3px sol
     tb.classList.remove("over");
 
     var big = inWin ? fmt(sch.e - sch.now) : "--:--";
-    var sub = inWin ? "verbleibend · Ende " + clockStr(sch.e) : sch ? "Stunde " + l.start + "–" + l.end : "Keine Beginn-/Endzeit";
-    var dg = $("digits"); if (dg) { dg.textContent = big; dg.className = "digits" + (inWin ? "" : " idle"); $("sub").textContent = sub; }
-    var sd = $("sc-digits"); sd.textContent = big; sd.className = "digits" + (inWin ? "" : " idle"); $("sc-sub").textContent = sub;
-    $("sc-cur").textContent = l ? l.name : "";
+    var dg = $("digits"); if (dg) { dg.textContent = big; dg.className = "digits" + (inWin ? "" : " idle"); }
+    var sd = $("sc-digits"); sd.textContent = big; sd.className = "digits" + (inWin ? "" : " idle");
 
     $("stagebox").style.background = shade("to right", doneFrac(sch, st.idx), "var(--tile)");
     scItems.forEach(function (it, i) {
