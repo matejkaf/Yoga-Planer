@@ -124,13 +124,13 @@ button:focus-visible, input:focus-visible, label:focus-within { outline: 3px sol
 .md .md-gap { height: 0.5em; }
 .md strong { font-weight: 700; }
 .tl-md { max-width: min(100%, 60ch); max-height: 100%; font-size: clamp(1.5rem, 4.6vh, 2.8rem); }
-.sc-md { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: center; font-size: clamp(1.5rem, 4.6vh, 2.8rem); }
+.sc-md { position: relative; display: flex; flex-direction: column; justify-content: center; font-size: clamp(1.5rem, 4.6vh, 2.8rem); }
 .md-thumb { font-size: 1rem; max-height: 7.5em; border: 1px solid #e6e6df; border-radius: 10px; padding: 8px 10px; background: #fff; }
 .tl-side .nxb.small .md-thumb { font-size: 0.85rem; max-height: 5.5em; }
 .tl-pic.both, .sc-pic.both { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 24px; align-items: center; }
 .pic-img { position: relative; height: 100%; min-height: 0; min-width: 0; }
 .pic-img img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; pointer-events: none; }
-.sc-pic.both .sc-md { position: relative; inset: auto; max-height: 100%; }
+.sc-pic.both .sc-md { max-height: none; }
 @media (max-width: 760px), (orientation: portrait) {
   .tl-pic.both, .sc-pic.both { grid-template-columns: minmax(0, 1fr); grid-template-rows: minmax(0, 1fr) minmax(0, 1fr); gap: 12px; }
 }
@@ -254,7 +254,7 @@ button:focus-visible, input:focus-visible, label:focus-within { outline: 3px sol
 /* scroll view: all exercises in one free-scrolling column; the one nearest the middle line becomes active after a short pause */
 .scrollview { position: relative; min-height: 0; background: var(--tile); border: 1px solid var(--line); border-radius: 18px; overflow: hidden; color: #1c2032; }
 .sc-list { position: absolute; inset: 0; overflow-y: auto; -webkit-overflow-scrolling: touch; overscroll-behavior: contain; touch-action: manipulation; padding: calc(var(--sc-h, 600px) * 0.25) 14px; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; }
-.sc-item { position: relative; height: calc(var(--sc-h, 600px) * 0.5); display: grid; grid-template-columns: minmax(0, 1fr) clamp(230px, 34%, 440px); gap: 18px; padding: 12px 14px; border-radius: 16px; border: 2px solid #dcdde4; opacity: 0.5; transition: opacity 0.25s, border-color 0.25s, background 0.25s; overflow: hidden; }
+.sc-item { position: relative; min-height: calc(var(--sc-h, 600px) * 0.5); display: grid; grid-template-columns: minmax(0, 1fr) clamp(230px, 34%, 440px); gap: 18px; padding: 12px 14px; border-radius: 16px; border: 2px solid #dcdde4; opacity: 0.5; transition: opacity 0.25s, border-color 0.25s, background 0.25s; overflow: hidden; }
 .sc-item + .sc-item { margin-top: 10px; }
 .sc-item.done { opacity: 0.35; }
 .sc-item.active { opacity: 1; border-color: var(--accent); background: #ffffff; }
@@ -711,7 +711,7 @@ button:focus-visible, input:focus-visible, label:focus-within { outline: 3px sol
     clearTimeout(refitTimer);
     refitTimer = setTimeout(function () {
       Array.prototype.forEach.call(document.querySelectorAll(".bigname, .sc-bigname, .tl-side .nm, .tl-head .name, .sc-name"), fitWidth);
-      Array.prototype.forEach.call(document.querySelectorAll(".tl-md, .sc-md"), fitText);
+      Array.prototype.forEach.call(document.querySelectorAll(".tl-md"), fitText);
     }, 200);
   });
   /* shrink the text until it fits its box (never below 55 % of the start size) */
@@ -924,7 +924,7 @@ button:focus-visible, input:focus-visible, label:focus-within { outline: 3px sol
         setImg(im2, e.img, function () { ib.remove(); pic.classList.remove("both"); });
         ib.appendChild(im2); pic.appendChild(ib);
       }
-      var md = mdBlock(e.text, "sc-md"); pic.appendChild(md); requestAnimationFrame(function () { fitText(md); });
+      var md = mdBlock(e.text, "sc-md"); pic.appendChild(md);
     }
     else if (e.img) {
       var im = document.createElement("img"); im.alt = e.name;
