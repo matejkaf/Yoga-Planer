@@ -1183,7 +1183,8 @@ button:focus-visible, input:focus-visible, label:focus-within { outline: 3px sol
     if (!nb.length) { setStatus("Bitte mindestens eine Übung eintragen."); return; }
     setStatus("Speichere …");
     var nm = ($("lesson-name").value || "").trim() || "Stunde";
-    var nl = clone(lessons), l = null;
+    /* base on the newest stored state (changes that arrived while editing), replace only the edited lesson */
+    var nl = clone(pendingLessons || lessons), l = null;
     nl.forEach(function (x) { if (x.id === curId) l = x; });
     var ts = $("lesson-start").value || "", dur = parseInt($("lesson-dur").value, 10), te = "";
     if (!HM_RE.test(ts)) ts = "";
