@@ -1,6 +1,6 @@
 {
  "v": 1,
- "publishedAt": "2026-10-17T05:59:03Z",
+ "publishedAt": "2026-10-17T08:18:56Z",
  "lessons": [
   {
    "blocks": [
@@ -366,7 +366,7 @@
       {
        "id": "vhs2s06",
        "img": "f18411c82842bcbdfb8de8084adc7cb4",
-       "min": 3,
+       "min": 1,
        "name": "Berghaltung",
        "note": "Tadasana · nachspüren",
        "text": ""
@@ -388,7 +388,7 @@
       {
        "id": "vhs2s08",
        "img": "a75d15dffef77cb6e76378dc81e050d8",
-       "min": 5,
+       "min": 3,
        "name": "Baum",
        "note": "beide Seiten",
        "text": ""
@@ -396,9 +396,9 @@
       {
        "id": "vhs2s09",
        "img": "11d7934849e0bcc2c52c399759375f22",
-       "min": 5,
+       "min": 2,
        "name": "Pavanmuktasana stehend",
-       "note": "mit Adduktorendehnung · beide Seiten",
+       "note": "beide Seiten",
        "text": ""
       }
      ],
@@ -437,14 +437,6 @@
        "min": 3,
        "name": "Herabschauender Hund",
        "note": "",
-       "text": ""
-      },
-      {
-       "id": "vhs2s14",
-       "img": "fd14099728a919c334290b61d77bf3ae",
-       "min": 1.5,
-       "name": "Handgelenke lockern",
-       "note": "im Kniestand · entlasten",
        "text": ""
       },
       {
@@ -557,10 +549,10 @@
      "title": "Atmung + Savasana"
     }
    ],
-   "end": "",
+   "end": "20:15",
    "id": "vhs2",
    "name": "VHS Stunde 2",
-   "start": ""
+   "start": "18:45"
   },
   {
    "blocks": [
