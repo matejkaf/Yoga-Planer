@@ -1,6 +1,6 @@
 {
  "v": 1,
- "publishedAt": "2026-10-11T18:43:57Z",
+ "publishedAt": "2026-10-17T05:49:52Z",
  "lessons": [
   {
    "blocks": [
@@ -201,8 +201,10 @@
      "title": "Abschluss"
     }
    ],
+   "end": "",
    "id": "l1",
-   "name": "Stunde 1"
+   "name": "Stunde 1",
+   "start": ""
   },
   {
    "blocks": [
@@ -303,8 +305,10 @@
      "title": "Abschluss"
     }
    ],
+   "end": "",
    "id": "l3bo1",
-   "name": "Bandscheiben-OP"
+   "name": "Bandscheiben-OP",
+   "start": ""
   },
   {
    "blocks": [
@@ -553,8 +557,48 @@
      "title": "Atmung + Savasana"
     }
    ],
+   "end": "",
    "id": "vhs2",
-   "name": "VHS Stunde 2"
+   "name": "VHS Stunde 2",
+   "start": ""
+  },
+  {
+   "blocks": [
+    {
+     "id": "tb1",
+     "steps": [
+      {
+       "id": "ts1",
+       "img": "f18411c82842bcbdfb8de8084adc7cb4",
+       "min": 0.5,
+       "name": "Berghaltung",
+       "note": "",
+       "text": ""
+      },
+      {
+       "id": "ts2",
+       "img": "7299fde9fbe4cc102ad56fe87d1b266b",
+       "min": 1,
+       "name": "Baum",
+       "note": "",
+       "text": ""
+      },
+      {
+       "id": "ts3",
+       "img": "8251143a188ffb73c1a4f0768888f35b",
+       "min": 0.5,
+       "name": "Savasana",
+       "note": "",
+       "text": ""
+      }
+     ],
+     "title": "Test"
+    }
+   ],
+   "end": "07:52",
+   "id": "test30s",
+   "name": "Test 30 s",
+   "start": "07:48"
   }
  ],
  "lib": [
