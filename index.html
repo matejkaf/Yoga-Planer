@@ -285,6 +285,17 @@ button:focus-visible, input:focus-visible, label:focus-within { outline: 3px sol
   .sc-hud { max-width: 60%; }
 }
 @media (prefers-reduced-motion: reduce) { .sc-item { transition: none; } }
+/* schedule shading: exercises that are over by the clock turn light grey; the current one partly */
+:root { --past: #e3e3dc; }
+.stagebox { transition: background 0.4s linear; }
+.sc-item { background: #ffffff; opacity: 1 !important; border-color: #dcdde4 !important; }
+.sc-item.past { background: var(--past); }
+.tfield { display: inline-flex; align-items: center; gap: 6px; color: var(--muted); font-size: 0.95rem; }
+.field.tm { width: 7.2em; min-width: 0; font-family: var(--font-mono); }
+.list-sum { padding: 2px 10px 8px; line-height: 1.4; white-space: pre-line; }
+.list-sum b { color: var(--fg); }
+.list-sum .over { color: var(--warn); font-weight: 600; }
+.item.past:not(.cur) { background: var(--surface2); }
 .appbox { display: none; margin-top: 18px; padding-top: 12px; border-top: 1px solid var(--line); }
 .ro .appbox { display: block; }
 .appbox .hint { margin-bottom: 8px; line-height: 1.4; }
@@ -307,22 +318,19 @@ button:focus-visible, input:focus-visible, label:focus-within { outline: 3px sol
   </header>
 
   <section class="play" id="play">
-    <div class="stagebox" id="stagebox" role="button" tabindex="0" aria-label="Übung. Doppelt tippen: Start oder Pause. Links tippen: zurück. Sonst tippen: nächste Übung.">
+    <div class="stagebox" id="stagebox" role="button" tabindex="0" aria-label="Übung. Links tippen: zurück. Sonst tippen: nächste Übung.">
       <div class="tilebody" id="tilebody"></div>
       <span class="chev l" aria-hidden="true">‹</span><span class="chev r" aria-hidden="true">›</span>
-      <span class="chip" id="chip"></span>
       <div class="flash" id="flash" aria-hidden="true"></div>
-      <div class="bar" id="bar"><i></i></div>
     </div>
   </section>
 
   <section class="scrollview" id="scroll" hidden>
-    <div class="sc-list" id="sc-list" aria-label="Alle Übungen. Die Übung in der Mitte wird nach kurzer Pause aktiv. Doppelt tippen: Start oder Pause."></div>
+    <div class="sc-list" id="sc-list" aria-label="Alle Übungen"></div>
     <div class="sc-hud" id="sc-hud">
       <div class="sc-cur" id="sc-cur"></div>
       <div class="digits" id="sc-digits"></div>
       <div class="sc-sub" id="sc-sub"></div>
-      <span class="sc-chip" id="sc-chip"></span>
     </div>
     <div class="flash" id="sc-flash" aria-hidden="true"></div>
   </section>
@@ -331,6 +339,8 @@ button:focus-visible, input:focus-visible, label:focus-within { outline: 3px sol
     <div class="ed-head">
       <h2>Stunde</h2>
       <input class="field lname" id="lesson-name" type="text" placeholder="Name der Stunde" autocomplete="off" spellcheck="false">
+      <label class="tfield">Beginn <input class="field tm" id="lesson-start" type="time"></label>
+      <label class="tfield">Ende <input class="field tm" id="lesson-end" type="time"></label>
       <span class="status" id="ed-status"></span>
       <button class="btn small" id="cancel-plan" type="button">Abbrechen</button>
       <button class="btn small go" id="save-plan" type="button">Speichern</button>
@@ -344,10 +354,10 @@ button:focus-visible, input:focus-visible, label:focus-within { outline: 3px sol
     <div class="list-head">
       <span class="eyebrow">Ablauf</span>
       <span>
-        <button class="mini" id="reset-btn" type="button">Zurücksetzen</button>
         <button class="mini" id="drawer-close" type="button">Schließen</button>
       </span>
     </div>
+    <p class="hint list-sum" id="list-sum"></p>
     <div id="list"></div>
   </aside>
 </div>
@@ -439,7 +449,7 @@ button:focus-visible, input:focus-visible, label:focus-within { outline: 3px sol
 <script>
 (function () {
   var LS_PLAN = "yoga.plan.cache.v2", LS_LESSONS = "yoga.lessons.cache.v3", LS_ACTIVE = "yoga.active.v1", LS_RUN = "yoga.run.v2", RUN_MAX_AGE = 6 * 3600 * 1000;
-  var ID_RE = /^[0-9a-f]{32}$/;
+  var ID_RE = /^[0-9a-f]{32}$/, HM_RE = /^(\d{1,2}):(\d{2})$/, lastWin = "";
   var DOUBLE_MS = 300, LEFT_ZONE = 0.22;
   var READONLY = !!window.__readonly;
   var uidN = 0;
@@ -518,20 +528,14 @@ button:focus-visible, input:focus-visible, label:focus-within { outline: 3px sol
   var editing = false, draft = null, pendingLessons = null;
   var st;
 
-  /* ---------- run state ---------- */
-  function freshRun() { st = { idx: 0, ms: flat.map(function () { return 0; }), running: false, startedAt: 0, finished: false }; }
+  /* ---------- view position (which exercise is shown; no timing) ---------- */
+  function freshRun() { st = { idx: 0 }; }
   function restoreRun() {
     freshRun();
-    var raw = lsGet(runKey()); if (!raw) return;
-    try {
-      var r = JSON.parse(raw);
-      if (r.key === sig && Date.now() - r.savedAt < RUN_MAX_AGE && r.ms.length === flat.length) {
-        st.idx = Math.min(r.idx, flat.length - 1); st.ms = r.ms; st.finished = !!r.finished;
-      }
-    } catch (e) {}
+    try { var r = JSON.parse(lsGet(runKey()) || "null"); if (r && typeof r.idx === "number") st.idx = Math.max(0, Math.min(flat.length - 1, r.idx)); } catch (e) {}
   }
   function runKey() { return LS_RUN + "." + (curId || "x"); }
-  function saveRun() { lsSet(runKey(), JSON.stringify({ key: sig, idx: st.idx, ms: st.ms, finished: st.finished, savedAt: Date.now() })); }
+  function saveRun() { lsSet(runKey(), JSON.stringify({ idx: st.idx })); }
 
   function normalizeLessons(raw) {
     var out = [];
@@ -539,7 +543,7 @@ button:focus-visible, input:focus-visible, label:focus-within { outline: 3px sol
     raw.forEach(function (l) {
       if (!l) return;
       var bl = normalize(l.blocks);
-      if (bl.length) out.push({ id: String(l.id || uid()), name: String(l.name || "").trim() || "Stunde", blocks: bl });
+      if (bl.length) out.push({ id: String(l.id || uid()), name: String(l.name || "").trim() || "Stunde", start: HM_RE.test(l.start || "") ? l.start : "", end: HM_RE.test(l.end || "") ? l.end : "", blocks: bl });
     });
     return out;
   }
@@ -557,12 +561,13 @@ button:focus-visible, input:focus-visible, label:focus-within { outline: 3px sol
     if (!l) l = lessons[0] || null;
     if (!l) { renderLessonUi(); return; }
     curId = l.id; blocks = l.blocks; flat = flatten(blocks); isExample = false; sig = signature(blocks);
-    if (curId !== prevId || sig !== prevSig) { releaseWake(); restoreRun(); renderAll(); }
-    else if (JSON.stringify(blocks) !== prevJson) renderAll();
+    var win = (l.start || "") + "-" + (l.end || ""), winChanged = win !== lastWin; lastWin = win;
+    if (curId !== prevId || sig !== prevSig) { restoreRun(); renderAll(); }
+    else if (JSON.stringify(blocks) !== prevJson || winChanged) renderAll();
     renderLessonUi();
   }
   function selectLesson(id) {
-    commit(); st.running = false; saveRun();
+    saveRun();
     lsSet(LS_ACTIVE, id); applyLessons(lessons);
   }
 
@@ -573,29 +578,39 @@ button:focus-visible, input:focus-visible, label:focus-within { outline: 3px sol
   }
   function fmtMin(min) { return (Math.round(min * 10) / 10).toString().replace(".", ",") + " min"; }
   function planMs(i) { return flat[i].min * 60000; }
-  function live(i) { return st.ms[i] + (st.running && i === st.idx ? Date.now() - st.startedAt : 0); }
-  function commit() { if (st.running) { var n = Date.now(); st.ms[st.idx] += n - st.startedAt; st.startedAt = n; } }
+  function hm(t) { var m = HM_RE.exec(t || ""); return m ? parseInt(m[1], 10) * 60 + parseInt(m[2], 10) : null; }
+  function clockStr(ms) { return new Date(ms).toLocaleTimeString("de-AT", { hour: "2-digit", minute: "2-digit" }); }
+  /* lesson window for today (end before start = past midnight) and the planned slot of every exercise, counted from the start */
+  function schedule() {
+    var l = curLesson(); if (!l) return null;
+    var a = hm(l.start), b = hm(l.end); if (a == null || b == null) return null;
+    var d = new Date(); d.setHours(0, 0, 0, 0);
+    var s = d.getTime() + a * 60000, e = d.getTime() + b * 60000; if (e <= s) e += 86400000;
+    var t = s, items = flat.map(function (x) { var it = { a: t, b: t + x.min * 60000 }; t = it.b; return it; });
+    return { s: s, e: e, items: items, now: Date.now() };
+  }
+  function doneFrac(sch, i) {
+    if (!sch || !sch.items[i]) return 0;
+    var it = sch.items[i]; if (sch.now <= it.a) return 0; if (sch.now >= it.b) return 1;
+    return (sch.now - it.a) / (it.b - it.a);
+  }
+  function shade(dir, f, base) {
+    if (f <= 0) return base;
+    if (f >= 1) return "var(--past)";
+    var p = (f * 100).toFixed(2) + "%";
+    return "linear-gradient(" + dir + ", var(--past) " + p + ", " + base + " " + p + ")";
+  }
 
   var wake = null;
-  function requestWake() { try { if (navigator.wakeLock) navigator.wakeLock.request("screen").then(function (l) { wake = l; }).catch(function () {}); } catch (e) {} }
+  function requestWake() { if (wake) return; try { if (navigator.wakeLock) navigator.wakeLock.request("screen").then(function (l) { wake = l; l.addEventListener("release", function () { wake = null; }); }).catch(function () {}); } catch (e) {} }
   function releaseWake() { try { if (wake) wake.release(); } catch (e) {} wake = null; }
-  document.addEventListener("visibilitychange", function () { if (document.visibilityState === "visible" && st.running) requestWake(); });
+  document.addEventListener("visibilitychange", function () { if (document.visibilityState === "visible") tick(); });
 
   /* ---------- actions ---------- */
-  function go(i) { commit(); st.idx = Math.max(0, Math.min(flat.length - 1, i)); st.finished = false; saveRun(); renderAll(); }
-  function next() {
-    if (st.finished) return;
-    if (st.idx >= flat.length - 1) { commit(); st.running = false; st.finished = true; releaseWake(); saveRun(); renderAll(); }
-    else go(st.idx + 1);
-  }
-  function prev() { if (st.finished) { st.finished = false; saveRun(); renderAll(); } else go(st.idx - 1); }
-  function toggle() {
-    if (st.finished) return;
-    if (st.running) { commit(); st.running = false; releaseWake(); }
-    else { st.startedAt = Date.now(); st.running = true; requestWake(); }
-    saveRun(); renderAll();
-  }
-  function reset() { releaseWake(); freshRun(); lsDel(runKey()); renderAll(); }
+  function syncFromScroll() { if (!$("scroll").hidden && scItems.length) { var n = nearestItem(); if (n >= 0) st.idx = n; } }
+  function go(i) { st.idx = Math.max(0, Math.min(flat.length - 1, i)); saveRun(); renderAll(); }
+  function next() { syncFromScroll(); go(st.idx + 1); }
+  function prev() { syncFromScroll(); go(st.idx - 1); }
 
   /* ---------- images ---------- */
   /* Pictograms often carry empty margins; crop them away so the figure fills its tile. */
@@ -720,13 +735,7 @@ button:focus-visible, input:focus-visible, label:focus-within { outline: 3px sol
     var body = $("tilebody"); body.textContent = "";
     $("example-tag").hidden = !isExample;
     var head = el("div", "tl-head"), pic = el("div", "tl-pic"), side = el("div", "tl-side"), timer = el("div", "tl-timer timer");
-    if (st.finished) {
-      var planned = flat.reduce(function (a, x) { return a + x.min * 60000; }, 0), total = st.ms.reduce(function (a, b) { return a + b; }, 0);
-      head.appendChild(el("div", "eyebrow", "Stunde beendet"));
-      var fin = el("div", "bigname", "Fertig");
-      fin.appendChild(el("span", "bignote", "Gesamtzeit " + fmt(total) + " · Differenz zur Planung " + (total > planned ? "+" : "−") + fmt(total - planned)));
-      pic.appendChild(fin);
-    } else {
+    {
       var e = flat[st.idx];
       var count = (st.idx + 1) + "/" + flat.length;
       var media = e.text || e.img;
@@ -771,16 +780,28 @@ button:focus-visible, input:focus-visible, label:focus-within { outline: 3px sol
 
   function renderList() {
     var list = $("list"); list.textContent = "";
+    var sch = schedule(), l = curLesson(), plan = flat.reduce(function (a, x) { return a + x.min; }, 0), sum = $("list-sum");
+    sum.textContent = "";
+    sum.appendChild(document.createTextNode("Geplant: ")); sum.appendChild(el("b", null, fmtMin(plan)));
+    if (sch) {
+      var avail = (sch.e - sch.s) / 60000, diff = Math.round((plan - avail) * 10) / 10;
+      sum.appendChild(document.createTextNode(" · verfügbar: ")); sum.appendChild(el("b", null, fmtMin(avail) + " (" + l.start + "–" + l.end + ")"));
+      sum.appendChild(document.createTextNode("\n"));
+      if (Math.abs(diff) < 0.05) sum.appendChild(el("span", null, "Passt genau."));
+      else if (diff > 0) sum.appendChild(el("span", "over", fmtMin(diff) + " zu lang"));
+      else sum.appendChild(el("span", null, fmtMin(-diff) + " Reserve"));
+    } else sum.appendChild(document.createTextNode(" · keine Beginn-/Endzeit festgelegt (Bearbeiten)"));
     flat.forEach(function (e, i) {
       if (e.si === 0 && e.bTitle) {
         var g = el("div", "grp"); g.appendChild(el("span", null, e.bTitle)); g.appendChild(el("span", null, fmtMin(e.bMin))); list.appendChild(g);
       }
-      var isCur = !st.finished && i === st.idx, isDone = st.finished || i < st.idx;
-      var btn = el("button", "item" + (isCur ? " cur" : "") + (isDone ? " done" : "")); btn.type = "button";
+      var isCur = i === st.idx, f = doneFrac(sch, i);
+      var btn = el("button", "item" + (isCur ? " cur" : "") + (f >= 1 ? " past" : "")); btn.type = "button";
+      if (!isCur && f > 0 && f < 1) btn.style.background = shade("to right", f, "transparent");
       btn.appendChild(el("span", "n", String(i + 1)));
       if (e.img) btn.appendChild(thumbEl(e.img, "", ""));
       btn.appendChild(el("span", "t", e.name));
-      btn.appendChild(el("span", "d", st.ms[i] > 0 && (isDone || isCur) ? fmt(st.ms[i]) : fmtMin(e.min)));
+      btn.appendChild(el("span", "d", fmtMin(e.min)));
       btn.addEventListener("click", function () { closeDrawer(); go(i); });
       list.appendChild(btn);
     });
@@ -788,81 +809,61 @@ button:focus-visible, input:focus-visible, label:focus-within { outline: 3px sol
 
   function renderAll() { renderStage(); renderList(); if (view === "scroll" && !editing) renderScroll(); tick(); }
 
+  /* every second: remaining lesson time (only inside the window) and the schedule shading */
   function tick() {
-    scHud();
-    var totalMs = 0, plannedTotal = 0, i;
-    for (i = 0; i < flat.length; i++) { totalMs += live(i); plannedTotal += planMs(i); }
-    var remaining = 0;
-    if (!st.finished) {
-      remaining = Math.max(0, planMs(st.idx) - live(st.idx));
-      for (i = st.idx + 1; i < flat.length; i++) remaining += planMs(i);
-    }
+    var sch = schedule(), inWin = !!sch && sch.now >= sch.s && sch.now <= sch.e;
+    var plan = flat.reduce(function (a, x) { return a + x.min; }, 0);
     var clock = $("clock"); clock.textContent = "";
-    var g = el("span", null, "Gesamt "); g.appendChild(el("b", null, fmt(totalMs))); g.appendChild(document.createTextNode(" / " + fmt(plannedTotal)));
-    clock.appendChild(g);
-    if (!st.finished) {
-      var endAt = new Date(Date.now() + remaining);
-      var en = el("span", null, "Ende ca. "); en.appendChild(el("b", null, endAt.toLocaleTimeString("de-AT", { hour: "2-digit", minute: "2-digit" })));
-      clock.appendChild(en);
-    }
-    var tb = $("total-bar"); tb.firstChild.style.width = Math.min(100, totalMs / plannedTotal * 100) + "%";
-    tb.classList.toggle("over", totalMs > plannedTotal);
+    var l = curLesson();
+    if (sch) { var w = el("span", null, "Stunde "); w.appendChild(el("b", null, l.start + "–" + l.end)); clock.appendChild(w); }
+    var g = el("span", null, "Plan "); g.appendChild(el("b", null, fmtMin(plan))); clock.appendChild(g);
+    var tb = $("total-bar");
+    tb.firstChild.style.width = sch ? Math.max(0, Math.min(100, (sch.now - sch.s) / (sch.e - sch.s) * 100)) + "%" : "0%";
+    tb.classList.remove("over");
 
-    var chip = $("chip"), started = st.ms.some(function (x) { return x > 0; });
-    chip.classList.remove("warn");
-    if (st.finished) chip.textContent = "Fertig";
-    else if (st.running) chip.textContent = "● läuft";
-    else if (started) chip.textContent = "❚❚ pausiert";
-    else chip.textContent = "Doppeltippen = Start";
+    var big = inWin ? fmt(sch.e - sch.now) : "--:--";
+    var sub = inWin ? "verbleibend · Ende " + clockStr(sch.e) : sch ? "Stunde " + l.start + "–" + l.end : "Keine Beginn-/Endzeit";
+    var dg = $("digits"); if (dg) { dg.textContent = big; dg.className = "digits" + (inWin ? "" : " idle"); $("sub").textContent = sub; }
+    var sd = $("sc-digits"); sd.textContent = big; sd.className = "digits" + (inWin ? "" : " idle"); $("sc-sub").textContent = sub;
+    $("sc-cur").textContent = l ? l.name : "";
 
-    var bar = $("bar");
-    if (st.finished) { bar.firstChild.style.width = "100%"; bar.classList.remove("over"); return; }
-    var cur = live(st.idx), pl = planMs(st.idx), over = cur > pl;
-    bar.firstChild.style.width = Math.min(100, cur / pl * 100) + "%"; bar.classList.toggle("over", over);
-    var dg = $("digits"); if (!dg) return;
-    dg.textContent = (over ? "+" : "") + fmt(pl - cur);
-    dg.className = "digits" + (over ? " over" : (!st.running && cur === 0 ? " idle" : ""));
-    $("sub").textContent = "Geplant " + fmt(pl) + " · vergangen " + fmt(cur);
+    $("stagebox").style.background = shade("to right", doneFrac(sch, st.idx), "var(--tile)");
+    scItems.forEach(function (it, i) {
+      var f = doneFrac(sch, i);
+      it.classList.toggle("past", f >= 1);
+      it.style.background = f > 0 && f < 1 ? shade("to bottom", f, "#ffffff") : "";
+    });
+    if (inWin && document.visibilityState === "visible") requestWake(); else releaseWake();
   }
+  setInterval(function () { if (!editing) tick(); }, 1000);
 
-  var ticks = 0;
-  setInterval(function () { if (st.running && !editing) { tick(); if (++ticks % 20 === 0) { commit(); saveRun(); } } }, 250);
-
-  /* ---------- tap gestures on the picture ---------- */
+  /* ---------- tap gestures on the picture: left edge = back, elsewhere = next ---------- */
   var flashTimer = 0;
   function flash(symbol) {
     var f = $("flash"); f.textContent = symbol; f.classList.remove("on"); void f.offsetWidth; f.classList.add("on");
     clearTimeout(flashTimer); flashTimer = setTimeout(function () { f.classList.remove("on"); }, 800);
   }
-  var tapTimer = 0, lastTapAt = 0;
   $("stagebox").addEventListener("click", function (ev) {
-    var rect = this.getBoundingClientRect(), x = (ev.clientX - rect.left) / rect.width, now = Date.now();
-    if (tapTimer && now - lastTapAt < DOUBLE_MS) {
-      clearTimeout(tapTimer); tapTimer = 0;
-      if (!st.finished) { toggle(); flash(st.running ? "▶" : "❚❚"); }
-      return;
-    }
-    lastTapAt = now;
-    tapTimer = setTimeout(function () {
-      tapTimer = 0;
-      if (x < LEFT_ZONE) { prev(); flash("‹"); } else { next(); flash("›"); }
-    }, DOUBLE_MS);
+    var rect = this.getBoundingClientRect(), x = (ev.clientX - rect.left) / rect.width;
+    if (x < LEFT_ZONE) { prev(); flash("‹"); } else { next(); flash("›"); }
   });
 
   /* ---------- scroll view ---------- */
-  /* All exercises in one column. The one nearest the dashed middle line becomes the current exercise
-     (also for timing), but only after scrolling has rested for SWITCH_MS, so a quick look ahead or back changes nothing. */
-  var LS_VIEW = "yoga.view.v1", SWITCH_MS = 2000;
+  /* All exercises in one freely scrolling column. Nothing becomes "active" by scrolling; switching back to the tile
+     view shows the exercise nearest the middle. */
+  var LS_VIEW = "yoga.view.v1";
   var view = lsGet(LS_VIEW) === "scroll" ? "scroll" : "tile";
-  var scKey = "", scItems = [], pendIdx = -1, pendTimer = 0, lastCentered = -1, progScroll = false, progTimer = 0, scRaf = 0;
+  var scKey = "", scItems = [], lastCentered = -1, scSaveTimer = 0;
   function applyView() {
     var sc = view === "scroll" && !editing;
     $("scroll").hidden = !sc; $("play").hidden = editing || sc;
     $("view-btn").textContent = view === "scroll" ? "Kachel" : "Scrollen";
     if (sc) { renderScroll(); requestAnimationFrame(function () { layoutScroll(); centerOn(st.idx, false); tick(); }); }
-    else clearPending();
   }
-  function setView(v) { view = v; lsSet(LS_VIEW, v); applyView(); }
+  function setView(v) {
+    if (view === "scroll" && v === "tile") { syncFromScroll(); saveRun(); renderStage(); }
+    view = v; lsSet(LS_VIEW, v); applyView(); tick();
+  }
   $("view-btn").addEventListener("click", function () { setView(view === "scroll" ? "tile" : "scroll"); });
 
   function scItem(e, i) {
@@ -890,32 +891,26 @@ button:focus-visible, input:focus-visible, label:focus-within { outline: 3px sol
     info.appendChild(nr);
     info.appendChild(el("div", "sc-dur", fmtMin(e.min)));
     if (e.note) info.appendChild(el("p", "sc-note", e.note));
-    var pb = el("div", "sc-pend"); pb.appendChild(el("i"));
-    it.appendChild(pic); it.appendChild(info); it.appendChild(pb);
+    it.appendChild(pic); it.appendChild(info);
     return it;
   }
   function renderScroll() {
     var list = $("sc-list");
     var key = curId + "|" + JSON.stringify(flat.map(function (e) { return [e.id, e.name, e.img, e.text, e.note, e.min, e.bTitle]; }));
     if (key !== scKey) {
-      scKey = key; list.textContent = ""; clearPending();
+      scKey = key; list.textContent = "";
       scItems = flat.map(function (e, i) { var it = scItem(e, i); list.appendChild(it); return it; });
       lastCentered = -1;
-      requestAnimationFrame(function () { layoutScroll(); centerOn(st.idx, false); });
+      requestAnimationFrame(function () { layoutScroll(); centerOn(st.idx, false); tick(); });
     }
-    scItems.forEach(function (it, i) {
-      it.classList.toggle("active", !st.finished && i === st.idx);
-      it.classList.toggle("done", st.finished || i < st.idx);
-    });
     if (lastCentered !== -1 && lastCentered !== st.idx && !$("scroll").hidden) centerOn(st.idx, true);
   }
   function layoutScroll() { var list = $("sc-list"); list.style.setProperty("--sc-h", list.clientHeight + "px"); }
   function centerOn(i, smooth) {
     var list = $("sc-list"), it = scItems[i]; if (!it) return;
-    clearPending(); lastCentered = i;
+    lastCentered = i;
     var top = Math.max(0, it.offsetTop + it.offsetHeight / 2 - list.clientHeight / 2);
     if (Math.abs(list.scrollTop - top) < 2) return;
-    progScroll = true; clearTimeout(progTimer); progTimer = setTimeout(function () { progScroll = false; }, 1200);
     try { list.scrollTo({ top: top, behavior: smooth ? "smooth" : "auto" }); } catch (e) { list.scrollTop = top; }
   }
   function nearestItem() {
@@ -923,59 +918,12 @@ button:focus-visible, input:focus-visible, label:focus-within { outline: 3px sol
     scItems.forEach(function (it, i) { var d = Math.abs(it.offsetTop + it.offsetHeight / 2 - mid); if (d < bd) { bd = d; best = i; } });
     return best;
   }
-  function clearPending() {
-    clearTimeout(pendTimer); pendTimer = 0;
-    if (pendIdx >= 0 && scItems[pendIdx]) scItems[pendIdx].classList.remove("pending");
-    pendIdx = -1;
-  }
-  function setPending(n) {
-    if (pendIdx !== n) { clearPending(); pendIdx = n; }
-    var it = scItems[n]; it.classList.remove("pending"); void it.offsetWidth; it.classList.add("pending");
-    clearTimeout(pendTimer);
-    pendTimer = setTimeout(function () {
-      var target = pendIdx; clearPending(); if (target < 0) return;
-      lastCentered = target; go(target);
-    }, SWITCH_MS);
-  }
-  function onScrollSettle() {
-    scRaf = 0;
-    if (progScroll || $("scroll").hidden || !scItems.length) return;
-    var n = nearestItem(); if (n < 0) return;
-    if (n === st.idx && !st.finished) { clearPending(); lastCentered = n; return; }
-    setPending(n);
-  }
-  $("sc-list").style.setProperty("--sc-wait", (SWITCH_MS / 1000) + "s");
+  /* remember the scroll position (as exercise) so the tile view and a reload continue there */
   $("sc-list").addEventListener("scroll", function () {
-    if (progScroll) { clearTimeout(progTimer); progTimer = setTimeout(function () { progScroll = false; }, 180); return; }
-    if (!scRaf) scRaf = requestAnimationFrame(onScrollSettle);
+    clearTimeout(scSaveTimer);
+    scSaveTimer = setTimeout(function () { var n = nearestItem(); if (n >= 0) { st.idx = n; lastCentered = n; saveRun(); } }, 400);
   }, { passive: true });
-  ["touchstart", "wheel", "mousedown"].forEach(function (t) {
-    $("sc-list").addEventListener(t, function () { progScroll = false; clearTimeout(progTimer); }, { passive: true });
-  });
-  var scLastTap = 0;
-  $("sc-list").addEventListener("click", function () {
-    var now = Date.now();
-    if (now - scLastTap < DOUBLE_MS) {
-      scLastTap = 0;
-      if (!st.finished) {
-        toggle();
-        var f = $("sc-flash"); f.textContent = st.running ? "▶" : "❚❚"; f.classList.remove("on"); void f.offsetWidth; f.classList.add("on");
-      }
-    } else scLastTap = now;
-  });
   if (window.ResizeObserver) new ResizeObserver(function () { if ($("scroll").hidden) return; layoutScroll(); centerOn(st.idx, false); }).observe($("scroll"));
-
-  function scHud() {
-    if ($("scroll").hidden) return;
-    var started = st.ms.some(function (x) { return x > 0; }), dg = $("sc-digits");
-    $("sc-chip").textContent = st.finished ? "Fertig" : st.running ? "● läuft" : started ? "❚❚ pausiert · Doppeltippen" : "Doppeltippen = Start";
-    if (st.finished) { $("sc-cur").textContent = "Stunde beendet"; dg.textContent = ""; $("sc-sub").textContent = ""; return; }
-    var cur = live(st.idx), pl = planMs(st.idx), over = cur > pl;
-    $("sc-cur").textContent = (st.idx + 1) + "/" + flat.length + " · " + flat[st.idx].name;
-    dg.textContent = (over ? "+" : "") + fmt(pl - cur);
-    dg.className = "digits" + (over ? " over" : (!st.running && cur === 0 ? " idle" : ""));
-    $("sc-sub").textContent = "Geplant " + fmt(pl) + " · vergangen " + fmt(cur);
-  }
 
   /* ---------- drawer ---------- */
   function openDrawer() { $("drawer").hidden = false; renderList(); var c = $("list").querySelector(".item.cur"); if (c) $("list").scrollTop = Math.max(0, c.offsetTop - 120); }
@@ -983,7 +931,6 @@ button:focus-visible, input:focus-visible, label:focus-within { outline: 3px sol
   $("list-btn").addEventListener("click", openDrawer);
   $("drawer-close").addEventListener("click", closeDrawer);
   $("drawer").addEventListener("click", function (ev) { if (ev.target === this) closeDrawer(); });
-  $("reset-btn").addEventListener("click", function () { reset(); closeDrawer(); });
 
   /* ---------- lessons ---------- */
   var delConfirm = "", delTimer = 0;
@@ -1030,7 +977,7 @@ button:focus-visible, input:focus-visible, label:focus-within { outline: 3px sol
   async function addLesson(l) {
     var nl = lessons.concat([l]);
     try { await persist(nl); } catch (e) { lessonStatus("Speichern fehlgeschlagen."); return false; }
-    commit(); st.running = false; saveRun();
+    saveRun();
     lsSet(LS_ACTIVE, l.id); applyLessons(nl); closeLessons(); return true;
   }
   $("lesson-new").addEventListener("click", async function () {
@@ -1058,6 +1005,7 @@ button:focus-visible, input:focus-visible, label:focus-within { outline: 3px sol
     txOpen = {};
     closeDrawer(); closeLessons(); draft = clone(blocks); editing = true; setStatus(lessonsDoc ? "" : "Wird nur auf diesem Gerät gespeichert.");
     $("lesson-name").value = curLesson() ? curLesson().name : "Stunde 1";
+    $("lesson-start").value = curLesson() ? curLesson().start || "" : ""; $("lesson-end").value = curLesson() ? curLesson().end || "" : "";
     showEditor(true); renderEditor();
   }
   function closeEditor() {
@@ -1150,7 +1098,9 @@ button:focus-visible, input:focus-visible, label:focus-within { outline: 3px sol
     var nm = ($("lesson-name").value || "").trim() || "Stunde";
     var nl = clone(lessons), l = null;
     nl.forEach(function (x) { if (x.id === curId) l = x; });
-    if (!l) { l = { id: curId || uid(), name: nm, blocks: nb }; nl.push(l); } else { l.name = nm; l.blocks = nb; }
+    var ts = $("lesson-start").value || "", te = $("lesson-end").value || "";
+    if (!HM_RE.test(ts)) ts = ""; if (!HM_RE.test(te)) te = "";
+    if (!l) { l = { id: curId || uid(), name: nm, start: ts, end: te, blocks: nb }; nl.push(l); } else { l.name = nm; l.start = ts; l.end = te; l.blocks = nb; }
     try { await persist(nl); }
     catch (e) { setStatus("Speichern fehlgeschlagen. Bitte noch einmal versuchen."); return; }
     lsSet(LS_ACTIVE, l.id);
@@ -1334,7 +1284,6 @@ button:focus-visible, input:focus-visible, label:focus-within { outline: 3px sol
     var t = ev.target && ev.target.tagName; if (t === "INPUT" || t === "TEXTAREA") return;
     if (ev.key === "ArrowRight") next();
     else if (ev.key === "ArrowLeft") prev();
-    else if (ev.key === " ") { ev.preventDefault(); toggle(); }
   });
 
   /* ---------- start ---------- */
