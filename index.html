@@ -444,7 +444,7 @@ button:focus-visible, input:focus-visible, label:focus-within { outline: 3px sol
   window.claude = { use: function (n) { return Promise.resolve(n === "db" ? { doc: doc } : null); } };
   if ("serviceWorker" in navigator) {
     var hadController = !!navigator.serviceWorker.controller;
-    navigator.serviceWorker.addEventListener("controllerchange", function () { if (hadController) { status.appUpdate = true; emit(); } hadController = true; });
+    navigator.serviceWorker.addEventListener("controllerchange", function () { if (hadController && !window.__reloaded) { window.__reloaded = true; location.reload(); } hadController = true; });
     navigator.serviceWorker.addEventListener("message", function (e) { if (e.data && e.data.type === "app-updated") { status.appUpdate = true; emit(); } });
     window.addEventListener("load", function () { navigator.serviceWorker.register("sw.js").then(function (r) { swReg = r; }).catch(function () {}); });
   }
