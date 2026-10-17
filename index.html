@@ -167,6 +167,10 @@ button:focus-visible, input:focus-visible, label:focus-within { outline: 3px sol
 .digits { font-family: var(--font-mono); font-weight: 500; font-size: clamp(2.4rem, 8vh, 4.4rem); line-height: 1; letter-spacing: -0.03em; font-variant-numeric: tabular-nums; }
 .digits.over { color: var(--warn); }
 .digits.idle { color: var(--muted); }
+.digits .colon { display: inline-block; animation: colon-pulse 2s ease-in-out infinite alternate; }
+.digits.idle .colon { animation: none; }
+@keyframes colon-pulse { from { opacity: 1; } to { opacity: 0.15; } }
+@media (prefers-reduced-motion: reduce) { .digits .colon { animation: none; } }
 .sub { color: var(--muted); font-size: 0.85rem; font-variant-numeric: tabular-nums; }
 
 /* drawer with the sequence list */
@@ -818,7 +822,7 @@ button:focus-visible, input:focus-visible, label:focus-within { outline: 3px sol
   function renderAll() { renderStage(); renderList(); if (view === "scroll" && !editing) renderScroll(); paint(null, true); loop(); }
 
   /* every second: remaining lesson time (only inside the window) and the schedule shading */
-  /* Updates only what changed. Inside the lesson window once per second (remaining time), outside once per
+  /* Updates only what changed. Inside the lesson window once per minute of remaining time and at exercise boundaries, outside once per
      minute and exactly at the start time. Opening the app in the middle of a lesson works the same way:
      every value is derived from the clock, nothing depends on having watched the start. */
   function tick() {
@@ -833,10 +837,16 @@ button:focus-visible, input:focus-visible, label:focus-within { outline: 3px sol
       : { k: "cur:" + sch.s + ":" + sch.e, f: (n - sch.s) / (sch.e - sch.s), rem: sch.e - n };
     applyShade($("total-bar").firstChild, "x", ws, false);
 
-    var big = inWin ? fmt(sch.e - n) : "--:--", cls = "digits" + (inWin ? "" : " idle");
+    /* remaining time as H:MM (minutes rounded up), the colon pulses slowly via CSS */
+    var hmParts = ["--", "--"];
+    if (inWin) { var rm = Math.ceil((sch.e - n) / 60000); hmParts = [String(Math.floor(rm / 60)), String(rm % 60).padStart(2, "0")]; }
+    var big = hmParts.join(":"), cls = "digits" + (inWin ? "" : " idle");
     [$("digits"), $("sc-digits")].forEach(function (d) {
       if (!d) return;
-      if (d.textContent !== big) d.textContent = big;
+      if (d.__t !== big) {
+        d.__t = big; d.textContent = "";
+        d.appendChild(document.createTextNode(hmParts[0])); d.appendChild(el("span", "colon", ":")); d.appendChild(document.createTextNode(hmParts[1]));
+      }
       if (d.className !== cls) d.className = cls;
     });
 
@@ -848,7 +858,11 @@ button:focus-visible, input:focus-visible, label:focus-within { outline: 3px sol
     clearTimeout(tickTimer);
     if (!editing) tick();
     var sch = schedule(), n = Date.now(), d;
-    if (sch && n >= sch.s && n < sch.e) d = 1000 - (n % 1000) + 5;
+    if (sch && n >= sch.s && n < sch.e) {
+      /* next change of the minute display or the next exercise boundary, whichever comes first */
+      d = ((sch.e - n) % 60000 || 60000) + 5;
+      sch.items.forEach(function (it) { if (it.b > n && it.b - n + 5 < d) d = it.b - n + 5; });
+    }
     else { d = 60000 - (n % 60000) + 5; if (sch && n < sch.s) d = Math.min(d, sch.s - n + 5); }
     tickTimer = setTimeout(loop, d);
   }
