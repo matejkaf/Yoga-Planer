@@ -295,6 +295,8 @@ button:focus-visible, input:focus-visible, label:focus-within { outline: 3px sol
 .sc-item.past > .shade { display: none; }
 .tfield { display: inline-flex; align-items: center; gap: 6px; color: var(--muted); font-size: 0.95rem; }
 .field.tm { width: 7.2em; min-width: 0; font-family: var(--font-mono); }
+.field.dm { width: 5em; min-width: 0; font-family: var(--font-mono); text-align: right; }
+.tfield:focus-within { outline: none; }
 .list-sum { padding: 2px 10px 8px; line-height: 1.4; white-space: pre-line; }
 .list-sum b { color: var(--fg); }
 .list-sum .over { color: var(--warn); font-weight: 600; }
@@ -342,7 +344,7 @@ button:focus-visible, input:focus-visible, label:focus-within { outline: 3px sol
       <h2>Stunde</h2>
       <input class="field lname" id="lesson-name" type="text" placeholder="Name der Stunde" autocomplete="off" spellcheck="false">
       <label class="tfield">Beginn <input class="field tm" id="lesson-start" type="time"></label>
-      <label class="tfield">Ende <input class="field tm" id="lesson-end" type="time"></label>
+      <label class="tfield">Dauer <input class="field dm" id="lesson-dur" type="number" inputmode="numeric" min="1" max="600" step="1" placeholder="90"> min</label>
       <span class="status" id="ed-status"></span>
       <button class="btn small" id="cancel-plan" type="button">Abbrechen</button>
       <button class="btn small go" id="save-plan" type="button">Speichern</button>
@@ -581,6 +583,7 @@ button:focus-visible, input:focus-visible, label:focus-within { outline: 3px sol
   function fmtMin(min) { return (Math.round(min * 10) / 10).toString().replace(".", ",") + " min"; }
   function planMs(i) { return flat[i].min * 60000; }
   function hm(t) { var m = HM_RE.exec(t || ""); return m ? parseInt(m[1], 10) * 60 + parseInt(m[2], 10) : null; }
+  function lessonDur(l) { var a = hm(l.start), b = hm(l.end); if (a == null || b == null) return ""; var d = b - a; if (d <= 0) d += 1440; return d; }
   function clockStr(ms) { return new Date(ms).toLocaleTimeString("de-AT", { hour: "2-digit", minute: "2-digit" }); }
   /* lesson window for today (end before start = past midnight) and the planned slot of every exercise, counted from the start */
   function schedule() {
@@ -821,8 +824,7 @@ button:focus-visible, input:focus-visible, label:focus-within { outline: 3px sol
     var clock = $("clock"), hk = (sch ? l.start + "–" + l.end : "") + "|" + plan;
     if (clock.__k !== hk) {
       clock.__k = hk; clock.textContent = "";
-      if (sch) { var w = el("span", null, "Stunde "); w.appendChild(el("b", null, l.start + "–" + l.end)); clock.appendChild(w); }
-      var g = el("span", null, "Plan "); g.appendChild(el("b", null, fmtMin(plan))); clock.appendChild(g);
+      if (sch) { var w = el("span"); w.appendChild(el("b", null, l.start + "–" + l.end)); w.appendChild(document.createTextNode(" (" + fmtMin(lessonDur(l)) + ")")); clock.appendChild(w); }
     }
     var ws = !sch ? { k: "none", f: 0, rem: 0 } : n < sch.s ? { k: "future", f: 0, rem: 0 } : n >= sch.e ? { k: "past", f: 1, rem: 0 }
       : { k: "cur:" + sch.s + ":" + sch.e, f: (n - sch.s) / (sch.e - sch.s), rem: sch.e - n };
@@ -1051,7 +1053,7 @@ button:focus-visible, input:focus-visible, label:focus-within { outline: 3px sol
     txOpen = {};
     closeDrawer(); closeLessons(); draft = clone(blocks); editing = true; setStatus(lessonsDoc ? "" : "Wird nur auf diesem Gerät gespeichert.");
     $("lesson-name").value = curLesson() ? curLesson().name : "Stunde 1";
-    $("lesson-start").value = curLesson() ? curLesson().start || "" : ""; $("lesson-end").value = curLesson() ? curLesson().end || "" : "";
+    $("lesson-start").value = curLesson() ? curLesson().start || "" : ""; $("lesson-dur").value = curLesson() ? lessonDur(curLesson()) : "";
     showEditor(true); renderEditor();
   }
   function closeEditor() {
@@ -1144,8 +1146,9 @@ button:focus-visible, input:focus-visible, label:focus-within { outline: 3px sol
     var nm = ($("lesson-name").value || "").trim() || "Stunde";
     var nl = clone(lessons), l = null;
     nl.forEach(function (x) { if (x.id === curId) l = x; });
-    var ts = $("lesson-start").value || "", te = $("lesson-end").value || "";
-    if (!HM_RE.test(ts)) ts = ""; if (!HM_RE.test(te)) te = "";
+    var ts = $("lesson-start").value || "", dur = parseInt($("lesson-dur").value, 10), te = "";
+    if (!HM_RE.test(ts)) ts = "";
+    if (ts && dur > 0) { var em = (hm(ts) + dur) % 1440; te = String(Math.floor(em / 60)).padStart(2, "0") + ":" + String(em % 60).padStart(2, "0"); }
     if (!l) { l = { id: curId || uid(), name: nm, start: ts, end: te, blocks: nb }; nl.push(l); } else { l.name = nm; l.start = ts; l.end = te; l.blocks = nb; }
     try { await persist(nl); }
     catch (e) { setStatus("Speichern fehlgeschlagen. Bitte noch einmal versuchen."); return; }
