@@ -1055,6 +1055,7 @@ button:focus-visible, input:focus-visible, label:focus-within { outline: 3px sol
     closeDrawer(); closeLessons(); draft = clone(blocks); editing = true; setStatus(lessonsDoc ? "" : "Wird nur auf diesem Gerät gespeichert.");
     $("lesson-name").value = curLesson() ? curLesson().name : "Stunde 1";
     $("lesson-start").value = curLesson() ? curLesson().start || "" : ""; $("lesson-dur").value = curLesson() ? lessonDur(curLesson()) : "";
+    $("lesson-dur").placeholder = Math.round(blocks.reduce(function (a, b) { return a + b.steps.reduce(function (x, y) { return x + (+y.min || 0); }, 0); }, 0)) || "";
     showEditor(true); renderEditor();
   }
   function closeEditor() {
@@ -1149,6 +1150,8 @@ button:focus-visible, input:focus-visible, label:focus-within { outline: 3px sol
     nl.forEach(function (x) { if (x.id === curId) l = x; });
     var ts = $("lesson-start").value || "", dur = parseInt($("lesson-dur").value, 10), te = "";
     if (!HM_RE.test(ts)) ts = "";
+    /* no duration entered: use the planned total of the exercises */
+    if (ts && !(dur > 0)) dur = Math.max(1, Math.round(nb.reduce(function (a, b) { return a + b.steps.reduce(function (x, y) { return x + (+y.min || 0); }, 0); }, 0)));
     if (ts && dur > 0) { var em = (hm(ts) + dur) % 1440; te = String(Math.floor(em / 60)).padStart(2, "0") + ":" + String(em % 60).padStart(2, "0"); }
     if (!l) { l = { id: curId || uid(), name: nm, start: ts, end: te, blocks: nb }; nl.push(l); } else { l.name = nm; l.start = ts; l.end = te; l.blocks = nb; }
     try { await persist(nl); }
