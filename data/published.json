@@ -1,6 +1,6 @@
 {
  "v": 1,
- "publishedAt": "2026-10-17T05:49:52Z",
+ "publishedAt": "2026-10-17T05:59:03Z",
  "lessons": [
   {
    "blocks": [
@@ -595,10 +595,10 @@
      "title": "Test"
     }
    ],
-   "end": "07:52",
+   "end": "08:04",
    "id": "test30s",
    "name": "Test 30 s",
-   "start": "07:48"
+   "start": "08:00"
   }
  ],
  "lib": [
