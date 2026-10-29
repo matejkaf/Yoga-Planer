@@ -311,7 +311,7 @@ button:focus-visible, input:focus-visible, label:focus-within { outline: 3px sol
 .ro .appbox { display: block; }
 .appbox .hint { margin-bottom: 8px; line-height: 1.4; }
 .toast { position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%); z-index: 30; background: var(--fg); color: var(--bg); padding: 12px 20px; border-radius: 14px; font-weight: 600; max-width: 90vw; text-align: center; }
-.ro #edit-btn, .ro #lesson-new, .ro #lesson-dup, .ro .lrow .ldel, .ro #no-such-btn { display: none !important; }
+.ro #edit-btn, .ro #pdf-btn, .ro #lesson-new, .ro #lesson-dup, .ro .lrow .ldel, .ro #no-such-btn { display: none !important; }
 @media (prefers-reduced-motion: reduce) { .bar > i, .total-bar > i { transition: none; } .flash.on { animation-duration: 0.01s; } }
 </style>
 </head>
@@ -324,6 +324,7 @@ button:focus-visible, input:focus-visible, label:focus-within { outline: 3px sol
     <button class="ghost" id="view-btn" type="button">Scrollen</button>
     <button class="ghost" id="list-btn" type="button">Ablauf</button>
     <button class="ghost" id="edit-btn" type="button">Bearbeiten</button>
+    <button class="ghost" id="pdf-btn" type="button" hidden>PDF</button>
     <button class="ghost" id="fs-btn" type="button" hidden>Vollbild</button>
     <div class="total-bar" id="total-bar"><i></i></div>
   </header>
@@ -1062,7 +1063,7 @@ button:focus-visible, input:focus-visible, label:focus-within { outline: 3px sol
   /* ---------- editor ---------- */
   function setStatus(t) { $("ed-status").textContent = t || ""; }
   function showEditor(on) {
-    $("editor").hidden = !on; $("view-btn").hidden = on; $("edit-btn").hidden = on; $("list-btn").hidden = on; $("lesson-btn").hidden = on;
+    $("editor").hidden = !on; $("pdf-btn").hidden = on || !downloadsApi || READONLY; $("view-btn").hidden = on; $("edit-btn").hidden = on; $("list-btn").hidden = on; $("lesson-btn").hidden = on;
     applyView();
   }
   var txOpen = {};
@@ -1341,6 +1342,136 @@ button:focus-visible, input:focus-visible, label:focus-within { outline: 3px sol
     renderChooser();
   });
 
+  /* ---------- PDF export of the current lesson (planner only; needs the downloads capability) ---------- */
+  var downloadsApi = null, pdfBusy = false;
+  var JSPDF_URL = "https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js";
+  function loadJsPdf() {
+    if (window.jspdf && window.jspdf.jsPDF) return Promise.resolve(window.jspdf.jsPDF);
+    return new Promise(function (ok, no) {
+      var s = document.createElement("script"); s.src = JSPDF_URL;
+      s.onload = function () { window.jspdf && window.jspdf.jsPDF ? ok(window.jspdf.jsPDF) : no(new Error("jsPDF")); };
+      s.onerror = function () { no(new Error("jsPDF")); };
+      document.head.appendChild(s);
+    });
+  }
+  /* the built-in PDF fonts only know WinAnsi: replace the few characters outside it */
+  function pdfText(s) {
+    return String(s || "").replace(/[↔⇄]/g, "<->").replace(/[→⇒]/g, "->").replace(/[←⇐]/g, "<-").replace(/[„“”]/g, "\"").replace(/[‚‘’]/g, "'")
+      .replace(/[^\x0A\x20-\x7E\xA0-\xFF–—•…·€]/g, "");
+  }
+  function mdPlain(src) {
+    return String(src || "").split("\n").map(function (line) {
+      var m;
+      line = line.replace(/\*\*([^*]+)\*\*/g, "$1").replace(/\*([^*\s][^*]*)\*/g, "$1");
+      if ((m = line.match(/^\s*[-*•]\s+(.*)$/))) return "• " + m[1];
+      if ((m = line.match(/^\s*#{1,3}\s+(.*)$/))) return m[1];
+      return line;
+    });
+  }
+  /* image as JPEG data URL on white, at most 360 px, plus its aspect ratio */
+  function pdfImage(id) {
+    return trimmed(id).then(function (u) {
+      if (!u) return null;
+      return new Promise(function (ok) {
+        var im = new Image();
+        im.onload = function () {
+          try {
+            var s = Math.min(1, 360 / Math.max(im.naturalWidth, im.naturalHeight));
+            var c = document.createElement("canvas"); c.width = Math.max(1, Math.round(im.naturalWidth * s)); c.height = Math.max(1, Math.round(im.naturalHeight * s));
+            var cx = c.getContext("2d"); cx.fillStyle = "#fff"; cx.fillRect(0, 0, c.width, c.height); cx.drawImage(im, 0, 0, c.width, c.height);
+            ok({ url: c.toDataURL("image/jpeg", 0.85), r: c.width / c.height });
+          } catch (e) { ok(null); }
+        };
+        im.onerror = function () { ok(null); };
+        im.src = u;
+      });
+    });
+  }
+  async function exportPdf() {
+    if (pdfBusy || !downloadsApi) return;
+    var l = curLesson(); if (!l) return;
+    pdfBusy = true; var btn = $("pdf-btn"); btn.disabled = true; btn.textContent = "PDF …";
+    try {
+      var JsPdf = await loadJsPdf();
+      var ids = []; flat.forEach(function (e) { if (e.img && ids.indexOf(e.img) < 0) ids.push(e.img); });
+      var imgs = {}; (await Promise.all(ids.map(pdfImage))).forEach(function (x, i) { imgs[ids[i]] = x; });
+      var sch = schedule(), plan = flat.reduce(function (a, x) { return a + x.min; }, 0);
+      var doc = new JsPdf({ unit: "mm", format: "a4" }), W = 210, H = 297, M = 15, y = M;
+      var INK = [28, 32, 50], MUTED = [93, 100, 128], ACC = [90, 74, 154], LINE = [207, 211, 224];
+      function color(c) { doc.setTextColor(c[0], c[1], c[2]); }
+      function need(h) { if (y + h > H - M) { doc.addPage(); y = M; } }
+      function wrap(t, w) { return doc.splitTextToSize(pdfText(t), w); }
+
+      /* title block */
+      doc.setFont("helvetica", "bold"); doc.setFontSize(20); color(INK);
+      wrap(l.name, W - 2 * M).forEach(function (ln) { doc.text(ln, M, y + 7); y += 8; });
+      doc.setFont("helvetica", "normal"); doc.setFontSize(10.5); color(MUTED);
+      var info = [];
+      if (sch) info.push(l.start + "–" + l.end + " (" + fmtMin(lessonDur(l)) + ")");
+      info.push("geplant " + fmtMin(plan));
+      if (sch) { var diff = Math.round((plan - (sch.e - sch.s) / 60000) * 10) / 10; if (Math.abs(diff) >= 0.05) info.push(diff > 0 ? fmtMin(diff) + " zu lang" : fmtMin(-diff) + " Reserve"); }
+      info.push(flat.length + " Übungen");
+      doc.text(pdfText(info.join("  ·  ")), M, y + 4); y += 9;
+      doc.setDrawColor(LINE[0], LINE[1], LINE[2]); doc.setLineWidth(0.3); doc.line(M, y, W - M, y); y += 5;
+
+      var TH = 24, TX = M + TH + 5, TW = W - M - TX - 22;
+      blocks.forEach(function (b) {
+        var bMin = b.steps.reduce(function (a, x) { return a + x.min; }, 0);
+        if (b.title) {
+          need(12 + TH);
+          doc.setFont("helvetica", "bold"); doc.setFontSize(12.5); color(ACC);
+          doc.text(pdfText(b.title.toUpperCase()), M, y + 4.5);
+          doc.setFont("courier", "normal"); doc.setFontSize(10); doc.text(pdfText(fmtMin(bMin)), W - M, y + 4.5, { align: "right" });
+          y += 8;
+        }
+        b.steps.forEach(function (s) {
+          var fi = -1; flat.forEach(function (e, k) { if (e.id === s.id) fi = k; });
+          doc.setFont("helvetica", "bold"); doc.setFontSize(12);
+          var nameL = wrap(s.name, TW);
+          doc.setFont("helvetica", "normal"); doc.setFontSize(9.5);
+          var noteL = s.note ? wrap(s.note, TW) : [];
+          var textL = []; mdPlain(s.text).forEach(function (t) { if (t.trim()) textL = textL.concat(wrap(t, TW)); });
+          var h = Math.max(s.img && imgs[s.img] ? TH : 0, nameL.length * 5.2 + noteL.length * 4.2 + textL.length * 4.2 + 2) + 4;
+          need(h);
+          var im = s.img && imgs[s.img];
+          if (im) {
+            var iw = TH, ih = TH; if (im.r > 1) ih = TH / im.r; else iw = TH * im.r;
+            doc.addImage(im.url, "JPEG", M + (TH - iw) / 2, y + (TH - ih) / 2, iw, ih);
+          } else {
+            doc.setDrawColor(LINE[0], LINE[1], LINE[2]); doc.setLineDashPattern([1, 1], 0); doc.rect(M, y, TH, TH); doc.setLineDashPattern([], 0);
+          }
+          var ty = y + 4.5;
+          doc.setFont("helvetica", "bold"); doc.setFontSize(12); color(INK);
+          nameL.forEach(function (ln) { doc.text(ln, TX, ty); ty += 5.2; });
+          doc.setFont("courier", "normal"); doc.setFontSize(10); color(INK);
+          doc.text(pdfText(fmtMin(s.min)), W - M, y + 4.5, { align: "right" });
+          if (sch && fi >= 0) { color(MUTED); doc.text(clockStr(sch.items[fi].a), W - M, y + 9.5, { align: "right" }); }
+          doc.setFont("helvetica", "normal"); doc.setFontSize(9.5); color(MUTED);
+          noteL.forEach(function (ln) { doc.text(ln, TX, ty); ty += 4.2; });
+          color(INK);
+          textL.forEach(function (ln) { doc.text(ln, TX, ty); ty += 4.2; });
+          y += h;
+        });
+        y += 3;
+      });
+
+      var pages = doc.getNumberOfPages(), stamp = new Date().toLocaleDateString("de-AT");
+      for (var p = 1; p <= pages; p++) {
+        doc.setPage(p); doc.setFont("helvetica", "normal"); doc.setFontSize(8.5); color(MUTED);
+        doc.text(pdfText(l.name + "  ·  " + stamp), M, H - 8);
+        doc.text(p + " / " + pages, W - M, H - 8, { align: "right" });
+      }
+      var name = (l.name || "Stunde").replace(/[\\/:*?"<>|]+/g, " ").trim() || "Stunde";
+      await downloadsApi.save({ filename: name + ".pdf", data: doc.output("blob") });
+    } catch (e) {
+      var code = e && e.code;
+      if (code !== "declined") toast(code === "rate_limited" ? "Bitte kurz warten und noch einmal versuchen." : "PDF konnte nicht erstellt werden.");
+    } finally {
+      pdfBusy = false; btn.disabled = false; btn.textContent = "PDF";
+    }
+  }
+  $("pdf-btn").addEventListener("click", exportPdf);
+
   /* ---------- status: time stamps, update info ---------- */
   function fmtStamp(iso) {
     var d = new Date(iso); if (isNaN(d)) return "unbekannt";
@@ -1389,6 +1520,7 @@ button:focus-visible, input:focus-visible, label:focus-within { outline: 3px sol
     var db = null;
     try { db = await window.claude.use("db"); } catch (e) {}
     try { assetsApi = await window.claude.use("assets"); } catch (e) {}
+    if (!READONLY) { try { downloadsApi = await window.claude.use("downloads"); } catch (e) {} $("pdf-btn").hidden = !downloadsApi || editing; }
     if (!db) return;
     planDoc = db.doc("yoga/plan"); lessonsDoc = db.doc("yoga/lessons"); libDoc = db.doc("yoga/lib");
     libDoc.onSnapshot(function (snap) {
