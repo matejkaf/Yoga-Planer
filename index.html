@@ -1437,8 +1437,6 @@ button:focus-visible, input:focus-visible, label:focus-within { outline: 3px sol
           if (im) {
             var iw = TH, ih = TH; if (im.r > 1) ih = TH / im.r; else iw = TH * im.r;
             doc.addImage(im.url, "JPEG", M + (TH - iw) / 2, y + (TH - ih) / 2, iw, ih);
-          } else {
-            doc.setDrawColor(LINE[0], LINE[1], LINE[2]); doc.setLineDashPattern([1, 1], 0); doc.rect(M, y, TH, TH); doc.setLineDashPattern([], 0);
           }
           var ty = y + 4.5;
           doc.setFont("helvetica", "bold"); doc.setFontSize(12); color(INK);
