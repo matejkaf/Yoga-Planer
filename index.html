@@ -432,7 +432,23 @@ button:focus-visible, input:focus-visible, label:focus-within { outline: 3px sol
       onSnapshot: function (f) { (subs[p] = subs[p] || []).push(f); setTimeout(function () { f(snap(p)); }, 0); return function () { subs[p] = (subs[p] || []).filter(function (x) { return x !== f; }); }; }
     };
   }
-  var status = { publishedAt: pub && pub.publishedAt, checkedAt: Date.now(), state: "checking", appUpdate: false }, swReg = null;
+  var BUILD = "9f50a793c2";
+  var status = { publishedAt: pub && pub.publishedAt, checkedAt: Date.now(), state: "checking", appUpdate: false, build: BUILD, manual: false }, swReg = null;
+  /* compare the build id of the index.html on the server with the running one */
+  function checkCode() {
+    return fetch("index.html?b=" + Date.now(), { cache: "no-store" }).then(function (r) { return r.ok ? r.text() : ""; }).then(function (t) {
+      var m = /var BUILD = "([0-9a-f]+)"/.exec(t || "");
+      if (m && m[1] !== BUILD) status.appUpdate = true;
+    }).catch(function () {});
+  }
+  /* drop every cache and the service worker, then load the newest app from the network */
+  function hardReload() {
+    var jobs = [];
+    try { if (window.caches) jobs.push(caches.keys().then(function (ks) { return Promise.all(ks.map(function (k) { return caches.delete(k); })); })); } catch (e) {}
+    try { if (navigator.serviceWorker) jobs.push(navigator.serviceWorker.getRegistrations().then(function (rs) { return Promise.all(rs.map(function (r) { return r.unregister(); })); })); } catch (e) {}
+    Promise.all(jobs).catch(function () {}).then(function () { location.replace(location.pathname + "?v=" + Date.now()); });
+  }
+  window.__appHardReload = hardReload;
   function emit() { window.__appStatus = status; window.dispatchEvent(new Event("appstatus")); }
   function check() {
     status.state = "checking"; emit();
@@ -447,7 +463,14 @@ button:focus-visible, input:focus-visible, label:focus-within { outline: 3px sol
     });
   }
   var ready = check();
-  window.__appCheck = function () { check(); if (swReg) swReg.update().catch(function () {}); };
+  window.__appCheck = function () {
+    Promise.all([check(), checkCode()]).then(function () {
+      if (status.appUpdate && navigator.onLine) { status.state = "reloading"; emit(); setTimeout(hardReload, 600); return; }
+      status.manual = true; emit(); status.manual = false;
+    });
+  };
+  if (/[?&]v=[0-9]+/.test(location.search)) try { history.replaceState(null, "", location.pathname); } catch (e) {}
+  setTimeout(function () { checkCode().then(function () { if (status.appUpdate) emit(); }); }, 3000);
   window.__srcFor = function (id) { return ready.then(function () { return FILES[id] ? "img/" + FILES[id] : null; }); };
   window.claude = { use: function (n) { return Promise.resolve(n === "db" ? { doc: doc } : null); } };
   if ("serviceWorker" in navigator) {
@@ -1485,17 +1508,22 @@ button:focus-visible, input:focus-visible, label:focus-within { outline: 3px sol
     if (a.state === "checking") lines.push("Prüfe auf Update …");
     else if (a.state === "offline") lines.push("Kein Netz – gespeicherter Stand wird verwendet.");
     else if (a.state === "new") lines.push("Neuer Stand wurde übernommen.");
+    else if (a.state === "reloading") lines.push("Neue App-Version – wird geladen …");
     else lines.push("Aktuell. Geprüft um " + new Date(a.checkedAt).toLocaleTimeString("de-AT", { hour: "2-digit", minute: "2-digit" }) + " Uhr.");
-    if (a.appUpdate) lines.push("Neue App-Version geladen – bitte neu laden.");
+    if (a.appUpdate && a.state !== "reloading") lines.push("Neue App-Version verfügbar.");
+    if (a.build) lines.push("App-Version: " + a.build.slice(0, 7));
     $("app-info").textContent = lines.join("\n"); $("app-info").style.whiteSpace = "pre-line";
     $("app-reload").hidden = !a.appUpdate;
     var key = a.state + "|" + a.publishedAt + "|" + a.appUpdate;
-    if (key !== lastToast && (a.state === "new" || a.appUpdate)) { toast(a.appUpdate ? "Neue App-Version bereit – im Menü „Stunden“ neu laden." : "Neuer Stand vom " + fmtStamp(a.publishedAt) + " übernommen."); }
+    if (a.state === "reloading") toast("Neue App-Version wird geladen …");
+    else if (key !== lastToast && (a.state === "new" || a.appUpdate)) { toast(a.appUpdate ? "Neue App-Version bereit – im Menü „Stunden“ neu laden." : "Neuer Stand vom " + fmtStamp(a.publishedAt) + " übernommen."); }
+    else if (a.manual && a.state === "ok") toast("Alles aktuell – Stand vom " + fmtStamp(a.publishedAt) + ".");
+    else if (a.manual && a.state === "offline") toast("Kein Netz – Update nicht möglich.");
     lastToast = key;
   }
   window.addEventListener("appstatus", renderAppInfo);
   $("app-update").addEventListener("click", function () { if (window.__appCheck) window.__appCheck(); });
-  $("app-reload").addEventListener("click", function () { location.reload(); });
+  $("app-reload").addEventListener("click", function () { if (window.__appHardReload) window.__appHardReload(); else location.reload(); });
 
   /* ---------- keyboard ---------- */
   document.addEventListener("keydown", function (ev) {
