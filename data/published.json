@@ -1,6 +1,6 @@
 {
  "v": 1,
- "publishedAt": "2026-10-17T08:18:56Z",
+ "publishedAt": "2026-11-05T12:58:56Z",
  "lessons": [
   {
    "blocks": [
@@ -101,7 +101,7 @@
       },
       {
        "id": "s6",
-       "img": "",
+       "img": "cb1d06eb4e8b329e446b366a21e55324",
        "min": 1,
        "name": "Kobra",
        "note": "Ellbogen nah am Körper",
@@ -109,7 +109,7 @@
       },
       {
        "id": "s7",
-       "img": "",
+       "img": "fd912fdda6cbe77ddd5f9693c78917ae",
        "min": 2,
        "name": "Herabschauender Hund",
        "note": "Fersen Richtung Boden, 5 Atemzüge",
@@ -123,7 +123,7 @@
      "steps": [
       {
        "id": "s8",
-       "img": "",
+       "img": "adf9a209057a8ee1f844853abdc5ea2a",
        "min": 3,
        "name": "Krieger I",
        "note": "Je Seite 5 Atemzüge",
@@ -131,7 +131,7 @@
       },
       {
        "id": "s9",
-       "img": "",
+       "img": "35f2c99b619f6f3d99c475ccdbd2c7f2",
        "min": 3,
        "name": "Krieger II",
        "note": "Blick über die vordere Hand",
@@ -139,7 +139,7 @@
       },
       {
        "id": "s10",
-       "img": "",
+       "img": "d8ddd404d4492eb958d355fcd10fd444",
        "min": 3,
        "name": "Seitwinkel",
        "note": "Oberen Arm lang nach vorn",
@@ -221,7 +221,7 @@
       },
       {
        "id": "bo2",
-       "img": "",
+       "img": "a9128b28328bda9139feffd7c2436106",
        "min": 3,
        "name": "Becken sanft kippen",
        "note": "Kleine, langsame Bewegung. Nur im schmerzfreien Bereich.",
@@ -251,7 +251,7 @@
       },
       {
        "id": "bo5",
-       "img": "",
+       "img": "a9128b28328bda9139feffd7c2436106",
        "min": 3,
        "name": "Fersen gleiten",
        "note": "Abwechselnd ein Bein lang ausstrecken. Rücken bleibt ruhig am Boden.",
@@ -557,52 +557,285 @@
   {
    "blocks": [
     {
-     "id": "tb1",
+     "id": "v3b1",
      "steps": [
       {
-       "id": "ts1",
-       "img": "f18411c82842bcbdfb8de8084adc7cb4",
-       "min": 0.5,
-       "name": "Berghaltung",
-       "note": "",
-       "text": ""
-      },
-      {
-       "id": "ts2",
-       "img": "7299fde9fbe4cc102ad56fe87d1b266b",
+       "id": "ynj6fob7p39",
+       "img": "223647ff325049532c2e466e79a74b67",
        "min": 1,
-       "name": "Baum",
+       "name": "Ankommen",
        "note": "",
        "text": ""
       },
       {
-       "id": "ts3",
-       "img": "8251143a188ffb73c1a4f0768888f35b",
-       "min": 0.5,
-       "name": "Savasana",
+       "id": "v3s02",
+       "img": "a04a1de64333cb6b74569f5de196e8f3",
+       "min": 2,
+       "name": "Füße mobilisieren",
+       "note": "Fuß- und Sprunggelenke, im Langsitz",
+       "text": ""
+      },
+      {
+       "id": "kobzr4lca34",
+       "img": "6111fb0de6374fc0d65181387efc9242",
+       "min": 2,
+       "name": "Handgelenke und Schultern mobilisieren",
+       "note": "im Stehen",
+       "text": ""
+      },
+      {
+       "id": "fpoj953ph36",
+       "img": "9a44993691ce0e848cc8a1ac14515a7d",
+       "min": 1,
+       "name": "Arme Korkenzieher",
        "note": "",
+       "text": ""
+      },
+      {
+       "id": "pqlllzl0b35",
+       "img": "72afb0a5fb63da9bc60f3c85a0e8bc34",
+       "min": 2,
+       "name": "Stuhl Flow",
+       "note": "",
+       "text": ""
+      },
+      {
+       "id": "v3s05",
+       "img": "2a56ec1dcf13cc1b0b37e9996a113b5c",
+       "min": 2,
+       "name": "Wirbelsäule bewegen",
+       "note": "in vier Richtungen",
+       "text": ""
+      },
+      {
+       "id": "v3s06",
+       "img": "f18411c82842bcbdfb8de8084adc7cb4",
+       "min": 1,
+       "name": "Berghaltung",
+       "note": "Tadasana · nachspüren",
        "text": ""
       }
      ],
-     "title": "Test"
+     "title": "Aufwärmen"
+    },
+    {
+     "id": "v3b2",
+     "steps": [
+      {
+       "id": "v3s10",
+       "img": "adf9a209057a8ee1f844853abdc5ea2a",
+       "min": 2,
+       "name": "Krieger I dynamisch",
+       "note": "",
+       "text": ""
+      },
+      {
+       "id": "zgdbd333m37",
+       "img": "6a17ec9f7e9b0218f37ec19579d4e725",
+       "min": 1,
+       "name": "Leichtes Drehen",
+       "note": "mitschwingen der Arme",
+       "text": ""
+      },
+      {
+       "id": "v3s09",
+       "img": "97712605e691c9440d376cd771e1e807",
+       "min": 3,
+       "name": "Dreieck",
+       "note": "Yoga-Vidya-Variante",
+       "text": ""
+      },
+      {
+       "id": "v3s07",
+       "img": "35f2c99b619f6f3d99c475ccdbd2c7f2",
+       "min": 4,
+       "name": "Krieger II",
+       "note": "beide Seiten · angepasst · geringe Beugetiefe",
+       "text": ""
+      },
+      {
+       "id": "v3s11",
+       "img": "f18411c82842bcbdfb8de8084adc7cb4",
+       "min": 2,
+       "name": "Berghaltung",
+       "note": "Tadasana · nachspüren",
+       "text": ""
+      }
+     ],
+     "title": "Standpositionen"
+    },
+    {
+     "id": "v3b3",
+     "steps": [
+      {
+       "id": "v3s12",
+       "img": "231c6374fdd62f4daa98e3298912892d",
+       "min": 4,
+       "name": "Silvio-Mobilisation",
+       "note": "beide Seiten, mit Aufdrehen",
+       "text": "- Fuß ausgestellt\n- sanfte Drehung"
+      },
+      {
+       "id": "v3s13",
+       "img": "cdb9e8d1108f5f309cc30c27b37a3df3",
+       "min": 3,
+       "name": "Katze-Kuh",
+       "note": "",
+       "text": ""
+      },
+      {
+       "id": "v3s14",
+       "img": "e4cb4e76f859f070124011a368d5a98a",
+       "min": 4,
+       "name": "Reiter",
+       "note": "Hüftbeweglichkeits-Sequenz · beide Seiten",
+       "text": "- klein und unterpolstert\n- Schrittlänge klein wählen\n- hinteres Knie gut unterpolstern"
+      },
+      {
+       "id": "v3s15",
+       "img": "34c8bead0c3603758201931e4e356130",
+       "min": 3,
+       "name": "Weite Kindesposition",
+       "note": "Hüftbeweglichkeit",
+       "text": "- Becken sanft nach rechts und links bewegen"
+      },
+      {
+       "id": "v3s16",
+       "img": "fd912fdda6cbe77ddd5f9693c78917ae",
+       "min": 3,
+       "name": "Herabschauender Hund",
+       "note": "angepasst",
+       "text": "- Knie bleiben weich\n- Fersen müssen den Boden nicht erreichen"
+      }
+     ],
+     "title": "Vierfüßler und Hüftbeweglichkeit"
+    },
+    {
+     "id": "v3b4",
+     "steps": [
+      {
+       "id": "v3s21",
+       "img": "cf8128270d7a628b6e353dd4bc40783b",
+       "min": 3,
+       "name": "Becken kippen",
+       "note": "Rückenlage · klein und atemgeführt",
+       "text": ""
+      },
+      {
+       "id": "v3s17",
+       "img": "eedf88e5960324c7bac039bb28ebcd8f",
+       "min": 3,
+       "name": "Knie gegen Hand",
+       "note": "beide Seiten",
+       "text": "- Bauchwand gegen die Hände aktivieren\n- ein Knie gegen die Hand führen\n- Atem fließt normal weiter, ohne Pressen"
+      },
+      {
+       "id": "v3s18",
+       "img": "22ebb354efba2bce6ca6bbfb5af3a7f4",
+       "min": 3,
+       "name": "Ferse wegschieben",
+       "note": "beide Seiten",
+       "text": "- Hand und Knie diagonal sanft gegeneinander drücken\n- Atem fließt normal weiter, ohne Pressen"
+      },
+      {
+       "id": "v3s19",
+       "img": "eedf88e5960324c7bac039bb28ebcd8f",
+       "min": 2,
+       "name": "Diagonal",
+       "note": "Hand gegen Knie",
+       "text": ""
+      },
+      {
+       "id": "v3s20",
+       "img": "d0c4e0d896ff91d5ad2682db65bbc6ad",
+       "min": 3,
+       "name": "Schulterbrücke",
+       "note": "dynamisch · ruhige Atmung",
+       "text": ""
+      }
+     ],
+     "title": "Bauchmuskeln"
+    },
+    {
+     "id": "v3b5",
+     "steps": [
+      {
+       "id": "v3s22",
+       "img": "7251df41361609c665b8f793b62cf223",
+       "min": 3,
+       "name": "Apanasana",
+       "note": "Knie nach außen, halbes Happy Baby",
+       "text": ""
+      },
+      {
+       "id": "v3s23",
+       "img": "ac90db694c79a548eb80e8c7ff40cf53",
+       "min": 3,
+       "name": "Knie pendeln",
+       "note": "aufgestellte Knie sanft nach rechts und links",
+       "text": ""
+      },
+      {
+       "id": "v3s27",
+       "img": "59c4b26dde59671e8fb3eeaa807e2c85",
+       "min": 2,
+       "name": "Liegende Drehung",
+       "note": "mit weiten Beinen",
+       "text": ""
+      },
+      {
+       "id": "n5jjeab2i38",
+       "img": "c6b1048299b278afb3f018863860d493",
+       "min": 3,
+       "name": "Nadelöhr",
+       "note": "",
+       "text": ""
+      },
+      {
+       "id": "v3s25",
+       "img": "ff6d22fd72fb62fb9ca4a0de11d0fba0",
+       "min": 2,
+       "name": "Liegender Schmetterling",
+       "note": "Hüftbeweglichkeits-Sequenz · Knie bei Bedarf mit Polstern stützen",
+       "text": ""
+      }
+     ],
+     "title": "Rückenlage und Hüfte"
+    },
+    {
+     "id": "v3b6",
+     "steps": [
+      {
+       "id": "v3s28",
+       "img": "223647ff325049532c2e466e79a74b67",
+       "min": 2,
+       "name": "Atemübung",
+       "note": "",
+       "text": ""
+      },
+      {
+       "id": "v3s29",
+       "img": "8251143a188ffb73c1a4f0768888f35b",
+       "min": 10,
+       "name": "Savasana",
+       "note": "ruhige Atemwahrnehmung",
+       "text": ""
+      }
+     ],
+     "title": "Savasana"
     }
    ],
-   "end": "08:04",
-   "id": "test30s",
-   "name": "Test 30 s",
-   "start": "08:00"
+   "end": "20:15",
+   "id": "5geoemojc1",
+   "name": "VHS Stunde 3",
+   "start": "18:45"
   }
  ],
  "lib": [
   {
-   "id": "66e71a7a301389817a719a7a1b69b581",
-   "name": "drehsitz-ein-bein-gestreckt",
-   "file": "66e71a7a301389817a719a7a1b69b581.png"
-  },
-  {
-   "id": "33050b0659056343c1df75e96db790b1",
-   "name": "brett",
-   "file": "33050b0659056343c1df75e96db790b1.png"
+   "id": "aba4c8b1a67a39b654eb611b3d63af58",
+   "name": "bauchentspannungslage-stirn-auf-händen",
+   "file": "aba4c8b1a67a39b654eb611b3d63af58.png"
   },
   {
    "id": "7299fde9fbe4cc102ad56fe87d1b266b",
@@ -610,69 +843,9 @@
    "file": "7299fde9fbe4cc102ad56fe87d1b266b.png"
   },
   {
-   "id": "7251df41361609c665b8f793b62cf223",
-   "name": "pawanmuktasana",
-   "file": "7251df41361609c665b8f793b62cf223.png"
-  },
-  {
-   "id": "2e635244bbe989b1a4cdeddf660b7e5d",
-   "name": "schmetterling-baddha-konasana",
-   "file": "2e635244bbe989b1a4cdeddf660b7e5d.png"
-  },
-  {
-   "id": "d0c4e0d896ff91d5ad2682db65bbc6ad",
-   "name": "schulterbrücke",
-   "file": "d0c4e0d896ff91d5ad2682db65bbc6ad.png"
-  },
-  {
-   "id": "35f2c99b619f6f3d99c475ccdbd2c7f2",
-   "name": "krieger-ii",
-   "file": "35f2c99b619f6f3d99c475ccdbd2c7f2.png"
-  },
-  {
-   "id": "d8ddd404d4492eb958d355fcd10fd444",
-   "name": "gestreckter-seitlicher-winkel",
-   "file": "d8ddd404d4492eb958d355fcd10fd444.png"
-  },
-  {
-   "id": "f85877f2824096a270f5df3a70fafffc",
-   "name": "schiefe-ebene-purvottanasana",
-   "file": "f85877f2824096a270f5df3a70fafffc.png"
-  },
-  {
-   "id": "f18411c82842bcbdfb8de8084adc7cb4",
-   "name": "berghaltung",
-   "file": "f18411c82842bcbdfb8de8084adc7cb4.png"
-  },
-  {
-   "id": "8251143a188ffb73c1a4f0768888f35b",
-   "name": "shavasna",
-   "file": "8251143a188ffb73c1a4f0768888f35b.png"
-  },
-  {
-   "id": "97712605e691c9440d376cd771e1e807",
-   "name": "dreieck-yoga-vidya",
-   "file": "97712605e691c9440d376cd771e1e807.png"
-  },
-  {
-   "id": "653d86734bcfdc3fe957249d5d3dcf4e",
-   "name": "erdgebet",
-   "file": "653d86734bcfdc3fe957249d5d3dcf4e.png"
-  },
-  {
-   "id": "ec901cd51dc6ebff3b32d307a0059dbe",
-   "name": "sitzende-vorwärtsbeuge",
-   "file": "ec901cd51dc6ebff3b32d307a0059dbe.png"
-  },
-  {
-   "id": "a7af98808edcacf48575570b700e5f93",
-   "name": "tisch",
-   "file": "a7af98808edcacf48575570b700e5f93.png"
-  },
-  {
-   "id": "aba4c8b1a67a39b654eb611b3d63af58",
-   "name": "bauchentspannungslage-stirn-auf-händen",
-   "file": "aba4c8b1a67a39b654eb611b3d63af58.png"
+   "id": "a75d15dffef77cb6e76378dc81e050d8",
+   "name": "baum-leicht",
+   "file": "a75d15dffef77cb6e76378dc81e050d8.png"
   },
   {
    "id": "d9fbc856322747380ff6b90e7119d36e",
@@ -685,9 +858,54 @@
    "file": "f0a1ae2d320bfd59ecaf13f2bfb26a96.png"
   },
   {
+   "id": "69cae2c803619632c3e5475c09fe554b",
+   "name": "bequemer-sitz-muktasana",
+   "file": "69cae2c803619632c3e5475c09fe554b.png"
+  },
+  {
+   "id": "f18411c82842bcbdfb8de8084adc7cb4",
+   "name": "berghaltung",
+   "file": "f18411c82842bcbdfb8de8084adc7cb4.png"
+  },
+  {
+   "id": "346416a1b76d107ae845a6e6972445cd",
+   "name": "berghaltung-hände-hinter-kopf-ellbogen-oben",
+   "file": "346416a1b76d107ae845a6e6972445cd.png"
+  },
+  {
+   "id": "33050b0659056343c1df75e96db790b1",
+   "name": "brett",
+   "file": "33050b0659056343c1df75e96db790b1.png"
+  },
+  {
+   "id": "d8af76b2032dccf2eead2dc8d1153cb1",
+   "name": "bär-vierfüßlerstand-knie-angehoben",
+   "file": "d8af76b2032dccf2eead2dc8d1153cb1.png"
+  },
+  {
+   "id": "57a08de13148ba6a122af897c51e9fbf",
+   "name": "crunch-rechter-ellbogen-linkes-knie-schräg-hinten",
+   "file": "57a08de13148ba6a122af897c51e9fbf.png"
+  },
+  {
+   "id": "66e71a7a301389817a719a7a1b69b581",
+   "name": "drehsitz-ein-bein-gestreckt",
+   "file": "66e71a7a301389817a719a7a1b69b581.png"
+  },
+  {
    "id": "cc5c53e1166c61239982cd5eaef1a57f",
    "name": "dreieck-klassisch",
    "file": "cc5c53e1166c61239982cd5eaef1a57f.png"
+  },
+  {
+   "id": "97712605e691c9440d376cd771e1e807",
+   "name": "dreieck-yoga-vidya",
+   "file": "97712605e691c9440d376cd771e1e807.png"
+  },
+  {
+   "id": "1d12f657296e9411d2d5daac28166f12",
+   "name": "einbein-knie-arm-diagonal-gehoben",
+   "file": "1d12f657296e9411d2d5daac28166f12.png"
   },
   {
    "id": "6a90edb1a7fa275380f1ce7a9397547e",
@@ -695,9 +913,24 @@
    "file": "6a90edb1a7fa275380f1ce7a9397547e.png"
   },
   {
+   "id": "653d86734bcfdc3fe957249d5d3dcf4e",
+   "name": "erdgebet",
+   "file": "653d86734bcfdc3fe957249d5d3dcf4e.png"
+  },
+  {
+   "id": "d8ddd404d4492eb958d355fcd10fd444",
+   "name": "gestreckter-seitlicher-winkel",
+   "file": "d8ddd404d4492eb958d355fcd10fd444.png"
+  },
+  {
    "id": "661109b0a7564f3de4aef02df9e57b73",
    "name": "halbe-heuschrecke-linkes-bein",
    "file": "661109b0a7564f3de4aef02df9e57b73.png"
+  },
+  {
+   "id": "274089b06385094de17baf7784219a73",
+   "name": "halbes-happy-baby-ein-bein-gestreckt",
+   "file": "274089b06385094de17baf7784219a73.png"
   },
   {
    "id": "fd912fdda6cbe77ddd5f9693c78917ae",
@@ -720,6 +953,16 @@
    "file": "34c8bead0c3603758201931e4e356130.png"
   },
   {
+   "id": "1828ca8543f38f3f8dcfc046673d2e8f",
+   "name": "kleiner-bär-rückenlage-arme-beine-zur-decke",
+   "file": "1828ca8543f38f3f8dcfc046673d2e8f.png"
+  },
+  {
+   "id": "fd14099728a919c334290b61d77bf3ae",
+   "name": "kniestand-seitlich-zehen-aufgestellt",
+   "file": "fd14099728a919c334290b61d77bf3ae.png"
+  },
+  {
    "id": "cb1d06eb4e8b329e446b366a21e55324",
    "name": "kobra",
    "file": "cb1d06eb4e8b329e446b366a21e55324.png"
@@ -728,6 +971,11 @@
    "id": "adf9a209057a8ee1f844853abdc5ea2a",
    "name": "krieger-i-arme-über-kopf",
    "file": "adf9a209057a8ee1f844853abdc5ea2a.png"
+  },
+  {
+   "id": "35f2c99b619f6f3d99c475ccdbd2c7f2",
+   "name": "krieger-ii",
+   "file": "35f2c99b619f6f3d99c475ccdbd2c7f2.png"
   },
   {
    "id": "e401462db829434b3afbdd30a377584c",
@@ -745,6 +993,11 @@
    "file": "59c4b26dde59671e8fb3eeaa807e2c85.png"
   },
   {
+   "id": "ff6d22fd72fb62fb9ca4a0de11d0fba0",
+   "name": "liegender-schmetterling-rückenlage",
+   "file": "ff6d22fd72fb62fb9ca4a0de11d0fba0.png"
+  },
+  {
    "id": "c6b1048299b278afb3f018863860d493",
    "name": "nadelöhr-yin-yoga",
    "file": "c6b1048299b278afb3f018863860d493.png"
@@ -755,9 +1008,39 @@
    "file": "11d7934849e0bcc2c52c399759375f22.png"
   },
   {
+   "id": "7251df41361609c665b8f793b62cf223",
+   "name": "pawanmuktasana",
+   "file": "7251df41361609c665b8f793b62cf223.png"
+  },
+  {
+   "id": "a04a1de64333cb6b74569f5de196e8f3",
+   "name": "pawanmuktasana-teil-1",
+   "file": "a04a1de64333cb6b74569f5de196e8f3.png"
+  },
+  {
    "id": "62ceb0fb20244d2c3e6e9099b887b80b",
    "name": "pinguingang",
    "file": "62ceb0fb20244d2c3e6e9099b887b80b.png"
+  },
+  {
+   "id": "e4cb4e76f859f070124011a368d5a98a",
+   "name": "reiterposition-knie-abgelegt-hände-auf-knie",
+   "file": "e4cb4e76f859f070124011a368d5a98a.png"
+  },
+  {
+   "id": "eedf88e5960324c7bac039bb28ebcd8f",
+   "name": "rueckenlage-tischposition-arme-seitlich",
+   "file": "eedf88e5960324c7bac039bb28ebcd8f.png"
+  },
+  {
+   "id": "22ebb354efba2bce6ca6bbfb5af3a7f4",
+   "name": "rueckenlage-vorderes-bein-gestreckt",
+   "file": "22ebb354efba2bce6ca6bbfb5af3a7f4.png"
+  },
+  {
+   "id": "a9128b28328bda9139feffd7c2436106",
+   "name": "rückenlage-beine-aufgestellt-arme-neben-dem-körper",
+   "file": "a9128b28328bda9139feffd7c2436106.png"
   },
   {
    "id": "cf8128270d7a628b6e353dd4bc40783b",
@@ -765,14 +1048,84 @@
    "file": "cf8128270d7a628b6e353dd4bc40783b.png"
   },
   {
+   "id": "ac90db694c79a548eb80e8c7ff40cf53",
+   "name": "rückenlage-tisch-schräg",
+   "file": "ac90db694c79a548eb80e8c7ff40cf53.png"
+  },
+  {
+   "id": "f85877f2824096a270f5df3a70fafffc",
+   "name": "schiefe-ebene-purvottanasana",
+   "file": "f85877f2824096a270f5df3a70fafffc.png"
+  },
+  {
+   "id": "2e635244bbe989b1a4cdeddf660b7e5d",
+   "name": "schmetterling-baddha-konasana",
+   "file": "2e635244bbe989b1a4cdeddf660b7e5d.png"
+  },
+  {
+   "id": "223647ff325049532c2e466e79a74b67",
+   "name": "schneidersitz-aufrecht",
+   "file": "223647ff325049532c2e466e79a74b67.png"
+  },
+  {
+   "id": "d0c4e0d896ff91d5ad2682db65bbc6ad",
+   "name": "schulterbrücke",
+   "file": "d0c4e0d896ff91d5ad2682db65bbc6ad.png"
+  },
+  {
+   "id": "8251143a188ffb73c1a4f0768888f35b",
+   "name": "shavasna",
+   "file": "8251143a188ffb73c1a4f0768888f35b.png"
+  },
+  {
+   "id": "ec901cd51dc6ebff3b32d307a0059dbe",
+   "name": "sitzende-vorwärtsbeuge",
+   "file": "ec901cd51dc6ebff3b32d307a0059dbe.png"
+  },
+  {
    "id": "8fa56388c51d0c61c408054f7b2c0b13",
    "name": "sphinx",
    "file": "8fa56388c51d0c61c408054f7b2c0b13.png"
   },
   {
+   "id": "9a44993691ce0e848cc8a1ac14515a7d",
+   "name": "stand-t",
+   "file": "9a44993691ce0e848cc8a1ac14515a7d.png"
+  },
+  {
+   "id": "6a17ec9f7e9b0218f37ec19579d4e725",
+   "name": "standdrehung-arme-mitschwingend",
+   "file": "6a17ec9f7e9b0218f37ec19579d4e725.png"
+  },
+  {
    "id": "a002d55c4d53b5514fd4de298a6db909",
    "name": "standdrehung-arme-seitlich",
    "file": "a002d55c4d53b5514fd4de298a6db909.png"
+  },
+  {
+   "id": "6111fb0de6374fc0d65181387efc9242",
+   "name": "stehen-arme-nach-vorne-ausgestreckt",
+   "file": "6111fb0de6374fc0d65181387efc9242.png"
+  },
+  {
+   "id": "72afb0a5fb63da9bc60f3c85a0e8bc34",
+   "name": "stuhlpose-gefaltete-hände-schräg-vorne",
+   "file": "72afb0a5fb63da9bc60f3c85a0e8bc34.png"
+  },
+  {
+   "id": "462bc8eb960c42fecedb6db041ed44c4",
+   "name": "tiger-arm-bein-diagonal-gestreckt",
+   "file": "462bc8eb960c42fecedb6db041ed44c4.png"
+  },
+  {
+   "id": "d495d2574d4a8c091542ed935c7980af",
+   "name": "tiger-bein-gehoben",
+   "file": "d495d2574d4a8c091542ed935c7980af.png"
+  },
+  {
+   "id": "a7af98808edcacf48575570b700e5f93",
+   "name": "tisch",
+   "file": "a7af98808edcacf48575570b700e5f93.png"
   },
   {
    "id": "1add940426c195fd3701f7ffd7da9f74",
@@ -798,46 +1151,6 @@
    "id": "2a56ec1dcf13cc1b0b37e9996a113b5c",
    "name": "wirbelsäule-seitlich",
    "file": "2a56ec1dcf13cc1b0b37e9996a113b5c.png"
-  },
-  {
-   "id": "d8af76b2032dccf2eead2dc8d1153cb1",
-   "name": "bär-vierfüßlerstand-knie-angehoben",
-   "file": "d8af76b2032dccf2eead2dc8d1153cb1.png"
-  },
-  {
-   "id": "69cae2c803619632c3e5475c09fe554b",
-   "name": "bequemer-sitz-muktasana",
-   "file": "69cae2c803619632c3e5475c09fe554b.png"
-  },
-  {
-   "id": "1828ca8543f38f3f8dcfc046673d2e8f",
-   "name": "kleiner-bär-rückenlage-arme-beine-zur-decke",
-   "file": "1828ca8543f38f3f8dcfc046673d2e8f.png"
-  },
-  {
-   "id": "462bc8eb960c42fecedb6db041ed44c4",
-   "name": "tiger-arm-bein-diagonal-gestreckt",
-   "file": "462bc8eb960c42fecedb6db041ed44c4.png"
-  },
-  {
-   "id": "d495d2574d4a8c091542ed935c7980af",
-   "name": "tiger-bein-gehoben",
-   "file": "d495d2574d4a8c091542ed935c7980af.png"
-  },
-  {
-   "id": "346416a1b76d107ae845a6e6972445cd",
-   "name": "berghaltung-hände-hinter-kopf-ellbogen-oben",
-   "file": "346416a1b76d107ae845a6e6972445cd.png"
-  },
-  {
-   "id": "fd14099728a919c334290b61d77bf3ae",
-   "name": "kniestand-seitlich-zehen-aufgestellt",
-   "file": "fd14099728a919c334290b61d77bf3ae.png"
-  },
-  {
-   "id": "a75d15dffef77cb6e76378dc81e050d8",
-   "name": "baum-leicht",
-   "file": "a75d15dffef77cb6e76378dc81e050d8.png"
   }
  ]
 }
