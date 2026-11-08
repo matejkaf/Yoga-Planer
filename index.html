@@ -219,6 +219,7 @@ button:focus-visible, input:focus-visible, label:focus-within { outline: 3px sol
 .sq.txt { font-family: var(--font-display); font-weight: 700; color: var(--muted); }
 .sq.txt.on { color: var(--accent); border-color: var(--accent); }
 .sq.txt.open { background: var(--surface2); }
+img.flip { transform: scaleX(-1); }
 .addrow { display: flex; flex-wrap: wrap; gap: 8px; }
 
 /* image chooser */
@@ -432,7 +433,7 @@ button:focus-visible, input:focus-visible, label:focus-within { outline: 3px sol
       onSnapshot: function (f) { (subs[p] = subs[p] || []).push(f); setTimeout(function () { f(snap(p)); }, 0); return function () { subs[p] = (subs[p] || []).filter(function (x) { return x !== f; }); }; }
     };
   }
-  var BUILD = "9f50a793c2";
+  var BUILD = "453c632266";
   var status = { publishedAt: pub && pub.publishedAt, checkedAt: Date.now(), state: "checking", appUpdate: false, build: BUILD, manual: false }, swReg = null;
   /* compare the build id of the index.html on the server with the running one */
   function checkCode() {
@@ -531,14 +532,16 @@ button:focus-visible, input:focus-visible, label:focus-within { outline: 3px sol
       b.steps.forEach(function (s) {
         if (!s) return;
         var min = parseFloat(s.min);
-        steps.push({
+        var st1 = {
           id: String(s.id || uid()),
           name: String(s.name || "").trim() || "Übung",
           min: min > 0 ? min : 1,
           note: String(s.note || "").trim(),
           img: ID_RE.test(String(s.img || "")) ? String(s.img) : "",
           text: String(s.text || "").replace(/\r/g, "").replace(/\s+$/, "").slice(0, 4000)
-        });
+        };
+        if (s.flip === true && st1.img) st1.flip = true;
+        steps.push(st1);
       });
       if (steps.length) out.push({ id: String(b.id || uid()), title: String(b.title || "").trim(), steps: steps });
     });
@@ -549,7 +552,7 @@ button:focus-visible, input:focus-visible, label:focus-within { outline: 3px sol
     blocks.forEach(function (b) {
       var bMin = b.steps.reduce(function (a, x) { return a + x.min; }, 0);
       b.steps.forEach(function (s, i) {
-        f.push({ id: s.id, name: s.name, min: s.min, note: s.note, img: s.img, text: s.text || "", bTitle: b.title, si: i, bLen: b.steps.length, bMin: bMin });
+        f.push({ id: s.id, name: s.name, min: s.min, note: s.note, img: s.img, flip: !!s.flip, text: s.text || "", bTitle: b.title, si: i, bLen: b.steps.length, bMin: bMin });
       });
     });
     return f;
@@ -686,14 +689,14 @@ button:focus-visible, input:focus-visible, label:focus-within { outline: 3px sol
     }); });
     return trimCache[id];
   }
-  function setImg(im, id, onFail) {
-    im.style.visibility = "hidden";
+  function setImg(im, id, onFail, flip) {
+    im.style.visibility = "hidden"; if (flip) im.classList.add("flip");
     trimmed(id).then(function (u) { if (!u) { if (onFail) onFail(); return; } im.src = u; im.style.visibility = ""; });
   }
-  function thumbEl(imgId, cls, alt) {
+  function thumbEl(imgId, cls, alt, flip) {
     var t = el("span", "thumb " + (cls || ""));
     var im = document.createElement("img"); im.alt = alt || "";
-    setImg(im, imgId, function () { t.remove(); });
+    setImg(im, imgId, function () { t.remove(); }, flip);
     t.appendChild(im); return t;
   }
 
@@ -761,7 +764,7 @@ button:focus-visible, input:focus-visible, label:focus-within { outline: 3px sol
     var b = el("div", "nxb" + (small ? " small" : ""));
     if (!n) { b.appendChild(el("div", "nm", "Ende der Stunde")); return b; }
     if (n.bTitle && n.si === 0) b.appendChild(el("div", "eyebrow", n.bTitle));
-    if (n.img) b.appendChild(thumbEl(n.img, "", n.name));
+    if (n.img) b.appendChild(thumbEl(n.img, "", n.name, n.flip));
     else if (n.text) b.appendChild(mdBlock(n.text, "md-thumb"));
     var row = el("div", "nmrow");
     row.appendChild(fitWidth(el("div", "nm", n.name)));
@@ -786,7 +789,7 @@ button:focus-visible, input:focus-visible, label:focus-within { outline: 3px sol
         if (e.img) {
           pic.classList.add("both");
           var ib = el("div", "pic-img"), im2 = document.createElement("img"); im2.alt = e.name;
-          setImg(im2, e.img, function () { ib.remove(); pic.classList.remove("both"); });
+          setImg(im2, e.img, function () { ib.remove(); pic.classList.remove("both"); }, e.flip);
           ib.appendChild(im2); pic.appendChild(ib);
         }
         var md = mdBlock(e.text, "tl-md"); pic.appendChild(md); fitText(md);
@@ -797,7 +800,7 @@ button:focus-visible, input:focus-visible, label:focus-within { outline: 3px sol
         head.appendChild(nrow);
         if (e.note) head.appendChild(el("p", "note", e.note));
         var im = document.createElement("img"); im.alt = e.name;
-        setImg(im, e.img, function () { pic.textContent = ""; pic.appendChild(textTile(e)); });
+        setImg(im, e.img, function () { pic.textContent = ""; pic.appendChild(textTile(e)); }, e.flip);
         pic.appendChild(im);
       } else pic.appendChild(textTile(e));
 
@@ -835,7 +838,7 @@ button:focus-visible, input:focus-visible, label:focus-within { outline: 3px sol
       var btn = el("button", "item" + (isCur ? " cur" : "") + (f >= 1 ? " past" : "")); btn.type = "button";
       if (!isCur && f > 0 && f < 1) btn.style.background = shade("to right", f, "transparent");
       btn.appendChild(el("span", "n", String(i + 1)));
-      if (e.img) btn.appendChild(thumbEl(e.img, "", ""));
+      if (e.img) btn.appendChild(thumbEl(e.img, "", "", e.flip));
       btn.appendChild(el("span", "t", e.name));
       btn.appendChild(el("span", "d", fmtMin(e.min)));
       btn.addEventListener("click", function () { closeDrawer(); go(i); });
@@ -962,14 +965,14 @@ button:focus-visible, input:focus-visible, label:focus-within { outline: 3px sol
       if (e.img) {
         pic.classList.add("both");
         var ib = el("div", "pic-img"), im2 = document.createElement("img"); im2.alt = e.name;
-        setImg(im2, e.img, function () { ib.remove(); pic.classList.remove("both"); });
+        setImg(im2, e.img, function () { ib.remove(); pic.classList.remove("both"); }, e.flip);
         ib.appendChild(im2); pic.appendChild(ib);
       }
       var md = mdBlock(e.text, "sc-md"); pic.appendChild(md);
     }
     else if (e.img) {
       var im = document.createElement("img"); im.alt = e.name;
-      setImg(im, e.img, function () { pic.textContent = ""; pic.appendChild(fitWidth(el("div", "sc-bigname", e.name))); });
+      setImg(im, e.img, function () { pic.textContent = ""; pic.appendChild(fitWidth(el("div", "sc-bigname", e.name))); }, e.flip);
       pic.appendChild(im);
     } else pic.appendChild(fitWidth(el("div", "sc-bigname", e.name)));
     var info = el("div", "sc-info");
@@ -1167,10 +1170,11 @@ button:focus-visible, input:focus-visible, label:focus-within { outline: 3px sol
       b.steps.forEach(function (s, si) {
         var r = el("div", "srow");
         var pic = el("button", "pic"); pic.type = "button"; pic.setAttribute("aria-label", "Bild wählen");
-        if (s.img) { var im = document.createElement("img"); im.alt = ""; setImg(im, s.img, function () { pic.textContent = "Bild"; }); pic.appendChild(im); }
+        if (s.img) { var im = document.createElement("img"); im.alt = ""; setImg(im, s.img, function () { pic.textContent = "Bild"; }, s.flip); pic.appendChild(im); }
         else pic.textContent = assetsApi && libDoc ? "+ Bild" : "Bild";
         pic.addEventListener("click", function () { if (assetsApi && libDoc || lib.length) openChooser("pick", s); });
         r.appendChild(pic);
+        r.appendChild(sqBtn("⇋", s.flip ? "Spiegelung aufheben" : "Bild horizontal spiegeln", function () { s.flip = !s.flip; renderEditor(); }, "txt" + (s.flip ? " on" : ""), !s.img));
         r.appendChild(textField("nm", s.name, "Übung", function (v) { s.name = v; }));
         var mn = el("input", "field mn"); mn.type = "text"; mn.inputMode = "decimal"; mn.value = String(s.min).replace(".", ","); mn.setAttribute("aria-label", "Minuten"); mn.title = "Minuten";
         mn.addEventListener("input", function () { var v = parseFloat(mn.value.replace(",", ".")); s.min = v > 0 ? v : 0; updSum(); });
@@ -1392,7 +1396,8 @@ button:focus-visible, input:focus-visible, label:focus-within { outline: 3px sol
     });
   }
   /* image as JPEG data URL on white, at most 360 px, plus its aspect ratio */
-  function pdfImage(id) {
+  function pdfImage(key) {
+    var id = key.split("|")[0], flip = key.indexOf("|f") > 0;
     return trimmed(id).then(function (u) {
       if (!u) return null;
       return new Promise(function (ok) {
@@ -1401,7 +1406,7 @@ button:focus-visible, input:focus-visible, label:focus-within { outline: 3px sol
           try {
             var s = Math.min(1, 360 / Math.max(im.naturalWidth, im.naturalHeight));
             var c = document.createElement("canvas"); c.width = Math.max(1, Math.round(im.naturalWidth * s)); c.height = Math.max(1, Math.round(im.naturalHeight * s));
-            var cx = c.getContext("2d"); cx.fillStyle = "#fff"; cx.fillRect(0, 0, c.width, c.height); cx.drawImage(im, 0, 0, c.width, c.height);
+            var cx = c.getContext("2d"); cx.fillStyle = "#fff"; cx.fillRect(0, 0, c.width, c.height); if (flip) { cx.translate(c.width, 0); cx.scale(-1, 1); } cx.drawImage(im, 0, 0, c.width, c.height);
             ok({ url: c.toDataURL("image/jpeg", 0.85), r: c.width / c.height });
           } catch (e) { ok(null); }
         };
@@ -1416,7 +1421,8 @@ button:focus-visible, input:focus-visible, label:focus-within { outline: 3px sol
     pdfBusy = true; var btn = $("pdf-btn"); btn.disabled = true; btn.textContent = "PDF …";
     try {
       var JsPdf = await loadJsPdf();
-      var ids = []; flat.forEach(function (e) { if (e.img && ids.indexOf(e.img) < 0) ids.push(e.img); });
+      function imgKey(x) { return x.img ? x.img + (x.flip ? "|f" : "") : ""; }
+      var ids = []; flat.forEach(function (e) { var k = imgKey(e); if (k && ids.indexOf(k) < 0) ids.push(k); });
       var imgs = {}; (await Promise.all(ids.map(pdfImage))).forEach(function (x, i) { imgs[ids[i]] = x; });
       var sch = schedule(), plan = flat.reduce(function (a, x) { return a + x.min; }, 0);
       var doc = new JsPdf({ unit: "mm", format: "a4" }), W = 210, H = 297, M = 15, y = M;
@@ -1454,9 +1460,9 @@ button:focus-visible, input:focus-visible, label:focus-within { outline: 3px sol
           doc.setFont("helvetica", "normal"); doc.setFontSize(9.5);
           var noteL = s.note ? wrap(s.note, TW) : [];
           var textL = []; mdPlain(s.text).forEach(function (t) { if (t.trim()) textL = textL.concat(wrap(t, TW)); });
-          var h = Math.max(s.img && imgs[s.img] ? TH : 0, nameL.length * 5.2 + noteL.length * 4.2 + textL.length * 4.2 + 2) + 4;
+          var h = Math.max(s.img && imgs[imgKey(s)] ? TH : 0, nameL.length * 5.2 + noteL.length * 4.2 + textL.length * 4.2 + 2) + 4;
           need(h);
-          var im = s.img && imgs[s.img];
+          var im = s.img && imgs[imgKey(s)];
           if (im) {
             var iw = TH, ih = TH; if (im.r > 1) ih = TH / im.r; else iw = TH * im.r;
             doc.addImage(im.url, "JPEG", M + (TH - iw) / 2, y + (TH - ih) / 2, iw, ih);
