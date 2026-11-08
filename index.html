@@ -433,7 +433,7 @@ img.flip { transform: scaleX(-1); }
       onSnapshot: function (f) { (subs[p] = subs[p] || []).push(f); setTimeout(function () { f(snap(p)); }, 0); return function () { subs[p] = (subs[p] || []).filter(function (x) { return x !== f; }); }; }
     };
   }
-  var BUILD = "453c632266";
+  var BUILD = "da824ad667";
   var status = { publishedAt: pub && pub.publishedAt, checkedAt: Date.now(), state: "checking", appUpdate: false, build: BUILD, manual: false }, swReg = null;
   /* compare the build id of the index.html on the server with the running one */
   function checkCode() {
@@ -988,7 +988,7 @@ img.flip { transform: scaleX(-1); }
   }
   function renderScroll() {
     var list = $("sc-list");
-    var key = curId + "|" + JSON.stringify(flat.map(function (e) { return [e.id, e.name, e.img, e.text, e.note, e.min, e.bTitle]; }));
+    var key = curId + "|" + JSON.stringify(flat.map(function (e) { return [e.id, e.name, e.img, e.flip, e.text, e.note, e.min, e.bTitle]; }));
     if (key !== scKey) {
       scKey = key; list.textContent = "";
       scItems = flat.map(function (e, i) { var it = scItem(e, i); list.appendChild(it); return it; });
