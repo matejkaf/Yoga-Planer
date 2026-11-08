@@ -271,7 +271,7 @@ img.flip { transform: scaleX(-1); }
 .sc-info .eyebrow { color: var(--tile-ink); }
 .sc-name { font-family: var(--font-display); font-weight: 700; font-size: clamp(2.4rem, 7.8vh, 4.3rem); line-height: 1.05; overflow-wrap: break-word; min-width: 0; }
 .sc-dur { font-family: var(--font-mono); color: var(--tile-ink); font-size: clamp(0.9rem, 2.2vh, 1.2rem); }
-.sc-note { margin: 0; color: var(--tile-ink); font-size: clamp(1rem, 2.4vh, 1.25rem); }
+.sc-note { margin: 0; color: var(--tile-ink); font-size: clamp(1.05rem, 2.6vh, 1.4rem); }
 .sc-pend { position: absolute; left: 0; right: 0; bottom: 0; height: 6px; background: transparent; }
 .sc-pend > i { display: block; height: 100%; width: 0; background: var(--accent); }
 .sc-item.pending .sc-pend { background: #e2e5ee; }
@@ -285,7 +285,6 @@ img.flip { transform: scaleX(-1); }
 @media (max-width: 760px), (orientation: portrait) {
   .sc-item { grid-template-columns: 1fr; grid-template-rows: minmax(0, 1fr) auto; gap: 8px; }
   .sc-info { justify-content: flex-start; }
-  .sc-note { display: none; }
   .sc-hud { max-width: 60%; }
 }
 @media (prefers-reduced-motion: reduce) { .sc-item { transition: none; } }
@@ -433,7 +432,7 @@ img.flip { transform: scaleX(-1); }
       onSnapshot: function (f) { (subs[p] = subs[p] || []).push(f); setTimeout(function () { f(snap(p)); }, 0); return function () { subs[p] = (subs[p] || []).filter(function (x) { return x !== f; }); }; }
     };
   }
-  var BUILD = "da824ad667";
+  var BUILD = "bf94b3ec00";
   var status = { publishedAt: pub && pub.publishedAt, checkedAt: Date.now(), state: "checking", appUpdate: false, build: BUILD, manual: false }, swReg = null;
   /* compare the build id of the index.html on the server with the running one */
   function checkCode() {
