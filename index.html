@@ -432,7 +432,7 @@ img.flip { transform: scaleX(-1); }
       onSnapshot: function (f) { (subs[p] = subs[p] || []).push(f); setTimeout(function () { f(snap(p)); }, 0); return function () { subs[p] = (subs[p] || []).filter(function (x) { return x !== f; }); }; }
     };
   }
-  var BUILD = "cc7a342ac7";
+  var BUILD = "6776f871f1";
   var status = { publishedAt: pub && pub.publishedAt, checkedAt: Date.now(), state: "checking", appUpdate: false, build: BUILD, manual: false }, swReg = null;
   /* compare the build id of the index.html on the server with the running one */
   function checkCode() {
@@ -1186,6 +1186,7 @@ img.flip { transform: scaleX(-1); }
         r.appendChild(sqBtn("T", txShown ? "Text ausblenden" : (hasTx ? "Text einblenden (vorhanden)" : "Text einblenden"), function () { txOpen[s.id] = !txShown; renderEditor(); }, "txt" + (hasTx ? " on" : "") + (txShown ? " open" : "")));
         tx.spellcheck = false; tx.setAttribute("aria-label", "Text statt Bild");
         tx.addEventListener("input", function () { s.text = tx.value; });
+        r.appendChild(sqBtn("⧉", "Übung duplizieren", function () { var c = clone(s); c.id = uid(); b.steps.splice(si + 1, 0, c); renderEditor(); }));
         r.appendChild(sqBtn("↑", si === 0 ? "In die vorige Sequenz verschieben" : "Übung nach oben", function () { moveStep(bi, si, -1); }, "", bi === 0 && si === 0));
         r.appendChild(sqBtn("↓", si === b.steps.length - 1 ? "In die nächste Sequenz verschieben" : "Übung nach unten", function () { moveStep(bi, si, 1); }, "", bi === draft.length - 1 && si === b.steps.length - 1));
         r.appendChild(sqBtn("✕", "Übung löschen", function () { b.steps.splice(si, 1); if (!b.steps.length) draft.splice(bi, 1); renderEditor(); }, "del"));
