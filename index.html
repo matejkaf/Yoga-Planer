@@ -315,6 +315,7 @@ img.flip { transform: scaleX(-1); }
 .ro #edit-btn, .ro #pdf-btn, .ro #lesson-new, .ro #lesson-dup, .ro .lrow .ldel, .ro #no-such-btn { display: none !important; }
 @media (prefers-reduced-motion: reduce) { .bar > i, .total-bar > i { transition: none; } .flash.on { animation-duration: 0.01s; } }
 </style>
+<style>/* keep the page itself from scrolling: iPadOS fades scrolled page content under the status bar */ html, body { overflow: hidden; overscroll-behavior: none; }</style>
 </head>
 <body>
 
@@ -433,7 +434,7 @@ img.flip { transform: scaleX(-1); }
       onSnapshot: function (f) { (subs[p] = subs[p] || []).push(f); setTimeout(function () { f(snap(p)); }, 0); return function () { subs[p] = (subs[p] || []).filter(function (x) { return x !== f; }); }; }
     };
   }
-  var BUILD = "7f29ed0840";
+  var BUILD = "2d83ebeb99";
   var status = { publishedAt: pub && pub.publishedAt, checkedAt: Date.now(), state: "checking", appUpdate: false, build: BUILD, manual: false }, swReg = null;
   /* compare the build id of the index.html on the server with the running one */
   function checkCode() {
