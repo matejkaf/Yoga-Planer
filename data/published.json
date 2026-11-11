@@ -1,6 +1,6 @@
 {
  "v": 1,
- "publishedAt": "2026-11-11T18:44:40Z",
+ "publishedAt": "2026-11-11T19:06:10Z",
  "lessons": [
   {
    "blocks": [
@@ -1106,7 +1106,7 @@
        "min": 1,
        "name": "Gräser im Wind",
        "note": "Sitz, Beine angewinkelt, auf Arme gestützt",
-       "text": "Knie pendlen von links nach rechts und zurück"
+       "text": ""
       },
       {
        "id": "v4s12",
@@ -1279,7 +1279,7 @@
        "min": 3,
        "name": "Knie kreisen",
        "note": "",
-       "text": "- Bauchwand gegen die Hände aktivieren\n- ein Knie gegen die Hand führen\n- Atem fließt normal weiter, ohne Pressen"
+       "text": ""
       },
       {
        "id": "v4s30",
@@ -1287,7 +1287,7 @@
        "min": 3,
        "name": "Ferse wegschieben",
        "note": "abwechseln l/r",
-       "text": "- Hand und Knie diagonal sanft gegeneinander drücken\n- Atem fließt normal weiter, ohne Pressen"
+       "text": ""
       },
       {
        "id": "v4s31",
