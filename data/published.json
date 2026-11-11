@@ -1,6 +1,6 @@
 {
  "v": 1,
- "publishedAt": "2026-11-05T12:58:56Z",
+ "publishedAt": "2026-11-11T18:31:59Z",
  "lessons": [
   {
    "blocks": [
@@ -829,9 +829,541 @@
    "id": "5geoemojc1",
    "name": "VHS Stunde 3",
    "start": "18:45"
+  },
+  {
+   "blocks": [
+    {
+     "id": "kpb1",
+     "steps": [
+      {
+       "id": "kp01",
+       "img": "1413396da01ea0638886b1197ff40091",
+       "min": 0.5,
+       "name": "Gräser im Wind",
+       "note": "Sitz, Beine angewinkelt, auf Arme gestützt",
+       "text": "Knie pendlen von links nach rechts und zurück"
+      },
+      {
+       "id": "kp02",
+       "img": "5044a950adae69e06d6b9679d813d0de",
+       "min": 0.5,
+       "name": "Einbeinige Vorbeuge",
+       "note": "rechts",
+       "text": ""
+      },
+      {
+       "flip": true,
+       "id": "jvo7rwgwz1",
+       "img": "5044a950adae69e06d6b9679d813d0de",
+       "min": 0.5,
+       "name": "Einbeinige Vorbeuge",
+       "note": "links",
+       "text": ""
+      },
+      {
+       "id": "kp03",
+       "img": "f2a998ed147be3eeaf38fda994ff1ff1",
+       "min": 0.5,
+       "name": "Schmetterling",
+       "note": "",
+       "text": ""
+      }
+     ],
+     "title": "Sitz"
+    },
+    {
+     "id": "kpb2",
+     "steps": [
+      {
+       "id": "kp04",
+       "img": "2e0e57e8268e390f1503c07594abf80c",
+       "min": 0.5,
+       "name": "Rückenlage",
+       "note": "ankommen",
+       "text": ""
+      },
+      {
+       "id": "kp05",
+       "img": "598d71fa681cda1dc2565e63c201f2e7",
+       "min": 0.5,
+       "name": "Apanasana",
+       "note": "rechts · linkes Bein lang ausgestreckt",
+       "text": ""
+      },
+      {
+       "id": "kp06",
+       "img": "0b21def9acbf731e878b0c2f4aded162",
+       "min": 0.5,
+       "name": "Hüftadduktoren",
+       "note": "Bein nach rechts sinken lassen · linken Arm ausstrecken",
+       "text": ""
+      },
+      {
+       "id": "0nlkmxzsn2",
+       "img": "0899b6ab5cf9c6485de26cce22d8c4b0",
+       "min": 0.5,
+       "name": "Liegende Drehung",
+       "note": "Bein auf die linke Seite · linken Arm ausstrecken · Hüfte \"gestapelt\"",
+       "text": ""
+      },
+      {
+       "id": "kp07",
+       "img": "bc883d1c69d67a260dc9b15092b6fcb9",
+       "min": 0.5,
+       "name": "Halbes Happy Baby",
+       "note": "rechts · linkes Bein aufgestellt",
+       "text": ""
+      },
+      {
+       "id": "kp08",
+       "img": "b0f01e90fc763c6dafed386b43a72b01",
+       "min": 0.5,
+       "name": "Beinrückseite dehnen",
+       "note": "rechts · Bein senkrecht nach oben",
+       "text": ""
+      }
+     ],
+     "title": "Rückenlage – rechte Seite"
+    },
+    {
+     "id": "kpb3",
+     "steps": [
+      {
+       "flip": true,
+       "id": "kp09",
+       "img": "598d71fa681cda1dc2565e63c201f2e7",
+       "min": 0.5,
+       "name": "Apanasana",
+       "note": "links · rechtes Bein lang ausgestreckt",
+       "text": ""
+      },
+      {
+       "flip": true,
+       "id": "yu5y4pvf04",
+       "img": "0b21def9acbf731e878b0c2f4aded162",
+       "min": 0.5,
+       "name": "Hüftadduktoren",
+       "note": "Bein nach links sinken lassen · rechten Arm ausstrecken",
+       "text": ""
+      },
+      {
+       "flip": true,
+       "id": "6m3lep5kw3",
+       "img": "0899b6ab5cf9c6485de26cce22d8c4b0",
+       "min": 0.5,
+       "name": "Liegende Drehung",
+       "note": "Bein auf die rechte Seite · rechten Arm ausstrecken· Hüfte \"gestapelt\"",
+       "text": ""
+      },
+      {
+       "flip": true,
+       "id": "kp11",
+       "img": "bc883d1c69d67a260dc9b15092b6fcb9",
+       "min": 0.5,
+       "name": "Halbes Happy Baby",
+       "note": "links · rechtes Bein aufgestellt",
+       "text": ""
+      },
+      {
+       "id": "kp12",
+       "img": "b85bbaff47aed113fc46fdbd5e84211c",
+       "min": 0.5,
+       "name": "Beinrückseite dehnen",
+       "note": "links · Bein senkrecht nach oben",
+       "text": ""
+      }
+     ],
+     "title": "Rückenlage – linke Seite"
+    },
+    {
+     "id": "kpb4",
+     "steps": [
+      {
+       "id": "kp13",
+       "img": "ee2769e56cd3c8c5717b821065311021",
+       "min": 0.5,
+       "name": "Yoga-Paket",
+       "note": "beide Knie zur Brust",
+       "text": ""
+      },
+      {
+       "id": "kp14",
+       "img": "090c6b754c87632ef9b717c596d188d5",
+       "min": 0.5,
+       "name": "Beine kreisen",
+       "note": "Rückenmassage",
+       "text": ""
+      }
+     ],
+     "title": "Abschluss"
+    }
+   ],
+   "end": "",
+   "id": "kurzhuefte",
+   "name": "Kurz-Praxis Hüftbeweglichkeit",
+   "start": ""
+  },
+  {
+   "blocks": [
+    {
+     "id": "v4b1",
+     "steps": [
+      {
+       "id": "v4s01",
+       "img": "69cae2c803619632c3e5475c09fe554b",
+       "min": 2,
+       "name": "Ankommen",
+       "note": "gemeinsamer Atemzug",
+       "text": ""
+      },
+      {
+       "id": "v4s02",
+       "img": "62ceb0fb20244d2c3e6e9099b887b80b",
+       "min": 2,
+       "name": "Pinguingang",
+       "note": "",
+       "text": ""
+      },
+      {
+       "id": "v4s03",
+       "img": "6a90edb1a7fa275380f1ce7a9397547e",
+       "min": 2,
+       "name": "Beine und Arme heben",
+       "note": "abwechselnd",
+       "text": ""
+      },
+      {
+       "id": "v4s04",
+       "img": "adf9a209057a8ee1f844853abdc5ea2a",
+       "min": 5,
+       "name": "Krieger I",
+       "note": "beide Seiten · dynamische Aufwärmsequenz",
+       "text": ""
+      },
+      {
+       "id": "v4s05",
+       "img": "346416a1b76d107ae845a6e6972445cd",
+       "min": 2,
+       "name": "Hände Kopf ↔ Nieren",
+       "note": "Handrücken, Guy",
+       "text": ""
+      },
+      {
+       "id": "v4s06",
+       "img": "2a56ec1dcf13cc1b0b37e9996a113b5c",
+       "min": 4,
+       "name": "Wirbelsäule bewegen",
+       "note": "in vier Richtungen",
+       "text": ""
+      },
+      {
+       "id": "v4s07",
+       "img": "f18411c82842bcbdfb8de8084adc7cb4",
+       "min": 1,
+       "name": "Berghaltung",
+       "note": "Tadasana · nachspüren",
+       "text": ""
+      }
+     ],
+     "title": "Aufwärmen im Stehen"
+    },
+    {
+     "id": "v4b2",
+     "steps": [
+      {
+       "id": "v4s08",
+       "img": "35f2c99b619f6f3d99c475ccdbd2c7f2",
+       "min": 5,
+       "name": "Krieger II",
+       "note": "beide Seiten",
+       "text": ""
+      },
+      {
+       "id": "v4s09",
+       "img": "a75d15dffef77cb6e76378dc81e050d8",
+       "min": 3,
+       "name": "Baum",
+       "note": "beide Seiten",
+       "text": ""
+      },
+      {
+       "id": "v4s10",
+       "img": "11d7934849e0bcc2c52c399759375f22",
+       "min": 2,
+       "name": "Pavanmuktasana stehend",
+       "note": "beide Seiten",
+       "text": ""
+      }
+     ],
+     "title": "Standpositionen"
+    },
+    {
+     "id": "v4b3",
+     "steps": [
+      {
+       "id": "v4s11",
+       "img": "1413396da01ea0638886b1197ff40091",
+       "min": 1,
+       "name": "Gräser im Wind",
+       "note": "Sitz, Beine angewinkelt, auf Arme gestützt",
+       "text": "Knie pendlen von links nach rechts und zurück"
+      },
+      {
+       "id": "v4s12",
+       "img": "5044a950adae69e06d6b9679d813d0de",
+       "min": 1,
+       "name": "Einbeinige Vorbeuge",
+       "note": "rechts",
+       "text": ""
+      },
+      {
+       "flip": true,
+       "id": "v4s13",
+       "img": "5044a950adae69e06d6b9679d813d0de",
+       "min": 1,
+       "name": "Einbeinige Vorbeuge",
+       "note": "links",
+       "text": ""
+      },
+      {
+       "id": "v4s14",
+       "img": "f2a998ed147be3eeaf38fda994ff1ff1",
+       "min": 1,
+       "name": "Schmetterling",
+       "note": "",
+       "text": ""
+      }
+     ],
+     "title": "Sitz"
+    },
+    {
+     "id": "v4b4",
+     "steps": [
+      {
+       "id": "v4s15",
+       "img": "2e0e57e8268e390f1503c07594abf80c",
+       "min": 1,
+       "name": "Rückenlage",
+       "note": "ankommen",
+       "text": ""
+      },
+      {
+       "id": "v4s16",
+       "img": "598d71fa681cda1dc2565e63c201f2e7",
+       "min": 1,
+       "name": "Apanasana",
+       "note": "rechts · linkes Bein lang ausgestreckt",
+       "text": ""
+      },
+      {
+       "id": "v4s17",
+       "img": "0b21def9acbf731e878b0c2f4aded162",
+       "min": 1,
+       "name": "Hüftadduktoren",
+       "note": "Bein nach rechts sinken lassen · linken Arm ausstrecken",
+       "text": ""
+      },
+      {
+       "id": "v4s18",
+       "img": "0899b6ab5cf9c6485de26cce22d8c4b0",
+       "min": 1,
+       "name": "Liegende Drehung",
+       "note": "Bein auf die linke Seite · linken Arm ausstrecken · Hüfte \"gestapelt\"",
+       "text": ""
+      },
+      {
+       "id": "v4s19",
+       "img": "bc883d1c69d67a260dc9b15092b6fcb9",
+       "min": 1,
+       "name": "Halbes Happy Baby",
+       "note": "rechts · linkes Bein aufgestellt",
+       "text": ""
+      },
+      {
+       "id": "v4s20",
+       "img": "b0f01e90fc763c6dafed386b43a72b01",
+       "min": 1,
+       "name": "Beinrückseite dehnen",
+       "note": "rechts · Bein senkrecht nach oben",
+       "text": ""
+      }
+     ],
+     "title": "Rückenlage – rechte Seite"
+    },
+    {
+     "id": "v4b5",
+     "steps": [
+      {
+       "flip": true,
+       "id": "v4s21",
+       "img": "598d71fa681cda1dc2565e63c201f2e7",
+       "min": 1,
+       "name": "Apanasana",
+       "note": "links · rechtes Bein lang ausgestreckt",
+       "text": ""
+      },
+      {
+       "flip": true,
+       "id": "v4s22",
+       "img": "0b21def9acbf731e878b0c2f4aded162",
+       "min": 1,
+       "name": "Hüftadduktoren",
+       "note": "Bein nach links sinken lassen · rechten Arm ausstrecken",
+       "text": ""
+      },
+      {
+       "flip": true,
+       "id": "v4s23",
+       "img": "0899b6ab5cf9c6485de26cce22d8c4b0",
+       "min": 1,
+       "name": "Liegende Drehung",
+       "note": "Bein auf die rechte Seite · rechten Arm ausstrecken· Hüfte \"gestapelt\"",
+       "text": ""
+      },
+      {
+       "flip": true,
+       "id": "v4s24",
+       "img": "bc883d1c69d67a260dc9b15092b6fcb9",
+       "min": 1,
+       "name": "Halbes Happy Baby",
+       "note": "links · rechtes Bein aufgestellt",
+       "text": ""
+      },
+      {
+       "id": "v4s25",
+       "img": "b85bbaff47aed113fc46fdbd5e84211c",
+       "min": 1,
+       "name": "Beinrückseite dehnen",
+       "note": "links · Bein senkrecht nach oben",
+       "text": ""
+      }
+     ],
+     "title": "Rückenlage – linke Seite"
+    },
+    {
+     "id": "v4b6",
+     "steps": [
+      {
+       "id": "v4s26",
+       "img": "ee2769e56cd3c8c5717b821065311021",
+       "min": 1,
+       "name": "Yoga-Paket",
+       "note": "beide Knie zur Brust",
+       "text": ""
+      },
+      {
+       "id": "v4s27",
+       "img": "090c6b754c87632ef9b717c596d188d5",
+       "min": 1,
+       "name": "Beine kreisen",
+       "note": "Rückenmassage",
+       "text": ""
+      }
+     ],
+     "title": "Abschluss"
+    },
+    {
+     "id": "v4b7",
+     "steps": [
+      {
+       "id": "v4s28",
+       "img": "cf8128270d7a628b6e353dd4bc40783b",
+       "min": 3,
+       "name": "Becken kippen",
+       "note": "Rückenlage · klein und atemgeführt",
+       "text": ""
+      },
+      {
+       "id": "v4s29",
+       "img": "eedf88e5960324c7bac039bb28ebcd8f",
+       "min": 3,
+       "name": "Knie kreisen",
+       "note": "",
+       "text": "- Bauchwand gegen die Hände aktivieren\n- ein Knie gegen die Hand führen\n- Atem fließt normal weiter, ohne Pressen"
+      },
+      {
+       "id": "v4s30",
+       "img": "22ebb354efba2bce6ca6bbfb5af3a7f4",
+       "min": 3,
+       "name": "Ferse wegschieben",
+       "note": "abwechseln l/r",
+       "text": "- Hand und Knie diagonal sanft gegeneinander drücken\n- Atem fließt normal weiter, ohne Pressen"
+      },
+      {
+       "id": "v4s31",
+       "img": "eedf88e5960324c7bac039bb28ebcd8f",
+       "min": 2,
+       "name": "Pinguin",
+       "note": "",
+       "text": ""
+      },
+      {
+       "id": "v4s32",
+       "img": "d0c4e0d896ff91d5ad2682db65bbc6ad",
+       "min": 3,
+       "name": "Schulterbrücke",
+       "note": "dynamisch · ruhige Atmung",
+       "text": ""
+      }
+     ],
+     "title": "Bauchmuskeln"
+    },
+    {
+     "id": "v4bsav",
+     "steps": [
+      {
+       "id": "v4sav0",
+       "img": "223647ff325049532c2e466e79a74b67",
+       "min": 3,
+       "name": "Bauchatmung",
+       "note": "",
+       "text": ""
+      },
+      {
+       "id": "9dud9mtqr2",
+       "img": "223647ff325049532c2e466e79a74b67",
+       "min": 3,
+       "name": "Kapalabati",
+       "note": "",
+       "text": ""
+      },
+      {
+       "id": "850almt951",
+       "img": "223647ff325049532c2e466e79a74b67",
+       "min": 3,
+       "name": "2-stufige Einatmung",
+       "note": "durch Mund aus",
+       "text": ""
+      },
+      {
+       "id": "v4sav1",
+       "img": "8251143a188ffb73c1a4f0768888f35b",
+       "min": 10,
+       "name": "Savasana",
+       "note": "ruhige Atemwahrnehmung",
+       "text": ""
+      }
+     ],
+     "title": "Savasana"
+    }
+   ],
+   "end": "20:15",
+   "id": "vhs4",
+   "name": "VHS Stunde 4",
+   "start": "18:45"
   }
  ],
  "lib": [
+  {
+   "id": "ee2769e56cd3c8c5717b821065311021",
+   "name": "apanasana-beide-knie-zur-brust",
+   "file": "ee2769e56cd3c8c5717b821065311021.png"
+  },
+  {
+   "id": "598d71fa681cda1dc2565e63c201f2e7",
+   "name": "apanasana-rechtes-knie-zur-brust",
+   "file": "598d71fa681cda1dc2565e63c201f2e7.png"
+  },
   {
    "id": "aba4c8b1a67a39b654eb611b3d63af58",
    "name": "bauchentspannungslage-stirn-auf-händen",
@@ -851,6 +1383,16 @@
    "id": "d9fbc856322747380ff6b90e7119d36e",
    "name": "beine-arme-gegenläufig-heben",
    "file": "d9fbc856322747380ff6b90e7119d36e.png"
+  },
+  {
+   "id": "b85bbaff47aed113fc46fdbd5e84211c",
+   "name": "beinrueckseitendehnung-links-rechtes-bein-aufgestellt",
+   "file": "b85bbaff47aed113fc46fdbd5e84211c.png"
+  },
+  {
+   "id": "b0f01e90fc763c6dafed386b43a72b01",
+   "name": "beinrueckseitendehnung-rechts",
+   "file": "b0f01e90fc763c6dafed386b43a72b01.png"
   },
   {
    "id": "f0a1ae2d320bfd59ecaf13f2bfb26a96",
@@ -908,6 +1450,11 @@
    "file": "1d12f657296e9411d2d5daac28166f12.png"
   },
   {
+   "id": "5044a950adae69e06d6b9679d813d0de",
+   "name": "einbeinige-vorbeuge-rechtes-bein",
+   "file": "5044a950adae69e06d6b9679d813d0de.png"
+  },
+  {
    "id": "6a90edb1a7fa275380f1ce7a9397547e",
    "name": "einbeinstand-arme-vorwärts",
    "file": "6a90edb1a7fa275380f1ce7a9397547e.png"
@@ -923,9 +1470,19 @@
    "file": "d8ddd404d4492eb958d355fcd10fd444.png"
   },
   {
+   "id": "1413396da01ea0638886b1197ff40091",
+   "name": "graeser-im-wind-knie-seitlich",
+   "file": "1413396da01ea0638886b1197ff40091.png"
+  },
+  {
    "id": "661109b0a7564f3de4aef02df9e57b73",
    "name": "halbe-heuschrecke-linkes-bein",
    "file": "661109b0a7564f3de4aef02df9e57b73.png"
+  },
+  {
+   "id": "bc883d1c69d67a260dc9b15092b6fcb9",
+   "name": "halbes-happy-baby",
+   "file": "bc883d1c69d67a260dc9b15092b6fcb9.png"
   },
   {
    "id": "274089b06385094de17baf7784219a73",
@@ -956,6 +1513,11 @@
    "id": "1828ca8543f38f3f8dcfc046673d2e8f",
    "name": "kleiner-bär-rückenlage-arme-beine-zur-decke",
    "file": "1828ca8543f38f3f8dcfc046673d2e8f.png"
+  },
+  {
+   "id": "090c6b754c87632ef9b717c596d188d5",
+   "name": "kniekreisen-rueckenmassage",
+   "file": "090c6b754c87632ef9b717c596d188d5.png"
   },
   {
    "id": "fd14099728a919c334290b61d77bf3ae",
@@ -993,6 +1555,16 @@
    "file": "59c4b26dde59671e8fb3eeaa807e2c85.png"
   },
   {
+   "id": "0b21def9acbf731e878b0c2f4aded162",
+   "name": "liegende-drehung-knie-rechts",
+   "file": "0b21def9acbf731e878b0c2f4aded162.png"
+  },
+  {
+   "id": "0899b6ab5cf9c6485de26cce22d8c4b0",
+   "name": "liegende-drehung-rechtes-knie-nach-links",
+   "file": "0899b6ab5cf9c6485de26cce22d8c4b0.png"
+  },
+  {
    "id": "ff6d22fd72fb62fb9ca4a0de11d0fba0",
    "name": "liegender-schmetterling-rückenlage",
    "file": "ff6d22fd72fb62fb9ca4a0de11d0fba0.png"
@@ -1028,6 +1600,11 @@
    "file": "e4cb4e76f859f070124011a368d5a98a.png"
   },
   {
+   "id": "2e0e57e8268e390f1503c07594abf80c",
+   "name": "rueckenlage-beine-ausgestreckt",
+   "file": "2e0e57e8268e390f1503c07594abf80c.png"
+  },
+  {
    "id": "eedf88e5960324c7bac039bb28ebcd8f",
    "name": "rueckenlage-tischposition-arme-seitlich",
    "file": "eedf88e5960324c7bac039bb28ebcd8f.png"
@@ -1061,6 +1638,11 @@
    "id": "2e635244bbe989b1a4cdeddf660b7e5d",
    "name": "schmetterling-baddha-konasana",
    "file": "2e635244bbe989b1a4cdeddf660b7e5d.png"
+  },
+  {
+   "id": "f2a998ed147be3eeaf38fda994ff1ff1",
+   "name": "schmetterling-sitzend",
+   "file": "f2a998ed147be3eeaf38fda994ff1ff1.png"
   },
   {
    "id": "223647ff325049532c2e466e79a74b67",
